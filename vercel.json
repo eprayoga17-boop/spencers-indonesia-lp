@@ -1,5 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "express",
+  "buildCommand": "npm run vercel-build",
   "regions": ["sin1"],
   "rewrites": [{ "source": "/admin/static/:path*", "destination": "/admin/:path*" }],
   "headers": [{ "source": "/(.*)", "headers": [{ "key": "X-Content-Type-Options", "value": "nosniff" }] }]
