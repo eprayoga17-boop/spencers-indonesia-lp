@@ -1,6 +1,6 @@
 import express from 'express';
 import helmet from 'helmet';
-import { fs, ensureSeeded, serveUpload, READONLY } from './src/storage.js';
+import { fs, ensureSeeded, serveUpload, READONLY, timing } from './src/storage.js';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { renderPage } from './src/render.js';
@@ -28,6 +28,25 @@ const SLUG = /^[a-z0-9][a-z0-9-]{0,79}$/;
 
 const app = express();
 app.disable('x-powered-by');
+
+// Request timing: storage round trips (n, ms) and total time. Admin responses get a Server-Timing header
+// (visible in DevTools > Network > Timing); every request is logged on Vercel for diagnosis.
+let coldStart = true;
+app.use((req, res, next) => {
+  const st = { n: 0, ms: 0, t0: performance.now(), cold: coldStart };
+  coldStart = false;
+  const writeHead = res.writeHead;
+  res.writeHead = function (...args) {
+    if (req.path.startsWith('/admin') && !res.headersSent) {
+      res.setHeader('Server-Timing', `store;desc="${st.n} calls";dur=${st.ms.toFixed(0)}, total;dur=${(performance.now() - st.t0).toFixed(0)}`);
+    }
+    return writeHead.apply(this, args);
+  };
+  if (process.env.VERCEL) {
+    res.on('finish', () => console.log(`[timing] ${req.method} ${req.path} ${res.statusCode} total=${(performance.now() - st.t0).toFixed(0)}ms store=${st.n}x/${st.ms.toFixed(0)}ms${st.cold ? ' cold' : ''}`));
+  }
+  timing.run(st, next);
+});
 // Vercel's edge sets X-Forwarded-For/-Proto itself (client values are not passed through).
 app.set('trust proxy', process.env.VERCEL ? 1 : 'loopback');
 

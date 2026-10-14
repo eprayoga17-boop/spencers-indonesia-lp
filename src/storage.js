@@ -7,6 +7,7 @@ import nodeFs from 'node:fs/promises';
 import nodeFss from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { AsyncLocalStorage } from 'node:async_hooks';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const R_URL = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || '';
@@ -14,16 +15,29 @@ const R_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_
 const BLOB_TOKEN = process.env.BLOB_READ_WRITE_TOKEN || '';
 export const CLOUD = Boolean(R_URL && R_TOKEN);
 
+// ---------------------------------------------------------------- per-request timing
+// Counts storage round trips per request (Server-Timing header for admins, one log line per admin request).
+export const timing = new AsyncLocalStorage();
+async function timed(fn) {
+  const st = timing.getStore();
+  const t0 = performance.now();
+  try {
+    return await fn();
+  } finally {
+    if (st) { st.n += 1; st.ms += performance.now() - t0; }
+  }
+}
+
 // ---------------------------------------------------------------- Upstash Redis (REST, no SDK)
 async function redis(cmd) {
-  const r = await fetch(R_URL, { method: 'POST', headers: { Authorization: `Bearer ${R_TOKEN}` }, body: JSON.stringify(cmd) });
+  const r = await timed(() => fetch(R_URL, { method: 'POST', headers: { Authorization: `Bearer ${R_TOKEN}` }, body: JSON.stringify(cmd) }));
   const j = await r.json();
   if (j.error) throw new Error(`redis: ${j.error}`);
   return j.result;
 }
 async function pipeline(cmds) {
   if (!cmds.length) return [];
-  const r = await fetch(`${R_URL}/pipeline`, { method: 'POST', headers: { Authorization: `Bearer ${R_TOKEN}` }, body: JSON.stringify(cmds) });
+  const r = await timed(() => fetch(`${R_URL}/pipeline`, { method: 'POST', headers: { Authorization: `Bearer ${R_TOKEN}` }, body: JSON.stringify(cmds) }));
   const out = await r.json();
   if (!Array.isArray(out)) throw new Error(`redis: ${out.error || 'pipeline failed'}`);
   const bad = out.find((x) => x.error);
