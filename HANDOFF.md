@@ -178,3 +178,10 @@ Written so far (not wired into server.js yet, untested):
 - Fixed on the way: promo date regex had lost its backslashes (dates were rejected); export codes of pages with
   [PROMO] sections were rejected on import.
 - Not in git (large design references): `design-src/live/`, `design-src/figma/`, `perbandingan-5-section.jpg`.
+- Live: https://spencers-indonesia-lp.vercel.app (Vercel project `spencers-indonesia-lp`, region sin1, Node 24, Express preset
+  via `vercel.json`, auto-deploy from GitHub `main`).
+- Without Redis env vars the Vercel build runs **read-only** (`READONLY` in storage.js): pages come from the bundled seed,
+  `/admin` answers 503. Connect Upstash Redis (Vercel Marketplace, env `KV_REST_API_*`) and redeploy to enable the admin.
+- Vercel's function loader cannot `require()` ES modules, so `sanitize-html` 2.18 (+ ESM-only htmlparser2 12) is bundled into
+  `src/vendor/sanitize-html.js` by `scripts/bundle-sanitizer.mjs` (postinstall + vercel-build; gitignored). Output verified
+  identical to the package with `design-src/test-sanitize.mjs`. Do not downgrade to 2.17.x (known XSS advisories).
