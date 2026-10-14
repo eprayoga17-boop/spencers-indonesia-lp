@@ -1,0 +1,881 @@
+{
+  "slug": "slimmealsolutionmintidn2",
+  "title": "Spencer's MealBlend Complete Nutrition | Spencer's Indonesia",
+  "description": "Dapatkan lingkar tubuh idamanmu dengan nutrisi alami dari Spencer's MealBlend",
+  "favicon": "/uploads/seed/favicon.png",
+  "robots": "noindex",
+  "settings": {
+    "maxWidth": null,
+    "designWidth": 320,
+    "background": "#ffffff",
+    "outerBackground": "#f2f2f2"
+  },
+  "sections": [
+    {
+      "id": "promo-bar",
+      "name": "[PROMO] Bar",
+      "type": "promo",
+      "part": "bar"
+    },
+    {
+      "id": "event-offline",
+      "name": "Event Offline Experience",
+      "type": "html",
+      "html": "<div class=\"fx s-event\" style=\"--k:calc(100cqw*0.865/320);aspect-ratio:320/109;\"><style>.s-event{background:#000;color:#fff}.s-event p{line-height:normal}.s-event .ev-it{font-style:italic;font-weight:400}</style><div class=\"a\" style=\"left:calc(-1.546*var(--k));top:calc(0*var(--k));width:calc(373*var(--k));height:calc(126*var(--k));\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/event-offline/photos.avif\"><img src=\"/uploads/sections/event-offline/photos.webp\" alt=\"MealBlend Sparkling Winter bersama Catherine Njoo dan PORSCHE Driven By Her\" fetchpriority=\"high\" decoding=\"async\" style=\"width:100%;height:100%;object-fit:cover\"></picture></div><div class=\"a\" style=\"left:calc(-1.546*var(--k));top:calc(-11.06*var(--k));width:calc(169.125*var(--k));height:calc(136.933*var(--k));transform:scaleX(-1);background:linear-gradient(-64.59deg,#000 36.38%,rgba(0,0,0,0) 80.037%)\"></div><div class=\"a\" style=\"left:calc(240.454*var(--k));top:calc(-11.06*var(--k));width:calc(131*var(--k));height:calc(136.933*var(--k));background:linear-gradient(-90deg,#000 0%,rgba(0,0,0,0) 93.966%)\"></div><img class=\"a\" src=\"/uploads/sections/event-offline/fade.svg\" alt=\"\" style=\"left:calc(123.734*var(--k));top:calc(-120.56*var(--k));width:calc(64*var(--k));height:calc(454.863*var(--k));transform:rotate(90deg)\"><img class=\"a\" src=\"/uploads/sections/event-offline/logo.svg\" alt=\"Spencer's MealBlend\" style=\"left:calc(10.804*var(--k));top:calc(10.04*var(--k));width:calc(91.12*var(--k));height:calc(27.02*var(--k));\"><p class=\"a nw ff-imprima\" style=\"left:calc(10.844*var(--k));top:calc(37.9*var(--k));font-size:calc(11.29*var(--k));letter-spacing:calc(-0.511*var(--k))\">offline experiences.</p><p class=\"a ff-inter ev-it\" style=\"left:calc(10.844*var(--k));top:calc(57.4*var(--k));width:calc(136.605*var(--k));font-size:calc(9.209*var(--k));letter-spacing:calc(-0.553*var(--k));text-shadow:0 0 calc(10*var(--k)) rgba(0,0,0,.9)\">Beyond Presence, Into Connection.<br>Closer to a Better You.</p><p class=\"a nw ff-inter ev-it\" style=\"left:calc(10.844*var(--k));top:calc(97.39*var(--k));font-size:calc(8.611*var(--k));letter-spacing:calc(-0.517*var(--k))\">MealBlend Sparkling Winter<br>with Catherine Njoo - International Fashion Designer</p><p class=\"a nw ff-inter ev-it\" style=\"right:calc(8.414*var(--k));top:calc(97.48*var(--k));font-size:calc(8.533*var(--k));letter-spacing:calc(-0.512*var(--k));text-align:right\">PORSCHE Driven By Her<br>with MealBlend</p></div>"
+    },
+    {
+      "id": "hero-testimoni",
+      "name": "Hero Testimoni (Langsing, Cantik, Glowing)",
+      "type": "html",
+      "html": "<div class=\"fx s-hero\" style=\"--k:calc(100cqw*0.853/320);aspect-ratio:320/445;\"><style>.s-hero{background:#fff}.s-hero .ht-row{display:flex;justify-content:center;align-items:center;margin:0;color:#fd6968;line-height:normal}.s-hero .ht-word{display:inline-flex;align-items:center;gap:calc(7*var(--k));font-family:Caveat,cursive;font-weight:700}.s-hero .ht-cap{color:#fff;font-weight:600;line-height:normal;text-align:center;white-space:nowrap}.s-hero .ht-em{font-size:.86em;letter-spacing:-.08em}.s-hero .ht-emoji{line-height:1.1}.s-hero .ht-time{color:#bababa;filter:blur(.15px)}.s-hero .ht-mau{color:#fe5757;line-height:.8;transform:translateX(-50%)}.s-hero .ht-card{background:linear-gradient(#fff,#fff) padding-box,linear-gradient(to bottom left,rgba(241,144,148,0) 18%,rgba(241,144,148,.9) 55%,rgba(241,144,148,.45) 90%) border-box;border-style:solid;border-color:transparent}.s-hero .ht-sub1,.s-hero .ht-sub2{text-align:center;line-height:1;text-transform:capitalize}.s-hero .ht-sub1{color:#f19094}.s-hero .ht-sub2{color:#1a1a1a}.s-hero .ht-sub2 b{color:#ffa500;font-weight:inherit}</style><div class=\"a\" style=\"left:calc(0*var(--k));top:calc(-10.156*var(--k));width:calc(375*var(--k));height:calc(398*var(--k));\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/hero-testimoni/bg.avif\"><img src=\"/uploads/sections/hero-testimoni/bg.webp\" alt=\"\" fetchpriority=\"high\" decoding=\"async\" style=\"width:100%;height:100%;object-fit:fill\"></picture></div><div class=\"a\" style=\"left:calc(0*var(--k));top:calc(-23.156*var(--k));width:calc(375*var(--k));height:calc(156*var(--k));background:linear-gradient(#fefefe,rgba(254,254,254,0))\"></div><div class=\"a\" style=\"left:calc(9.41*var(--k));top:calc(45.504*var(--k));width:calc(156.926*var(--k));height:calc(331.337*var(--k));\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/hero-testimoni/story.avif\"><img src=\"/uploads/sections/hero-testimoni/story.webp\" alt=\"Instagram story Bu Cinthya, client MealBlend\" fetchpriority=\"high\" decoding=\"async\" style=\"width:100%;height:100%;object-fit:fill\"></picture></div><div class=\"a\" style=\"left:calc(193.48*var(--k));top:calc(198.844*var(--k));width:calc(178.324*var(--k));height:calc(60.192*var(--k));border-radius:calc(9.39*var(--k));overflow:hidden;\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/hero-testimoni/bubble-3.avif\"><img src=\"/uploads/sections/hero-testimoni/bubble-3.webp\" alt=\"Chat: Ak takut bgt kl sedot lemak, jd yg alami2 aj udh bs cepet kok!\" loading=\"lazy\" decoding=\"async\" style=\"width:100%;height:100%;object-fit:fill\"></picture></div><div class=\"a\" style=\"left:calc(148*var(--k));top:calc(205.844*var(--k));width:calc(42.671*var(--k));height:calc(56.161*var(--k));border-radius:calc(2.404*var(--k));overflow:hidden;\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/hero-testimoni/thumb-3.avif\"><img src=\"/uploads/sections/hero-testimoni/thumb-3.webp\" alt=\"Foto progres customer\" loading=\"lazy\" decoding=\"async\" style=\"width:100%;height:100%;object-fit:fill\"></picture></div><div class=\"a\" style=\"left:calc(3*var(--k));top:calc(281.844*var(--k));width:calc(221.503*var(--k));height:calc(71.63*var(--k));background:rgba(0,0,0,.6);border-radius:calc(6.826*var(--k));-webkit-backdrop-filter:blur(calc(3.413*var(--k)));backdrop-filter:blur(calc(3.413*var(--k)))\"></div><p class=\"a ff-roboto ht-cap\" style=\"left:calc(9*var(--k));top:calc(291.844*var(--k));width:calc(209*var(--k));font-size:calc(14.151*var(--k))\">suka senyum2 sendiri <span class=\"ht-em\">😍🤣😝</span><br>dibilang suami “duh bodynya<br>skrg toned bgt kyk artis kpop“<span class=\"ht-em\">😝</span></p><div class=\"a\" style=\"left:calc(195.32*var(--k));top:calc(69.954*var(--k));width:calc(172.681*var(--k));height:calc(56.895*var(--k));border-radius:calc(9.406*var(--k));overflow:hidden;\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/hero-testimoni/bubble-1.avif\"><img src=\"/uploads/sections/hero-testimoni/bubble-1.webp\" alt=\"Chat: Eh dikira aku nge-gym, padahal enggaaa\" loading=\"lazy\" decoding=\"async\" style=\"width:100%;height:100%;object-fit:fill\"></picture></div><div class=\"a\" style=\"left:calc(152*var(--k));top:calc(72.844*var(--k));width:calc(40.675*var(--k));height:calc(59.768*var(--k));border-radius:calc(2*var(--k));overflow:hidden;\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/hero-testimoni/thumb-1.avif\"><img src=\"/uploads/sections/hero-testimoni/thumb-1.webp\" alt=\"Foto progres customer\" loading=\"lazy\" decoding=\"async\" style=\"width:100%;height:100%;object-fit:fill\"></picture></div><span class=\"a ht-emoji\" style=\"left:calc(299.5*var(--k));top:calc(96.264*var(--k));font-size:calc(14.579*var(--k))\" aria-hidden=\"true\">🤣</span><span class=\"a ht-emoji\" style=\"left:calc(315*var(--k));top:calc(95.844*var(--k));font-size:calc(14.579*var(--k))\" aria-hidden=\"true\">🤣</span><div class=\"a\" style=\"left:calc(172*var(--k));top:calc(143.844*var(--k));width:calc(183.898*var(--k));height:calc(45.375*var(--k));border-radius:calc(10.915*var(--k));overflow:hidden;\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/hero-testimoni/bubble-2.avif\"><img src=\"/uploads/sections/hero-testimoni/bubble-2.webp\" alt=\"Chat: skrg jd bebas pilih baju yg lucu2\" loading=\"lazy\" decoding=\"async\" style=\"width:100%;height:100%;object-fit:fill\"></picture></div><span class=\"a ht-emoji\" style=\"left:calc(331*var(--k));top:calc(149.844*var(--k));font-size:calc(14.501*var(--k))\" aria-hidden=\"true\">😍</span><div class=\"a\" style=\"left:calc(138*var(--k));top:calc(143.844*var(--k));width:calc(31.402*var(--k));height:calc(41*var(--k));border-radius:calc(2.131*var(--k));overflow:hidden;\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/hero-testimoni/thumb-2.avif\"><img src=\"/uploads/sections/hero-testimoni/thumb-2.webp\" alt=\"Foto progres customer\" loading=\"lazy\" decoding=\"async\" style=\"width:100%;height:100%;object-fit:fill\"></picture></div><p class=\"a nw ff-caveat ht-mau\" style=\"left:calc(282.64*var(--k));top:calc(309.664*var(--k));font-size:calc(39.769*var(--k));letter-spacing:calc(-0.795*var(--k))\">Mau?</p><img class=\"a\" src=\"/uploads/sections/hero-testimoni/underline.svg\" alt=\"\" style=\"left:calc(240.45*var(--k));top:calc(342.884*var(--k));width:calc(84.374*var(--k));height:calc(7.764*var(--k));\"><h2 class=\"a ht-row\" style=\"left:0;width:calc(375*var(--k));top:calc(-2.156*var(--k));padding:calc(5*var(--k)) calc(20*var(--k));gap:calc(20*var(--k));font-size:calc(23.167*var(--k))\"><span class=\"ht-word\"><span>Langsing</span><img src=\"/uploads/sections/hero-testimoni/check.svg\" alt=\"\" style=\"width:calc(23.175*var(--k));height:calc(23.175*var(--k))\"></span><span class=\"ht-word\"><span>Cantik</span><img src=\"/uploads/sections/hero-testimoni/check.svg\" alt=\"\" style=\"width:calc(23.175*var(--k));height:calc(23.175*var(--k))\"></span><span class=\"ht-word\"><span>Glowing</span><img src=\"/uploads/sections/hero-testimoni/check.svg\" alt=\"\" style=\"width:calc(23.175*var(--k));height:calc(23.175*var(--k))\"></span></h2><span class=\"a\" style=\"left:calc(312*var(--k));top:calc(171.844*var(--k));width:calc(35*var(--k));height:calc(9*var(--k));background:#fff\" aria-hidden=\"true\"></span><span class=\"a nw ff-roboto ht-time\" style=\"left:calc(326*var(--k));top:calc(169.844*var(--k));font-size:calc(8.73*var(--k));line-height:calc(11.856*var(--k));letter-spacing:calc(0.175*var(--k))\">12:03</span><span class=\"a\" style=\"left:calc(326*var(--k));top:calc(240.844*var(--k));width:calc(35*var(--k));height:calc(9*var(--k));background:#fff\" aria-hidden=\"true\"></span><span class=\"a nw ff-roboto ht-time\" style=\"left:calc(338*var(--k));top:calc(238.844*var(--k));font-size:calc(8.73*var(--k));line-height:calc(11.856*var(--k));letter-spacing:calc(0.175*var(--k))\">17:03</span><div class=\"a ht-card\" style=\"left:calc(42.5*var(--k));top:calc(366.844*var(--k));width:calc(290*var(--k));height:calc(147.5*var(--k));border-radius:calc(10*var(--k));border-width:calc(3*var(--k))\"></div><img class=\"a\" src=\"/uploads/sections/hero-testimoni/logo.svg\" alt=\"Spencer's MealBlend\" style=\"left:calc(94.01*var(--k));top:calc(380.764*var(--k));width:calc(187.5*var(--k));height:calc(55.27*var(--k));\"><p class=\"a nw ff-josefin ht-sub1\" style=\"left:calc(51*var(--k));top:calc(447.014*var(--k));width:calc(273*var(--k));font-size:calc(14*var(--k));letter-spacing:calc(-0.28*var(--k))\">Breakfast n Dinner praktis</p><p class=\"a ff-josefin ht-sub2\" style=\"left:calc(51.49*var(--k));top:calc(473.544*var(--k));width:calc(273*var(--k));font-size:calc(11.734*var(--k));letter-spacing:calc(-0.235*var(--k))\">Dengan Resep Nutrisi alami &amp; Ilmiah<br>yang <b>BEKERJA</b> Kecilkan Lingkar Tubuh Kamu</p></div>"
+    },
+    {
+      "id": "manfaat-utama",
+      "name": "Manfaat Utama (Pertama di Indonesia)",
+      "type": "html",
+      "mt": -7,
+      "html": "<div class=\"fx s-manfaat\" style=\"--k:calc(100cqw*0.858/320);aspect-ratio:320/646;\"><style>.s-manfaat{background:#fff}.s-manfaat .mu-list{margin:0;padding:0;list-style:none}.s-manfaat .mu-first{display:flex;align-items:center;justify-content:center}.s-manfaat .mu-first p{color:#e34d58;line-height:.9}.s-manfaat .mu-ic{border-radius:50%;background:linear-gradient(#ffa6ac,#e24954)}.s-manfaat .mu-lb{font-weight:700;color:#2a2a2a;text-align:center;line-height:1.2;text-transform:capitalize}.s-manfaat .mu-susut{display:flex;align-items:center;justify-content:center}.s-manfaat .mu-susut p{margin:0}.s-manfaat .mu-susut span{display:block;color:transparent;-webkit-background-clip:text;background-clip:text;background-image:linear-gradient(-56.31deg,#d44650 6.95%,#ff6651 93.05%)}.s-manfaat .mu-label{font-style:italic;font-weight:500;color:#4e2f31;text-align:right}.s-manfaat .mu-halal{border-radius:50%;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.12)}.s-manfaat .mu-survey{font-style:italic;color:#a598a1}.s-manfaat .mu-badge{overflow:visible}.s-manfaat .mb-t{font-family:Inter,Arial,sans-serif}.s-manfaat .mu-bar{border-style:solid;border-color:#fff;background:linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.5) 25%,#fff 50.4%,rgba(255,255,255,.5) 75%,rgba(255,255,255,0) 100%)}.s-manfaat .ff-carlito{line-height:normal}.s-manfaat .mu-sl{text-align:center}.s-manfaat .mu-sl i{font-weight:600}.s-manfaat .mu-sl b{font-weight:700}</style><div class=\"a\" style=\"left:calc(0*var(--k));top:calc(-4.3*var(--k));width:calc(373*var(--k));height:calc(1145*var(--k));\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/manfaat-utama/bg.avif\"><img src=\"/uploads/sections/manfaat-utama/bg.webp\" alt=\"Model memegang produk Spencer's MealBlend dengan minuman pina colada, latte, dan strawberry\" loading=\"lazy\" decoding=\"async\" style=\"width:100%;height:100%;\"></picture></div><div class=\"a mu-first\" style=\"left:calc(14.6*var(--k));top:calc(1.25*var(--k));width:calc(178.79*var(--k));height:calc(70.758*var(--k));\"><p class=\"ff-caveat nw\" style=\"font-size:calc(19.755*var(--k));padding:calc(6.585*var(--k)) calc(13.17*var(--k));transform:rotate(-13.25deg)\">Pertama di Indonesia!</p></div><ul class=\"a mu-list\" style=\"inset:0\"><li><div class=\"a mu-ic\" style=\"left:calc(160.56*var(--k));top:calc(41.9*var(--k));width:calc(47.848*var(--k));height:calc(47.848*var(--k));box-shadow:inset 0 calc(8.6*var(--k)) calc(8.6*var(--k)) rgba(0,0,0,.1)\"><img src=\"/uploads/sections/manfaat-utama/iconWaist.svg\" alt=\"\" style=\"position:absolute;top:13.11%;left:12.15%;width:74.85%;height:75.44%\"></div><p class=\"a ff-libre mu-lb\" style=\"left:calc(125.465*var(--k));top:calc(95.57*var(--k));width:calc(120.27*var(--k));font-size:calc(10*var(--k));letter-spacing:calc(-0.2*var(--k))\">Menyusutkan<br>lingkar pinggang<br>2-3cm /week</p></li><li><div class=\"a mu-ic\" style=\"left:calc(266.12*var(--k));top:calc(110.23*var(--k));width:calc(45.674*var(--k));height:calc(45.674*var(--k));box-shadow:inset 0 calc(8.6*var(--k)) calc(8.6*var(--k)) rgba(0,0,0,.1)\"><img src=\"/uploads/sections/manfaat-utama/iconThigh.svg\" alt=\"\" style=\"position:absolute;top:17.18%;left:18.78%;width:62.43%;height:61.87%\"></div><p class=\"a ff-libre mu-lb\" style=\"left:calc(229.17*var(--k));top:calc(164.98*var(--k));width:calc(119*var(--k));font-size:calc(10*var(--k));letter-spacing:calc(-0.2*var(--k))\">Mengikis Timbunan<br>lemak paha<br>1-2cm /week</p></li><li><div class=\"a mu-ic\" style=\"left:calc(59.95*var(--k));top:calc(109.9*var(--k));width:calc(47.526*var(--k));height:calc(47.526*var(--k));box-shadow:inset 0 calc(8.6*var(--k)) calc(8.6*var(--k)) rgba(0,0,0,.1)\"><img src=\"/uploads/sections/manfaat-utama/iconArm.svg\" alt=\"\" style=\"position:absolute;top:0%;left:0%;width:100%;height:100%\"></div><p class=\"a ff-libre mu-lb\" style=\"left:calc(22.687*var(--k));top:calc(160.67*var(--k));width:calc(124.045*var(--k));font-size:calc(10*var(--k));letter-spacing:calc(-0.2*var(--k))\">Mengencangkan tangan Bergelambir<br>1cm /week</p></li><li><div class=\"a mu-ic\" style=\"left:calc(26.73*var(--k));top:calc(219.02*var(--k));width:calc(45.674*var(--k));height:calc(45.674*var(--k));box-shadow:inset 0 calc(8.6*var(--k)) calc(8.6*var(--k)) rgba(0,0,0,.1)\"><img src=\"/uploads/sections/manfaat-utama/iconScale.svg\" alt=\"\" style=\"position:absolute;top:20.69%;left:20.7%;width:62.98%;height:63%\"></div><p class=\"a ff-libre mu-lb\" style=\"left:calc(-5.271*var(--k));top:calc(269.69*var(--k));width:calc(111.682*var(--k));font-size:calc(10*var(--k));letter-spacing:calc(-0.2*var(--k))\">BB turun alami<br>2-8kg dalam<br>2 minggu</p></li><li><div class=\"a mu-ic\" style=\"left:calc(302.07*var(--k));top:calc(218.91*var(--k));width:calc(45.763*var(--k));height:calc(45.763*var(--k));box-shadow:inset 0 calc(8.6*var(--k)) calc(8.6*var(--k)) rgba(0,0,0,.1)\"><img src=\"/uploads/sections/manfaat-utama/iconFace.svg\" alt=\"\" style=\"position:absolute;top:15.2%;left:15.07%;width:66.1%;height:69.6%\"></div><p class=\"a ff-libre mu-lb\" style=\"left:calc(273.808*var(--k));top:calc(269.69*var(--k));width:calc(104.283*var(--k));font-size:calc(10*var(--k));letter-spacing:calc(-0.2*var(--k))\">Mengurangi Lipatan kulit<br>dalam 2 minggu</p></li></ul><div class=\"a mu-susut\" style=\"left:calc(12.4*var(--k));top:calc(368.73*var(--k));width:calc(219.572*var(--k));height:calc(44.875*var(--k));\"><p class=\"ff-raleway\" style=\"width:calc(218.089*var(--k));font-size:calc(11.969*var(--k));line-height:calc(11.406*var(--k));transform:rotate(-4.73deg);filter:drop-shadow(calc(-0.885*var(--k)) calc(0.885*var(--k)) calc(0.88*var(--k)) rgba(0,0,0,.25))\"><span>Susut lingkar pinggang</span><span style=\"margin-top:calc(4.047*var(--k))\">tidak pernah se MENYENANGKAN ini !</span></p></div><img class=\"a\" src=\"/uploads/sections/manfaat-utama/arrow.svg\" alt=\"\" style=\"left:calc(184.6*var(--k));top:calc(592.6*var(--k));width:calc(120.4*var(--k));height:calc(26*var(--k));transform:rotate(180deg)\"><p class=\"a ff-inter mu-label\" style=\"right:calc(67.6*var(--k));top:calc(599.3*var(--k));font-size:calc(8.6*var(--k));line-height:calc(9.3*var(--k));letter-spacing:-.02em\">Minuman Serbuk Biji-Bijian<br>dan Kacang-Kacangan</p><div class=\"a mu-halal\" style=\"left:calc(307.8*var(--k));top:calc(591*var(--k));width:calc(52.8*var(--k));height:calc(52.8*var(--k));\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/manfaat-utama/halal.avif\"><img src=\"/uploads/sections/manfaat-utama/halal.webp\" alt=\"Halal Indonesia\" loading=\"lazy\" decoding=\"async\" style=\"width:100%;height:100%;\"></picture></div><p class=\"a ff-inter mu-survey\" style=\"left:calc(23*var(--k));top:calc(629.6*var(--k));width:calc(260*var(--k));font-size:calc(10.716*var(--k));line-height:calc(10.716*var(--k))\">*berdasarkan survey 1.860 customer yang<br>telah mengikuti program Spencer’s MealBlend</p><div class=\"a mu-bar\" style=\"left:calc(-54.3*var(--k));top:calc(665.02*var(--k));width:calc(455.731*var(--k));height:calc(90.779*var(--k));border-width:calc(1.072*var(--k));box-shadow:0 calc(2.68*var(--k)) calc(10.719*var(--k)) rgba(0,0,0,.15)\"></div><div class=\"a mu-bar\" style=\"left:calc(-54.3*var(--k));top:calc(665.02*var(--k));width:calc(455.731*var(--k));height:calc(90.779*var(--k));border-width:calc(1.072*var(--k));box-shadow:0 calc(2.68*var(--k)) calc(10.719*var(--k)) rgba(0,0,0,.15)\"></div><div class=\"a\" style=\"inset:0\" role=\"list\" aria-label=\"Kandungan per sajian\"><div role=\"listitem\"><span class=\"a nw ff-carlito\" style=\"left:calc(29.61*var(--k));top:calc(677.27*var(--k));font-size:calc(32.86*var(--k));color:#2a2a2a\">0</span><span class=\"a nw ff-carlito\" style=\"left:calc(47.7*var(--k));top:calc(688.23*var(--k));font-size:calc(15.716*var(--k));color:#2a2a2a\">%</span><p class=\"a ff-inter mu-sl\" style=\"left:calc(8.172*var(--k));top:calc(710.87*var(--k));width:calc(71.876*var(--k));line-height:calc(15.971*var(--k));color:#2a2a2a\"><i style=\"font-size:calc(9.734*var(--k))\">Added</i> <b style=\"font-size:calc(15.006*var(--k))\">SUGAR</b></p></div><div role=\"listitem\"><span class=\"a nw ff-carlito\" style=\"left:calc(112.91*var(--k));top:calc(674.09*var(--k));font-size:calc(34.331*var(--k));color:#2a2a2a\">9</span><span class=\"a nw ff-carlito\" style=\"left:calc(130.99*var(--k));top:calc(685.54*var(--k));font-size:calc(16.419*var(--k));color:#2a2a2a\">gr</span><p class=\"a ff-inter mu-sl\" style=\"left:calc(91.732*var(--k));top:calc(710.91*var(--k));width:calc(71.876*var(--k));line-height:calc(15.971*var(--k));color:#2a2a2a\"><i style=\"font-size:calc(9.734*var(--k))\">HIGH QUALITY</i> <b style=\"font-size:calc(15.006*var(--k))\">FIBER</b></p></div><div role=\"listitem\"><span class=\"a nw ff-carlito\" style=\"left:calc(191.64*var(--k));top:calc(677.31*var(--k));font-size:calc(29.146*var(--k));color:#2a2a2a\">15</span><span class=\"a nw ff-carlito\" style=\"left:calc(224.42*var(--k));top:calc(687.34*var(--k));font-size:calc(13.939*var(--k));color:#2a2a2a\">gr</span><p class=\"a ff-inter mu-sl\" style=\"left:calc(179.207*var(--k));top:calc(709.84*var(--k));width:calc(68.686*var(--k));line-height:calc(16.185*var(--k));color:#2a2a2a\"><i style=\"font-size:calc(9.734*var(--k))\">BALANCED</i> <b style=\"font-size:calc(15.006*var(--k))\">PROTEIN</b></p></div><div role=\"listitem\"><span class=\"a nw ff-carlito\" style=\"left:calc(270.2*var(--k));top:calc(673.9*var(--k));font-size:calc(34*var(--k));color:#000\"><span style=\"display:inline-block;transform:scaleX(.917);transform-origin:0 0\">170</span></span><span class=\"a nw ff-carlito\" style=\"left:calc(323*var(--k));top:calc(688.26*var(--k));font-size:calc(15.712*var(--k));color:#000\">kkal</span><p class=\"a ff-inter mu-sl\" style=\"left:calc(263.611*var(--k));top:calc(709.84*var(--k));width:calc(74.378*var(--k));line-height:normal;color:#000\"><i style=\"font-size:calc(9.734*var(--k))\">LOW</i> <b style=\"font-size:calc(15.006*var(--k))\">CALORIE</b></p></div></div><img class=\"a\" src=\"/uploads/sections/manfaat-utama/divider.svg\" alt=\"\" style=\"left:calc(83.61*var(--k));top:calc(676.39*var(--k));width:calc(1.072*var(--k));height:calc(66.309*var(--k));\"><img class=\"a\" src=\"/uploads/sections/manfaat-utama/divider.svg\" alt=\"\" style=\"left:calc(171.65*var(--k));top:calc(676.39*var(--k));width:calc(1.072*var(--k));height:calc(66.309*var(--k));\"><img class=\"a\" src=\"/uploads/sections/manfaat-utama/divider.svg\" alt=\"\" style=\"left:calc(253.19*var(--k));top:calc(676.39*var(--k));width:calc(1.072*var(--k));height:calc(66.309*var(--k));\"></div>"
+    },
+    {
+      "id": "nutrition-facts",
+      "name": "Nutrition Facts & Kombinasi Ilmiah",
+      "type": "html",
+      "html": "<div class=\"fx s-nutri\" style=\"--k:calc(100cqw*0.858/320);aspect-ratio:320/307;\"><style>.s-nutri{color:#000;background:linear-gradient(rgba(90,50,70,.28),rgba(90,50,70,0) 1.2%),linear-gradient(#e0c7d8,#e8cbdb 70%,#eac7d6)}.s-nutri .a{font-family:\"Open Sans\",Arial,sans-serif;line-height:normal}.s-nutri .nf-card{background:#fff;border-style:solid;border-color:#000}.s-nutri .nf-rule{background:#000}.s-nutri .nf-b{font-weight:700}.s-nutri .a:not(.nf-b){font-weight:400}.s-nutri .nf-komb{display:flex;align-items:center;justify-content:center}.s-nutri .nf-komb p{margin:0;font-family:Caveat,cursive;font-weight:700;color:#fa525e;text-align:center}.s-nutri .nf-komb span{display:block}</style><div class=\"a nf-card\" style=\"left:calc(55.1*var(--k));top:calc(10.496*var(--k));width:calc(262*var(--k));height:calc(212*var(--k));border-width:calc(1.121*var(--k));border-radius:calc(9.531*var(--k))\"></div><h2 class=\"a nw nf-b\" style=\"left:calc(63.1*var(--k));top:calc(14.646*var(--k));font-size:calc(9.531*var(--k));letter-spacing:calc(-0.477*var(--k))\">INFORMASI NILAI GISI / <i>NUTRITION FACTS</i></h2><span class=\"a nf-rule\" style=\"left:calc(62.72*var(--k));top:calc(31.356*var(--k));width:calc(246.369*var(--k));height:calc(2.242*var(--k));\"></span><p class=\"a nw nf-b\" style=\"left:calc(63.1*var(--k));top:calc(38.546*var(--k));font-size:calc(7.868*var(--k));line-height:0.772\">Takaran Saji / <i>Serving Size</i></p><p class=\"a nw nf-b\" style=\"left:calc(289.1*var(--k));top:calc(38.616*var(--k));font-size:calc(8.084*var(--k));line-height:0.772\">38gr</p><p class=\"a nw \" style=\"left:calc(63.1*var(--k));top:calc(47.696*var(--k));font-size:calc(7.715*var(--k));line-height:0.879\">1 Sajian per Kemasan / <i>1 Serving per Pack</i></p><span class=\"a nf-rule\" style=\"left:calc(62.61*var(--k));top:calc(58.916*var(--k));width:calc(246.339*var(--k));height:calc(0.634*var(--k));\"></span><p class=\"a nw nf-b\" style=\"left:calc(63.1*var(--k));top:calc(64.936*var(--k));font-size:calc(7.987*var(--k));line-height:0.772\">JUMLAH PER SAJIAN / <i>AMOUNT PER SERVING</i></p><p class=\"a nw nf-b\" style=\"left:calc(63.1*var(--k));top:calc(76.576*var(--k));font-size:calc(7.901*var(--k));line-height:0.772\">Energi Total / <i>Total Calories</i></p><p class=\"a nw nf-b\" style=\"left:calc(244.1*var(--k));top:calc(75.926*var(--k));font-size:calc(7.942*var(--k));line-height:0.772\">140 kkal / <i>kcal</i></p><p class=\"a nw \" style=\"left:calc(91.1*var(--k));top:calc(85.986*var(--k));font-size:calc(7.89*var(--k));line-height:0.879\">Energi dari Lemak / <i>Calories from Fat</i></p><p class=\"a nw \" style=\"left:calc(252.1*var(--k));top:calc(86.196*var(--k));font-size:calc(8.118*var(--k));line-height:0.879\">70 kkal / <i>kcal</i></p><span class=\"a nf-rule\" style=\"left:calc(62.61*var(--k));top:calc(96.646*var(--k));width:calc(246.339*var(--k));height:calc(0.634*var(--k));\"></span><p class=\"a nw nf-b\" style=\"left:calc(247.13*var(--k));top:calc(101.396*var(--k));font-size:calc(7.682*var(--k));line-height:0.772\">% AKG / <i>%DV*</i></p><p class=\"a nw nf-b\" style=\"left:calc(63.1*var(--k));top:calc(112.806*var(--k));font-size:calc(7.978*var(--k));line-height:0.772\">Lemak Total / <i>Total Fat</i></p><p class=\"a nw nf-b\" style=\"right:calc(108.9*var(--k));top:calc(112.806*var(--k));font-size:calc(7.926*var(--k));line-height:0.906;text-align:right\">8 g</p><p class=\"a nw nf-b\" style=\"right:calc(64.71*var(--k));top:calc(112.806*var(--k));font-size:calc(7.926*var(--k));line-height:0.826;text-align:right\">12 %</p><p class=\"a nw nf-b\" style=\"left:calc(63.1*var(--k));top:calc(123.416*var(--k));font-size:calc(7.978*var(--k));line-height:0.772\">Protein</p><p class=\"a nw nf-b\" style=\"right:calc(108.9*var(--k));top:calc(122.836*var(--k));font-size:calc(7.926*var(--k));line-height:0.906;text-align:right\">15 g</p><p class=\"a nw nf-b\" style=\"right:calc(64.71*var(--k));top:calc(122.496*var(--k));font-size:calc(7.926*var(--k));line-height:0.826;text-align:right\">24 %</p><p class=\"a nw nf-b\" style=\"left:calc(63.1*var(--k));top:calc(132.326*var(--k));font-size:calc(7.978*var(--k));line-height:0.772\">Karbohidrat Total / <i>Total Carbohydrate</i></p><p class=\"a nw nf-b\" style=\"right:calc(108.9*var(--k));top:calc(132.056*var(--k));font-size:calc(7.926*var(--k));line-height:0.906;text-align:right\">12 g</p><p class=\"a nw nf-b\" style=\"right:calc(65.27*var(--k));top:calc(132.326*var(--k));font-size:calc(7.926*var(--k));line-height:0.826;text-align:right\">4 %</p><p class=\"a nw \" style=\"left:calc(91.1*var(--k));top:calc(141.836*var(--k));font-size:calc(7.911*var(--k));line-height:0.879\">Serat Pangan / <i>Dietary Fiber</i></p><p class=\"a nw \" style=\"right:calc(108.9*var(--k));top:calc(141.286*var(--k));font-size:calc(7.926*var(--k));line-height:0.906;text-align:right\">9 g</p><p class=\"a nw \" style=\"right:calc(65.07*var(--k));top:calc(142.786*var(--k));font-size:calc(7.926*var(--k));line-height:0.826;text-align:right\">30 %</p><p class=\"a nw nf-b\" style=\"left:calc(63.1*var(--k));top:calc(151.976*var(--k));font-size:calc(7.978*var(--k));line-height:0.772\">Gula / <i>Sugar</i></p><p class=\"a nw nf-b\" style=\"right:calc(108.9*var(--k));top:calc(150.516*var(--k));font-size:calc(7.926*var(--k));line-height:0.906;text-align:right\">0.5 g</p><span class=\"a nf-rule\" style=\"left:calc(62.61*var(--k));top:calc(164.496*var(--k));width:calc(246.339*var(--k));height:calc(0.634*var(--k));\"></span><p class=\"a nf-note\" style=\"left:calc(63.1*var(--k));top:calc(170.516*var(--k));width:calc(255.851*var(--k));font-size:calc(8.237*var(--k));line-height:calc(7.593*var(--k))\">* % AKG berdasarkan kebutuhan energi 2150 kkal.<br>Kebutuhan energi anda  mungkin lebih tinggi atau lebih rendah.</p><p class=\"a nf-note\" style=\"left:calc(63.1*var(--k));top:calc(190.326*var(--k));width:calc(218.123*var(--k));font-size:calc(8.237*var(--k));line-height:calc(7.593*var(--k));font-style:italic\">* % Daily Values are based on a 2150 calorie diet.<br>Your daily values may be higher or lower depending on your calorie needs.</p><div class=\"a nf-komb\" style=\"left:calc(11.1*var(--k));top:calc(225.506*var(--k));width:calc(348.322*var(--k));height:calc(113.243*var(--k));\"><p class=\"ff-caveat\" style=\"width:calc(343.914*var(--k));font-size:calc(31.054*var(--k));line-height:calc(24.798*var(--k));transform:rotate(-2.89deg);text-shadow:calc(3*var(--k)) calc(0*var(--k)) 0 #fff,calc(2.898*var(--k)) calc(0.776*var(--k)) 0 #fff,calc(2.598*var(--k)) calc(1.5*var(--k)) 0 #fff,calc(2.121*var(--k)) calc(2.121*var(--k)) 0 #fff,calc(1.5*var(--k)) calc(2.598*var(--k)) 0 #fff,calc(0.776*var(--k)) calc(2.898*var(--k)) 0 #fff,calc(0*var(--k)) calc(3*var(--k)) 0 #fff,calc(-0.776*var(--k)) calc(2.898*var(--k)) 0 #fff,calc(-1.5*var(--k)) calc(2.598*var(--k)) 0 #fff,calc(-2.121*var(--k)) calc(2.121*var(--k)) 0 #fff,calc(-2.598*var(--k)) calc(1.5*var(--k)) 0 #fff,calc(-2.898*var(--k)) calc(0.776*var(--k)) 0 #fff,calc(-3*var(--k)) calc(0*var(--k)) 0 #fff,calc(-2.898*var(--k)) calc(-0.776*var(--k)) 0 #fff,calc(-2.598*var(--k)) calc(-1.5*var(--k)) 0 #fff,calc(-2.121*var(--k)) calc(-2.121*var(--k)) 0 #fff,calc(-1.5*var(--k)) calc(-2.598*var(--k)) 0 #fff,calc(-0.776*var(--k)) calc(-2.898*var(--k)) 0 #fff,calc(0*var(--k)) calc(-3*var(--k)) 0 #fff,calc(0.776*var(--k)) calc(-2.898*var(--k)) 0 #fff,calc(1.5*var(--k)) calc(-2.598*var(--k)) 0 #fff,calc(2.121*var(--k)) calc(-2.121*var(--k)) 0 #fff,calc(2.598*var(--k)) calc(-1.5*var(--k)) 0 #fff,calc(2.898*var(--k)) calc(-0.776*var(--k)) 0 #fff,0 calc(2.6*var(--k)) calc(2.4*var(--k)) rgba(0,0,0,.28)\"><span>Kombinasi Ilmiah</span><span style=\"margin-top:calc(10.499*var(--k))\">dari Nutrisi Alami Terbaik</span><span style=\"margin-top:calc(10.499*var(--k))\">untuk Tubuh Impian Kamu</span></p></div></div>"
+    },
+    {
+      "id": "customer-200k",
+      "name": "200.000++ Customer",
+      "type": "image",
+      "items": [
+        {
+          "src": "/uploads/seed/mealblend-women",
+          "alt": "200.000++ customer Spencer's",
+          "w": 320,
+          "h": 139,
+          "mt": 7
+        }
+      ]
+    },
+    {
+      "id": "award",
+      "name": "12 Years Journey & National Award",
+      "type": "image",
+      "items": [
+        {
+          "src": "/uploads/seed/m-5fbfa9",
+          "alt": "Spencer's 12 years journey dan National Award Best Brand, diliput media nasional",
+          "w": 320,
+          "h": 691
+        }
+      ]
+    },
+    {
+      "id": "bahan-alami",
+      "name": "Bahan Alami Pilihan",
+      "type": "html",
+      "html": "<div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.213/320);--x:0;--w:320;--h:179;--mt:0\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/bahan-alami/m-69b7e2-plate.avif\"><img src=\"/uploads/sections/bahan-alami/m-69b7e2-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(0*var(--k));top:calc(-0.469*var(--k));width:calc(1500*var(--k));height:calc(840*var(--k))\"></picture><h2 class=\"a nw ff-libre\" data-b=\"0\" style=\"left:calc(747.817*var(--k));top:calc(130.221*var(--k));font-size:calc(64.049*var(--k));line-height:calc(76.858*var(--k));font-weight:400;color:#2a2a2a;transform:translateX(-50%);text-align:center;\">Dari Berbagai Bahan Alami Pilihan</h2><p class=\"a nw ff-poppins\" data-b=\"1\" style=\"left:calc(281.996*var(--k));top:calc(292.567*var(--k));font-size:calc(50.734*var(--k));line-height:calc(60.881*var(--k));font-weight:700;color:#4c4c4c;\">Chia Seeds</p><p class=\"a nw ff-poppins\" data-b=\"2\" style=\"left:calc(996.826*var(--k));top:calc(288.734*var(--k));font-size:calc(50.671*var(--k));line-height:calc(60.805*var(--k));font-weight:700;color:#4c4c4c;\">Pea Protein</p><p class=\"a nw ff-poppins\" data-b=\"3\" style=\"left:calc(284.183*var(--k));top:calc(473.572*var(--k));font-size:calc(50.893*var(--k));line-height:calc(61.071*var(--k));font-weight:700;color:#4c4c4c;\">Kacang Almond</p><p class=\"a nw ff-poppins\" data-b=\"4\" style=\"left:calc(997*var(--k));top:calc(449.261*var(--k));font-size:calc(50.82*var(--k));line-height:calc(48*var(--k));font-weight:700;color:#4c4c4c;\">Black Sesame<br>Seeds</p><p class=\"a nw ff-poppins\" data-b=\"5\" style=\"left:calc(284.092*var(--k));top:calc(638.167*var(--k));font-size:calc(50.868*var(--k));line-height:calc(48*var(--k));font-weight:700;color:#4c4c4c;\">Stevia<br>Pemanis Alami</p><p class=\"a nw ff-poppins\" data-b=\"6\" style=\"left:calc(989.095*var(--k));top:calc(630.119*var(--k));font-size:calc(50.725*var(--k));line-height:calc(48*var(--k));font-weight:700;color:#4c4c4c;\">Dan Berbagai<br>Bahan Alami<br>lainnya...</p></div>",
+      "_items": [
+        {
+          "src": "/uploads/seed/m-69b7e2",
+          "alt": "Dari berbagai bahan alami pilihan: chia seeds, pea protein, kacang almond, black sesame seeds, stevia",
+          "w": 320,
+          "h": 179
+        }
+      ]
+    },
+    {
+      "id": "telah-teruji",
+      "name": "Telah Teruji & Studi Ilmiah",
+      "type": "html",
+      "html": "<div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.213/320);--x:0;--w:320;--h:358;--mt:0\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/telah-teruji/m-8e52ef-plate.avif\"><img src=\"/uploads/sections/telah-teruji/m-8e52ef-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(0*var(--k));top:calc(-2.937*var(--k));width:calc(1500*var(--k));height:calc(1684*var(--k))\"></picture><h2 class=\"a nw ff-inter\" data-b=\"0\" style=\"left:calc(84.253*var(--k));top:calc(127.969*var(--k));font-size:calc(109.869*var(--k));line-height:calc(131.842*var(--k));font-weight:900;color:transparent;background-image:linear-gradient(90deg,#131a3a 0%,#1f2b63 45%,#5f76c9 80%,#8ea3e6 100%);-webkit-background-clip:text;background-clip:text;letter-spacing:-0.04em;\">TELAH TERUJI</h2><p class=\"a nw ff-inter\" data-b=\"1\" style=\"left:calc(85.985*var(--k));top:calc(348.931*var(--k));font-size:calc(40.532*var(--k));line-height:calc(52*var(--k));font-weight:400;color:#363953;font-weight:400\">Telah teruji pada Wanita &amp; Pria dengan variable rentang <b>usia</b><br><b>18-73th, seluruh body type, berat 48kg - 135kg, 8 macam pola</b><br><b>makan, dan anabolism sekaligus catabolism metabolic rate</b><br>pada peserta kami di Pekanbaru, Papua, Medan &amp; Pulau Jawa.</p><p class=\"a nw ff-inter\" data-b=\"2\" style=\"left:calc(777.838*var(--k));top:calc(667.206*var(--k));font-size:calc(70.127*var(--k));line-height:calc(84.153*var(--k));font-weight:700;color:#000000;transform:translateX(-50%);text-align:center;\">Studi Ilmiah Buktikan:</p><h3 class=\"a nw ff-inter\" data-b=\"3\" style=\"left:calc(752.241*var(--k));top:calc(794.261*var(--k));font-size:calc(91.697*var(--k));line-height:calc(104*var(--k));font-weight:700;color:transparent;transform:translateX(-50%);text-align:center;background-image:linear-gradient(90deg,#3a72c8 0%,#2d559f 50%,#1f3a76 100%);-webkit-background-clip:text;background-clip:text;\">Chia Seed Turunkan BB<br>8x Lebih Besar</h3><p class=\"a nw ff-inter\" data-b=\"4\" style=\"left:calc(122.364*var(--k));top:calc(1053.769*var(--k));font-size:calc(57.416*var(--k));line-height:calc(68.9*var(--k));font-weight:700;color:#ffffff;\">Prof. Vladimir Vuksan</p><p class=\"a nw ff-inter\" data-b=\"5\" style=\"left:calc(122.796*var(--k));top:calc(1126.725*var(--k));font-size:calc(42.718*var(--k));line-height:calc(48*var(--k));font-weight:400;color:#ffffff;\">Professor of Nutritional Sciences &amp; Medicine<br>University of Toronto</p><p class=\"a nw ff-inter\" data-b=\"6\" style=\"left:calc(87.043*var(--k));top:calc(1269.446*var(--k));font-size:calc(42.161*var(--k));line-height:calc(56*var(--k));font-weight:400;color:#363953;\">Dalam uji klinis yang saya pimpin, peserta yang<br>mengonsumsi 30 gram chia seed setiap hari selama<br>6 bulan mengalami penurunan berat badan 8x lebih besar dan<br>penyusutan lingkar pinggang hingga 3,5 cm, disertai peningkatan<br>hormon kenyang dan penurunan peradangan tubuh hingga 40%.</p><p class=\"a nw ff-inter\" data-b=\"7\" style=\"left:calc(87.96*var(--k));top:calc(1574.666*var(--k));font-size:calc(20.332*var(--k));line-height:calc(27*var(--k));font-weight:400;font-style:italic;color:#adadad;\">Source: Vuksan V, et al. Salba-chia (Salvia hispanica L.) in the treatment of overweight and obese<br>patients with Type 2 diabetes. Nutrition, Metabolism and Cardiovascular Diseases. 2017;27(2):138–146.</p></div>",
+      "_items": [
+        {
+          "src": "/uploads/seed/m-8e52ef",
+          "alt": "Telah teruji pada wanita dan pria; studi ilmiah: chia seed turunkan BB 8x lebih besar",
+          "w": 320,
+          "h": 358
+        }
+      ]
+    },
+    {
+      "id": "diliput-judul",
+      "name": "Diliput Media (Judul)",
+      "type": "html",
+      "html": "<div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.425/320);--x:30;--w:255;--h:37;--mt:0\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/diliput-judul/m-10d649-plate.avif\"><img src=\"/uploads/sections/diliput-judul/m-10d649-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(-180.203*var(--k));top:calc(0*var(--k));width:calc(960*var(--k));height:calc(87*var(--k))\"></picture><h2 class=\"a nw ff-libre\" data-b=\"0\" style=\"left:calc(300.369*var(--k));top:calc(24.699*var(--k));font-size:calc(35.845*var(--k));line-height:calc(43.014*var(--k));font-weight:700;color:#020202;transform:translateX(-50%);text-align:center;\">Spencer’s sudah diliput oleh:</h2></div>",
+      "_items": [
+        {
+          "src": "/uploads/seed/m-10d649",
+          "alt": "Spencer's sudah diliput oleh:",
+          "x": 30,
+          "w": 255,
+          "h": 37
+        }
+      ]
+    },
+    {
+      "id": "diliput-slider",
+      "name": "Diliput Media (Slider Logo)",
+      "type": "image",
+      "layout": "slider",
+      "slider": {
+        "transition": "fade",
+        "interval": 5000,
+        "dots": "ring",
+        "arrows": false
+      },
+      "box": {
+        "w": 320,
+        "h": 52,
+        "mt": 3
+      },
+      "items": [
+        {
+          "src": "/uploads/seed/media-slide-1",
+          "alt": "Logo media yang meliput Spencer's"
+        },
+        {
+          "src": "/uploads/seed/media-slide-2",
+          "alt": "Logo media yang meliput Spencer's"
+        },
+        {
+          "src": "/uploads/seed/media-slide-3",
+          "alt": "Logo media yang meliput Spencer's"
+        },
+        {
+          "src": "/uploads/seed/media-slide-4",
+          "alt": "Logo media yang meliput Spencer's"
+        },
+        {
+          "src": "/uploads/seed/media-slide-5",
+          "alt": "Logo media yang meliput Spencer's"
+        },
+        {
+          "src": "/uploads/seed/media-slide-6",
+          "alt": "Logo media yang meliput Spencer's"
+        }
+      ]
+    },
+    {
+      "id": "79-juta",
+      "name": "79 Juta Wanita di Indonesia",
+      "type": "html",
+      "html": "<div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.215/320);--x:0;--w:320;--h:172;--mt:0\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/79-juta/m-cf3812-plate.avif\"><img src=\"/uploads/sections/79-juta/m-cf3812-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(-11.814*var(--k));top:calc(0*var(--k));width:calc(1512*var(--k));height:calc(800*var(--k))\"></picture><h2 class=\"a nw ff-caveat\" data-b=\"0\" style=\"left:calc(74.754*var(--k));top:calc(28.531*var(--k));font-size:calc(217.037*var(--k));line-height:calc(260.444*var(--k));font-weight:700;color:#fa525e;\">79 juta</h2><p class=\"a nw ff-caveat\" data-b=\"1\" style=\"left:calc(75.99*var(--k));top:calc(287.547*var(--k));font-size:calc(92.604*var(--k));line-height:calc(111.124*var(--k));font-weight:700;color:#fa525e;\">Wanita Di Indonesia</p><p class=\"a nw ff-libre\" data-b=\"2\" style=\"left:calc(75.255*var(--k));top:calc(441.601*var(--k));font-size:calc(48.464*var(--k));line-height:calc(64*var(--k));font-weight:700;color:#000000;\">Mencari Solusi Untuk Mengecilkan<br>Lingkar Tubuh Mereka,</p><p class=\"a nw ff-libre\" data-b=\"3\" style=\"left:calc(73.993*var(--k));top:calc(636.556*var(--k));font-size:calc(48.483*var(--k));line-height:calc(58.18*var(--k));font-weight:700;color:#000000;\">Demi Bisa Pake Outfit Idaman!</p></div>",
+      "_items": [
+        {
+          "src": "/uploads/seed/m-cf3812",
+          "alt": "79 juta wanita di Indonesia mencari solusi untuk mengecilkan lingkar tubuh",
+          "w": 320,
+          "h": 172,
+          "mt": 20
+        }
+      ],
+      "mt": 20
+    },
+    {
+      "id": "artisan-tea-1",
+      "name": "New Variant Artisan Tea",
+      "type": "image",
+      "items": [
+        {
+          "src": "/uploads/seed/m-457f7d",
+          "alt": "MealBlend new variant Artisan Tea Series: Jasmine Tea dan Peach Oolong Tea",
+          "x": 1,
+          "w": 316,
+          "h": 345,
+          "mt": 14
+        }
+      ]
+    },
+    {
+      "id": "testi-cindy-bekasi",
+      "name": "Testimoni Cindy (Bekasi)",
+      "type": "html",
+      "html": "<div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.214/320);--x:0;--w:320;--h:628;--mt:0\" role=\"group\" aria-label=\"Testimoni Cindy, Bekasi\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/testi-cindy-bekasi/m-34b61a-plate.avif\"><img src=\"/uploads/sections/testi-cindy-bekasi/m-34b61a-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(-8.484*var(--k));top:calc(0*var(--k));width:calc(1512*var(--k));height:calc(2934*var(--k))\"></picture><blockquote class=\"a nw ff-libre\" data-b=\"0\" style=\"left:calc(742.485*var(--k));top:calc(140.679*var(--k));font-size:calc(64.051*var(--k));line-height:calc(76*var(--k));font-weight:400;color:#2a2a2a;transform:translateX(-50%);text-align:center;\">“dr semua yg udh ak coba,<br>pinggang susut 8 cm<br>NEVER BE THIS EASIER!”</blockquote><p class=\"a nw ff-libre\" data-b=\"1\" style=\"left:calc(740.389*var(--k));top:calc(415.84*var(--k));font-size:calc(56.913*var(--k));line-height:calc(68.296*var(--k));font-weight:700;color:#2a2a2a;transform:translateX(-50%);text-align:center;\">- Cindy 39th, Bekasi</p></div>",
+      "_items": [
+        {
+          "src": "/uploads/seed/m-34b61a",
+          "alt": "Testimoni Cindy 39th, Bekasi: pinggang susut 8 cm",
+          "w": 320,
+          "h": 628,
+          "mt": 1
+        }
+      ],
+      "mt": 1
+    },
+    {
+      "id": "cara-kerja",
+      "name": "Bagaimana Cara Kerjanya",
+      "type": "html",
+      "html": "<div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.4/320);--x:0;--w:320;--h:253;--mt:0\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/cara-kerja/m-c8b1b7-plate.avif\"><img src=\"/uploads/sections/cara-kerja/m-c8b1b7-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(0*var(--k));top:calc(-0.25*var(--k));width:calc(800*var(--k));height:calc(633*var(--k))\"></picture><h2 class=\"a nw ff-caveat\" data-b=\"0\" style=\"left:calc(407.631*var(--k));top:calc(41.498*var(--k));font-size:calc(72.082*var(--k));line-height:calc(86.498*var(--k));font-weight:700;color:#ef5763;transform:translateX(-50%);text-align:center;\">Bagaimana Cara Kerjanya ?</h2><p class=\"a nw ff-inter\" data-b=\"1\" style=\"left:calc(162.813*var(--k));top:calc(185.75*var(--k));font-size:calc(28.75*var(--k));line-height:calc(34.5*var(--k));font-weight:700;color:#2e2a27;\">1.</p><p class=\"a nw ff-inter\" data-b=\"2\" style=\"left:calc(204.008*var(--k));top:calc(181.579*var(--k));font-size:calc(28.683*var(--k));line-height:calc(36*var(--k));font-weight:400;color:#362c2b;\">Membantu tubuh mempertahankan<br>metabolisme yang optimal, sehingga<br>mempermudah &amp; mempercepat<br>memiliki tubuh ideal &amp; sehat.</p><p class=\"a nw ff-inter\" data-b=\"3\" style=\"left:calc(162.8*var(--k));top:calc(387.003*var(--k));font-size:calc(27.789*var(--k));line-height:calc(33.347*var(--k));font-weight:700;color:#2f2b28;\">2.</p><p class=\"a nw ff-inter\" data-b=\"4\" style=\"left:calc(205.013*var(--k));top:calc(381.596*var(--k));font-size:calc(28.616*var(--k));line-height:calc(36*var(--k));font-weight:400;color:#352c2b;\">Menjaga perut kenyang lebih lama<br>berjam-jam secara natural &amp; sehat.</p><p class=\"a nw ff-inter\" data-b=\"5\" style=\"left:calc(162.76*var(--k));top:calc(508.641*var(--k));font-size:calc(30.023*var(--k));line-height:calc(36.028*var(--k));font-weight:700;color:#2e2a28;\">3.</p><p class=\"a nw ff-inter\" data-b=\"6\" style=\"left:calc(205.024*var(--k));top:calc(504.623*var(--k));font-size:calc(28.459*var(--k));line-height:calc(36*var(--k));font-weight:400;color:#362c2b;\">Menunjang defisit kalori secara<br>Nyaman, natural &amp; efektif.</p></div>",
+      "_items": [
+        {
+          "src": "/uploads/seed/m-c8b1b7",
+          "alt": "Bagaimana cara kerjanya: mempertahankan metabolisme, menjaga perut kenyang, menunjang defisit kalori",
+          "w": 320,
+          "h": 253,
+          "mt": -20
+        }
+      ],
+      "mt": -20
+    },
+    {
+      "id": "efek-samping",
+      "name": "Tanpa Efek Samping & Pro Natural",
+      "type": "html",
+      "html": "<div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.39/320);--x:7;--w:312;--h:317;--mt:0\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/efek-samping/m-012f74-plate.avif\"><img src=\"/uploads/sections/efek-samping/m-012f74-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(0*var(--k));top:calc(-6.59*var(--k));width:calc(800*var(--k));height:calc(826*var(--k))\"></picture><h2 class=\"a nw ff-libre\" data-b=\"0\" style=\"left:calc(45.703*var(--k));top:calc(40.738*var(--k));font-size:calc(61.663*var(--k));line-height:calc(73.995*var(--k));font-weight:700;color:#ee5763;\">EFEK SAMPING</h2><h3 class=\"a nw ff-libre\" data-b=\"1\" style=\"left:calc(113*var(--k));top:calc(207.744*var(--k));font-size:calc(40.063*var(--k));line-height:calc(48.075*var(--k));font-weight:700;color:#e15c64;\">TIDAK ADA EFEK SAMPING</h3><p class=\"a nw ff-poppins\" data-b=\"2\" style=\"left:calc(115.992*var(--k));top:calc(272.953*var(--k));font-size:calc(29.863*var(--k));line-height:calc(38.5*var(--k));font-weight:400;color:#001006;\">Betul! Karna bahan baku kami<br>menggunakan biji-bijian natural<br>dari alam.</p><h3 class=\"a nw ff-libre\" data-b=\"3\" style=\"left:calc(114.95*var(--k));top:calc(433.661*var(--k));font-size:calc(39.8*var(--k));line-height:calc(47.761*var(--k));font-weight:700;color:#e45b64;\">NO Chemical Fat Burner !</h3><p class=\"a nw ff-poppins\" data-b=\"4\" style=\"left:calc(115.955*var(--k));top:calc(497.937*var(--k));font-size:calc(29.891*var(--k));line-height:calc(38*var(--k));font-weight:400;color:#000f07;\">Kami tidak menggunakan CHEMICAL<br>FAT BURNER yang membuat jantung<br>kamu berdegup lebih kencang.</p><h3 class=\"a nw ff-libre\" data-b=\"5\" style=\"left:calc(116.997*var(--k));top:calc(648.728*var(--k));font-size:calc(39.658*var(--k));line-height:calc(47.59*var(--k));font-weight:700;color:#e35b64;\">Anti Pencahar !</h3><p class=\"a nw ff-poppins\" data-b=\"6\" style=\"left:calc(116.03*var(--k));top:calc(712.916*var(--k));font-size:calc(29.859*var(--k));line-height:calc(40*var(--k));font-weight:400;color:#000d08;\">Kamu tidak akan mules karna kami<br>TIDAK MENGGUNAKAN PENCAHAR.</p></div><div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.39/320);--x:7;--w:312;--h:115;--mt:0\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/efek-samping/m-9d94e1-plate.avif\"><img src=\"/uploads/sections/efek-samping/m-9d94e1-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(0*var(--k));top:calc(-16.064*var(--k));width:calc(800*var(--k));height:calc(327*var(--k))\"></picture><h3 class=\"a nw ff-libre\" data-b=\"0\" style=\"left:calc(116.954*var(--k));top:calc(10.255*var(--k));font-size:calc(39.624*var(--k));line-height:calc(47.549*var(--k));font-weight:700;color:#e05c66;\">No Preservatives</h3><h3 class=\"a nw ff-libre\" data-b=\"1\" style=\"left:calc(116.949*var(--k));top:calc(109.233*var(--k));font-size:calc(39.833*var(--k));line-height:calc(47.799*var(--k));font-weight:700;color:#e15c66;\">No Filler</h3><h3 class=\"a nw ff-libre\" data-b=\"2\" style=\"left:calc(116.946*var(--k));top:calc(208.221*var(--k));font-size:calc(39.939*var(--k));line-height:calc(47.927*var(--k));font-weight:700;color:#df5c65;\">No Emulsifier</h3></div><div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.39/320);--x:4;--w:312;--h:405;--mt:0\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/efek-samping/m-27c947-plate.avif\"><img src=\"/uploads/sections/efek-samping/m-27c947-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(0*var(--k));top:calc(-1.269*var(--k));width:calc(800*var(--k));height:calc(1041*var(--k))\"></picture><p class=\"a nw ff-inter\" data-b=\"0\" style=\"left:calc(740.653*var(--k));top:calc(462.608*var(--k));font-size:calc(19.401*var(--k));line-height:calc(27*var(--k));font-weight:500;font-style:italic;color:#3b4a41;transform:translateX(-100%);text-align:right;\">Minuman Serbuk Biji-Bijian<br>dan Kacang-Kacangan</p><h3 class=\"a nw ff-libre\" data-b=\"1\" style=\"left:calc(114.363*var(--k));top:calc(553.487*var(--k));font-size:calc(39.639*var(--k));line-height:calc(47.567*var(--k));font-weight:700;color:#e75b64;\">Pro Natural Ingredients !</h3><p class=\"a nw ff-libre\" data-b=\"2\" style=\"left:calc(115.017*var(--k));top:calc(629.232*var(--k));font-size:calc(33.584*var(--k));line-height:calc(41*var(--k));font-weight:700;color:#05482a;\">RAW Dari Alam,<br>Untuk Tubuh Ideal Kamu!</p><p class=\"a nw ff-poppins\" data-b=\"3\" style=\"left:calc(116.058*var(--k));top:calc(736.154*var(--k));font-size:calc(29.871*var(--k));line-height:calc(38.75*var(--k));font-weight:400;color:#000f05;\">Spencer's MealBlend menggunakan<br><b style=\"color:#ec5866;font-weight:700\">bahan alami pilihan</b> dengan<br>komposisi &amp; kandungan nutrisi<br>komplit untuk membantu<br>mendapatkan tubuh ideal Kamu.</p><p class=\"a nw ff-libre\" data-b=\"4\" style=\"left:calc(410.5*var(--k));top:calc(972.731*var(--k));font-size:calc(24.7*var(--k));line-height:calc(29.64*var(--k));font-weight:400;color:#ffffff;transform:translateX(-50%);text-align:center;word-spacing:.02em\">PRO NATURAL &nbsp; PRO NATURAL &nbsp; PRO NATURAL</p></div>",
+      "_items": [
+        {
+          "src": "/uploads/seed/m-012f74",
+          "alt": "Efek samping: tidak ada efek samping, no chemical fat burner, anti pencahar",
+          "x": 7,
+          "w": 312,
+          "h": 317
+        },
+        {
+          "src": "/uploads/seed/m-9d94e1",
+          "alt": "No preservatives, no filler, no emulsifier",
+          "x": 7,
+          "w": 312,
+          "h": 115
+        },
+        {
+          "src": "/uploads/seed/m-27c947",
+          "alt": "Pro natural ingredients: raw dari alam untuk tubuh ideal kamu",
+          "x": 4,
+          "w": 312,
+          "h": 405
+        }
+      ]
+    },
+    {
+      "id": "dampak-positif",
+      "name": "Dampak Positif untuk Kesehatan",
+      "type": "html",
+      "html": "<div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.213/320);--x:0;--w:320;--h:391;--mt:0\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/dampak-positif/m-eeb8df-plate.avif\"><img src=\"/uploads/sections/dampak-positif/m-eeb8df-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(0*var(--k));top:calc(-23.594*var(--k));width:calc(1500*var(--k));height:calc(1880*var(--k))\"></picture><h2 class=\"a nw ff-libre\" data-b=\"0\" style=\"left:calc(744.566*var(--k));top:calc(30.976*var(--k));font-size:calc(61.921*var(--k));line-height:calc(74.305*var(--k));font-weight:700;color:#fa525e;transform:translateX(-50%);text-align:center;\">Selain Tanpa Efek Samping,</h2><p class=\"a nw ff-libre\" data-b=\"1\" style=\"left:calc(744.566*var(--k));top:calc(171.218*var(--k));font-size:calc(58.09*var(--k));line-height:calc(76*var(--k));font-weight:400;color:#000000;transform:translateX(-50%);text-align:center;\">mengkonsumsi Spencer's MealBlend<br>secara rutin juga memberikan</p><p class=\"a nw ff-libre\" data-b=\"2\" style=\"left:calc(744.701*var(--k));top:calc(339.471*var(--k));font-size:calc(58.125*var(--k));line-height:calc(69.75*var(--k));font-weight:700;color:#00784d;transform:translateX(-50%);text-align:center;\">dampak positif untuk kesehatan kamu :</p><p class=\"a nw ff-inter\" data-b=\"3\" style=\"left:calc(300.882*var(--k));top:calc(505.126*var(--k));font-size:calc(52.258*var(--k));line-height:calc(62.709*var(--k));font-weight:700;color:#2a2a2a;\">1.</p><p class=\"a nw ff-inter\" data-b=\"4\" style=\"left:calc(385.713*var(--k));top:calc(495.966*var(--k));font-size:calc(53.587*var(--k));line-height:calc(68*var(--k));font-weight:400;color:#2a2a2a;\">Menurunkan Kadar Kolesterol<br>Dalam Darah.</p><p class=\"a nw ff-inter\" data-b=\"5\" style=\"left:calc(299.321*var(--k));top:calc(752.351*var(--k));font-size:calc(53.579*var(--k));line-height:calc(64.295*var(--k));font-weight:700;color:#2a2a2a;\">2.</p><p class=\"a nw ff-inter\" data-b=\"6\" style=\"left:calc(377.69*var(--k));top:calc(744.723*var(--k));font-size:calc(53.842*var(--k));line-height:calc(67.667*var(--k));font-weight:400;color:#2a2a2a;\">Mengontrol Gula Darah Dengan<br>Memperlambat Penyerapan Gula<br>Ke Dalam Darah, Sehingga<br>Kadar Gula Darah Lebih Stabil.</p><p class=\"a nw ff-inter\" data-b=\"7\" style=\"left:calc(303.822*var(--k));top:calc(1147.152*var(--k));font-size:calc(54.462*var(--k));line-height:calc(65.354*var(--k));font-weight:700;color:#2a2a2a;\">3.</p><p class=\"a nw ff-inter\" data-b=\"8\" style=\"left:calc(382.306*var(--k));top:calc(1137.742*var(--k));font-size:calc(53.883*var(--k));line-height:calc(68*var(--k));font-weight:400;color:#2a2a2a;\">Membantu Meringankan<br>Gejala GERD.</p><p class=\"a nw ff-inter\" data-b=\"9\" style=\"left:calc(303.82*var(--k));top:calc(1386.602*var(--k));font-size:calc(54.488*var(--k));line-height:calc(65.385*var(--k));font-weight:700;color:#2a2a2a;\">4.</p><p class=\"a nw ff-inter\" data-b=\"10\" style=\"left:calc(382.843*var(--k));top:calc(1384.637*var(--k));font-size:calc(53.915*var(--k));line-height:calc(68*var(--k));font-weight:400;color:#2a2a2a;\">Tinggi Antioksidan Untuk Meningkatkan<br>Sistem Kekebalan Tubuh.</p><p class=\"a nw ff-inter\" data-b=\"11\" style=\"left:calc(304.851*var(--k));top:calc(1641.784*var(--k));font-size:calc(53.713*var(--k));line-height:calc(64.455*var(--k));font-weight:700;color:#2a2a2a;\">5.</p><p class=\"a nw ff-inter\" data-b=\"12\" style=\"left:calc(382.678*var(--k));top:calc(1640.699*var(--k));font-size:calc(53.994*var(--k));line-height:calc(68*var(--k));font-weight:400;color:#2a2a2a;\">Membantu Melembabkan &amp; Menjaga<br>Kesehatan Kulit.</p></div>",
+      "_items": [
+        {
+          "src": "/uploads/seed/m-eeb8df",
+          "alt": "Dampak positif: menurunkan kolesterol, mengontrol gula darah, meringankan GERD, tinggi antioksidan, melembabkan kulit",
+          "w": 320,
+          "h": 391
+        }
+      ]
+    },
+    {
+      "id": "testi-nelly-josephine",
+      "name": "Testimoni Nelly & Josephine",
+      "type": "html",
+      "html": "<div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.213/320);--x:0;--w:320;--h:583;--mt:0\" role=\"group\" aria-label=\"Testimoni Nelly, Surabaya\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/testi-nelly-josephine/m-280b61-plate.avif\"><img src=\"/uploads/sections/testi-nelly-josephine/m-280b61-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(0*var(--k));top:calc(-1.094*var(--k));width:calc(1500*var(--k));height:calc(2735*var(--k))\"></picture><blockquote class=\"a nw ff-libre\" data-b=\"0\" style=\"left:calc(745.5*var(--k));top:calc(203.408*var(--k));font-size:calc(62.618*var(--k));line-height:calc(71*var(--k));font-weight:400;color:#2a2620;transform:translateX(-50%);text-align:center;\">“one step closer to be kpop idol<br>wkkwkwkw 🤣”</blockquote><p class=\"a nw ff-libre\" data-b=\"1\" style=\"left:calc(725.694*var(--k));top:calc(405.501*var(--k));font-size:calc(58.321*var(--k));line-height:calc(69.985*var(--k));font-weight:700;color:#2a2620;transform:translateX(-50%);text-align:center;\">- Nelly 36 th, Surabaya</p></div><div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.213/320);--x:0;--w:320;--h:571;--mt:20\" role=\"group\" aria-label=\"Testimoni Josephine, Jakarta\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/testi-nelly-josephine/m-93a2fa-plate.avif\"><img src=\"/uploads/sections/testi-nelly-josephine/m-93a2fa-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(0*var(--k));top:calc(-8.219*var(--k));width:calc(1500*var(--k));height:calc(2693*var(--k))\"></picture><blockquote class=\"a nw ff-libre\" data-b=\"0\" style=\"left:calc(730.071*var(--k));top:calc(231.431*var(--k));font-size:calc(64.069*var(--k));line-height:calc(76*var(--k));font-weight:700;color:#292620;transform:translateX(-50%);text-align:center;\">“ Utk aku yg super sibuk bgt ini<br>bener2 game changer sih..”</blockquote><p class=\"a nw ff-libre\" data-b=\"1\" style=\"left:calc(721.437*var(--k));top:calc(431.253*var(--k));font-size:calc(58.229*var(--k));line-height:calc(69.874*var(--k));font-weight:700;color:#2b2620;transform:translateX(-50%);text-align:center;\">- Josephine 28th, Jakarta</p></div>",
+      "_items": [
+        {
+          "src": "/uploads/seed/m-280b61",
+          "alt": "Testimoni Nelly 36th, Surabaya: one step closer to be kpop idol",
+          "w": 320,
+          "h": 583
+        },
+        {
+          "src": "/uploads/seed/m-93a2fa",
+          "alt": "Testimoni Josephine 28th, Jakarta: game changer",
+          "w": 320,
+          "h": 571,
+          "mt": 20
+        }
+      ]
+    },
+    {
+      "id": "langsung-kenyang",
+      "name": "Langsung Kenyang, Tahan Lama",
+      "type": "html",
+      "html": "<div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.414/320);--x:-5;--w:331;--h:243;--mt:0\" role=\"group\" aria-label=\"Langsung Kenyang, Tahan Lama! Spencer's MealBlend Instant Effect\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/langsung-kenyang/m-1e17f4-plate.avif\"><img src=\"/uploads/sections/langsung-kenyang/m-1e17f4-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(0*var(--k));top:calc(-0.844*var(--k));width:calc(800*var(--k));height:calc(589*var(--k))\"></picture><h2 class=\"a nw ff-libre\" data-b=\"0\" style=\"left:calc(390.592*var(--k));top:calc(43.477*var(--k));font-size:calc(53.772*var(--k));line-height:calc(64.526*var(--k));font-weight:700;color:#ec5965;transform:translateX(-50%);text-align:center;\">Langsung Kenyang,</h2><p class=\"a nw ff-caveat\" data-b=\"1\" style=\"left:calc(388.215*var(--k));top:calc(76.577*var(--k));font-size:calc(129.362*var(--k));line-height:calc(155.235*var(--k));font-weight:700;color:#f55462;transform:translateX(-50%);text-align:center;\">Tahan Lama!</p><p class=\"a nw ff-carlito\" data-b=\"2\" style=\"left:calc(137.344*var(--k));top:calc(434.621*var(--k));font-size:calc(60.346*var(--k));line-height:calc(72.415*var(--k));font-weight:700;color:#2b2a28;\">0<span style=\"font-size:.5em\">%</span></p><p class=\"a nw ff-carlito\" data-b=\"3\" style=\"left:calc(283.675*var(--k));top:calc(427.988*var(--k));font-size:calc(63.579*var(--k));line-height:calc(76.295*var(--k));font-weight:700;color:#2b2a2a;\">9<span style=\"font-size:.5em\">gr</span></p><p class=\"a nw ff-carlito\" data-b=\"4\" style=\"left:calc(425.093*var(--k));top:calc(436.172*var(--k));font-size:calc(48.22*var(--k));line-height:calc(57.865*var(--k));font-weight:700;color:#2a2a2a;\">15 <span style=\"font-size:.48em\">gr</span></p><p class=\"a nw ff-carlito\" data-b=\"5\" style=\"left:calc(570.369*var(--k));top:calc(433.669*var(--k));font-size:calc(54.79*var(--k));line-height:calc(65.748*var(--k));font-weight:700;color:#020201;\">170 <span style=\"font-size:.48em\">kkal</span></p><p class=\"a nw ff-inter\" data-b=\"6\" style=\"left:calc(162.664*var(--k));top:calc(499.016*var(--k));font-size:calc(17.614*var(--k));line-height:calc(21.137*var(--k));font-weight:500;font-style:italic;color:#2f2b29;transform:translateX(-50%);text-align:center;\">Added</p><p class=\"a nw ff-inter\" data-b=\"7\" style=\"left:calc(162.827*var(--k));top:calc(519.111*var(--k));font-size:calc(26.863*var(--k));line-height:calc(32.236*var(--k));font-weight:700;color:#2c2928;transform:translateX(-50%);text-align:center;\">SUGAR</p><p class=\"a nw ff-inter\" data-b=\"8\" style=\"left:calc(311.767*var(--k));top:calc(499.217*var(--k));font-size:calc(17.503*var(--k));line-height:calc(21.003*var(--k));font-weight:500;font-style:italic;color:#2f2d2d;transform:translateX(-50%);text-align:center;\">HIGH QUALITY</p><p class=\"a nw ff-inter\" data-b=\"9\" style=\"left:calc(311.419*var(--k));top:calc(519.841*var(--k));font-size:calc(26.871*var(--k));line-height:calc(32.245*var(--k));font-weight:700;color:#2c2a2b;transform:translateX(-50%);text-align:center;\">FIBER</p><p class=\"a nw ff-inter\" data-b=\"10\" style=\"left:calc(464.83*var(--k));top:calc(497.208*var(--k));font-size:calc(17.545*var(--k));line-height:calc(21.054*var(--k));font-weight:500;font-style:italic;color:#302f2f;transform:translateX(-50%);text-align:center;\">BALANCED</p><p class=\"a nw ff-inter\" data-b=\"11\" style=\"left:calc(464.025*var(--k));top:calc(518.149*var(--k));font-size:calc(26.66*var(--k));line-height:calc(31.991*var(--k));font-weight:700;color:#2c2b2b;transform:translateX(-50%);text-align:center;\">PROTEIN</p><p class=\"a nw ff-inter\" data-b=\"12\" style=\"left:calc(629.982*var(--k));top:calc(491.54*var(--k));font-size:calc(16.067*var(--k));line-height:calc(19.281*var(--k));font-weight:500;font-style:italic;color:#0a0a06;transform:translateX(-50%);text-align:center;\">LOW</p><p class=\"a nw ff-inter\" data-b=\"13\" style=\"left:calc(617.605*var(--k));top:calc(512.764*var(--k));font-size:calc(28.409*var(--k));line-height:calc(34.091*var(--k));font-weight:700;color:#090401;transform:translateX(-50%);text-align:center;\">CALORIE</p><p class=\"a nw ff-inter\" data-b=\"14\" style=\"left:calc(403.94*var(--k));top:calc(549.774*var(--k));font-size:calc(16.498*var(--k));line-height:calc(19.798*var(--k));font-weight:400;font-style:italic;color:#8f8a8c;transform:translateX(-50%);text-align:center;\">*Kandungan gizi dapat bervariasi bergantung pada varian rasa</p></div>",
+      "_items": [
+        {
+          "src": "/uploads/seed/m-1e17f4",
+          "alt": "Langsung kenyang, tahan lama! Spencer's MealBlend instant effect",
+          "x": -5,
+          "w": 331,
+          "h": 243,
+          "mt": 27
+        }
+      ],
+      "mt": 27
+    },
+    {
+      "id": "video-langsung-kenyang",
+      "name": "Video: Langsung Kenyang, Tahan Lama!",
+      "type": "html",
+      "mt": 20,
+      "html": "<div class=\"lp-yt\" data-yt=\"dBE-GNGdJds\" data-start=\"1\" data-title=\"Langsung Kenyang, Tahan Lama!\" style=\"--x:0;--w:320;--h:400\"></div>"
+    },
+    {
+      "id": "pola-makan",
+      "name": "Cara Menggunakan (Pola Makan Daily)",
+      "type": "html",
+      "html": "<div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.402/320);--x:0;--w:320;--h:578;--mt:0\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/pola-makan/m-fc037a-plate.avif\"><img src=\"/uploads/sections/pola-makan/m-fc037a-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(-1.938*var(--k));top:calc(0*var(--k));width:calc(800*var(--k));height:calc(1438*var(--k))\"></picture><h2 class=\"a nw ff-caveat\" data-b=\"0\" style=\"left:calc(407.386*var(--k));top:calc(63.415*var(--k));font-size:calc(69.102*var(--k));line-height:calc(82.923*var(--k));font-weight:700;color:#e07b80;transform:translateX(-50%);text-align:center;\">Bagaimana Menggunakan</h2><h3 class=\"a nw ff-libre\" data-b=\"1\" style=\"left:calc(395.657*var(--k));top:calc(400.054*var(--k));font-size:calc(41.22*var(--k));line-height:calc(49.464*var(--k));font-weight:700;color:#ffffff;transform:translateX(-50%);text-align:center;\">Pola Makan Daily</h3><p class=\"a nw ff-inter\" data-b=\"2\" style=\"left:calc(210.863*var(--k));top:calc(697.065*var(--k));font-size:calc(25.237*var(--k));line-height:calc(30.285*var(--k));font-weight:600;color:#030303;transform:translateX(-50%);text-align:center;\">1 sachet MealBlend</p><p class=\"a nw ff-inter\" data-b=\"3\" style=\"left:calc(586.964*var(--k));top:calc(697.115*var(--k));font-size:calc(25.051*var(--k));line-height:calc(30.061*var(--k));font-weight:600;color:#030303;transform:translateX(-50%);text-align:center;\">Menu Favorit Kamu</p><p class=\"a nw ff-libre\" data-b=\"4\" style=\"left:calc(177.061*var(--k));top:calc(765.075*var(--k));font-size:calc(32.969*var(--k));line-height:calc(39.563*var(--k));font-weight:700;color:#d97f84;\">Breakfast</p><p class=\"a nw ff-libre\" data-b=\"5\" style=\"left:calc(558.047*var(--k));top:calc(766.938*var(--k));font-size:calc(33.849*var(--k));line-height:calc(40.619*var(--k));font-weight:700;color:#da7d83;\">Lunch</p><p class=\"a nw ff-inter\" data-b=\"6\" style=\"left:calc(176.859*var(--k));top:calc(1025.044*var(--k));font-size:calc(25.346*var(--k));line-height:calc(30.415*var(--k));font-weight:600;color:#030303;transform:translateX(-50%);text-align:center;\">1 sachet MealBlend</p><p class=\"a nw ff-inter\" data-b=\"7\" style=\"left:calc(344.56*var(--k));top:calc(1073.552*var(--k));font-size:calc(37.548*var(--k));line-height:calc(45.058*var(--k));font-weight:600;color:#020202;\">Or</p><p class=\"a nw ff-inter\" data-b=\"8\" style=\"left:calc(184.964*var(--k));top:calc(1255.115*var(--k));font-size:calc(25.051*var(--k));line-height:calc(30.061*var(--k));font-weight:600;color:#030303;transform:translateX(-50%);text-align:center;\">Menu Favorit Kamu</p><p class=\"a nw ff-inter\" data-b=\"9\" style=\"left:calc(589.983*var(--k));top:calc(1200.552*var(--k));font-size:calc(25.135*var(--k));line-height:calc(32*var(--k));font-weight:600;color:#050505;transform:translateX(-50%);text-align:center;\">1-2 sachet<br>MealBlend</p><p class=\"a nw ff-libre\" data-b=\"10\" style=\"left:calc(403.073*var(--k));top:calc(1325.041*var(--k));font-size:calc(32.99*var(--k));line-height:calc(39.588*var(--k));font-weight:700;color:#d97e84;\">Dinner</p></div>",
+      "_items": [
+        {
+          "src": "/uploads/seed/m-fc037a",
+          "alt": "Bagaimana menggunakan Spencer's MealBlend: pola makan daily untuk breakfast, lunch, dinner",
+          "w": 320,
+          "h": 578
+        }
+      ]
+    },
+    {
+      "id": "emergency-snack",
+      "name": "Emergency Snack",
+      "type": "html",
+      "html": "<div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.4/320);--x:0;--w:320;--h:547;--mt:0\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/emergency-snack/m-7620c6-plate.avif\"><img src=\"/uploads/sections/emergency-snack/m-7620c6-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(0*var(--k));top:calc(-3.25*var(--k));width:calc(800*var(--k));height:calc(1374*var(--k))\"></picture><h2 class=\"a nw ff-inter\" data-b=\"0\" style=\"left:calc(389.745*var(--k));top:calc(76.221*var(--k));font-size:calc(31.934*var(--k));line-height:calc(41*var(--k));font-weight:600;color:#060200;transform:translateX(-50%);text-align:center;\">Suka tiba-tiba lapar di waktu yang<br>tidak tepat ?</h2><p class=\"a nw ff-inter\" data-b=\"1\" style=\"left:calc(390.302*var(--k));top:calc(169.2*var(--k));font-size:calc(33.601*var(--k));line-height:calc(40.321*var(--k));font-weight:700;color:#060100;transform:translateX(-50%);text-align:center;\">No worries anymore, beb !</p><p class=\"a nw ff-poppins\" data-b=\"2\" style=\"left:calc(125.977*var(--k));top:calc(430.525*var(--k));font-size:calc(28.902*var(--k));line-height:calc(34.682*var(--k));font-weight:500;color:#d68185;\">For Your</p><p class=\"a nw ff-libre\" data-b=\"3\" style=\"left:calc(121.753*var(--k));top:calc(469.609*var(--k));font-size:calc(41.564*var(--k));line-height:calc(49*var(--k));font-weight:700;color:#dd7c81;\">Emergency<br>But Safe</p><p class=\"a nw ff-libre\" data-b=\"4\" style=\"left:calc(390.456*var(--k));top:calc(467.844*var(--k));font-size:calc(90.881*var(--k));line-height:calc(109.058*var(--k));font-weight:700;color:#e5797e;\">Snack</p><p class=\"a nw ff-libre\" data-b=\"5\" style=\"left:calc(223.841*var(--k));top:calc(665.418*var(--k));font-size:calc(36.434*var(--k));line-height:calc(51*var(--k));font-weight:700;color:#ffffff;\">Snacking<br>Pagi ?</p><p class=\"a nw ff-libre\" data-b=\"6\" style=\"left:calc(223.051*var(--k));top:calc(771.086*var(--k));font-size:calc(30.53*var(--k));line-height:calc(36.636*var(--k));font-weight:700;color:#ffffff;\">Bisaa...</p><p class=\"a nw ff-libre\" data-b=\"7\" style=\"left:calc(223.103*var(--k));top:calc(909.511*var(--k));font-size:calc(36.614*var(--k));line-height:calc(53*var(--k));font-weight:700;color:#ffffff;\">Snacking<br>Sore ?</p><p class=\"a nw ff-libre\" data-b=\"8\" style=\"left:calc(224.153*var(--k));top:calc(1026.463*var(--k));font-size:calc(27.11*var(--k));line-height:calc(32.531*var(--k));font-weight:700;color:#ffffff;\">Bisa Banget...</p><p class=\"a nw ff-libre\" data-b=\"9\" style=\"left:calc(213.383*var(--k));top:calc(1158.418*var(--k));font-size:calc(36.434*var(--k));line-height:calc(51*var(--k));font-weight:700;color:#ffffff;\">Snacking<br>Malam ?</p><p class=\"a nw ff-libre\" data-b=\"10\" style=\"left:calc(207.923*var(--k));top:calc(1262.434*var(--k));font-size:calc(31.269*var(--k));line-height:calc(37.523*var(--k));font-weight:700;color:#ffffff;\">Aman !</p></div>",
+      "_items": [
+        {
+          "src": "/uploads/seed/m-7620c6",
+          "alt": "Spencer's MealBlend for your emergency but safe snack: pagi, sore, malam",
+          "w": 320,
+          "h": 547,
+          "mt": 25
+        }
+      ],
+      "mt": 25
+    },
+    {
+      "id": "your-body",
+      "name": "Your Body + MealBlend",
+      "type": "html",
+      "html": "<div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.4/320);--x:0;--w:320;--h:251;--mt:0\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/your-body/m-5dda19-plate.avif\"><img src=\"/uploads/sections/your-body/m-5dda19-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(0*var(--k));top:calc(-21.25*var(--k));width:calc(800*var(--k));height:calc(670*var(--k))\"></picture><p class=\"a nw ff-caveat\" data-b=\"0\" style=\"left:calc(65.92*var(--k));top:calc(39.331*var(--k));font-size:calc(84.414*var(--k));line-height:calc(88*var(--k));font-weight:700;color:#f15663;\">Your<br>Body</p><p class=\"a nw ff-caveat\" data-b=\"1\" style=\"left:calc(386.707*var(--k));top:calc(374.677*var(--k));font-size:calc(60.765*var(--k));line-height:calc(75*var(--k));font-weight:700;color:#e85966;transform:translateX(-50%);text-align:center;\">You’ll Realize That Your Body<br>Is The Best Gift From God Ever!</p></div>",
+      "_items": [
+        {
+          "src": "/uploads/seed/m-5dda19",
+          "alt": "Your body + Spencer's MealBlend: you'll realize that your body is the best gift from God ever",
+          "w": 320,
+          "h": 251
+        }
+      ]
+    },
+    {
+      "id": "testi-cindy-surabaya",
+      "name": "Testimoni Cindy (Surabaya) & Confident",
+      "type": "html",
+      "html": "<div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.218/320);--x:0;--w:320;--h:546;--mt:0\" role=\"group\" aria-label=\"Testimoni Cindy, Surabaya\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/testi-cindy-surabaya/m-fdfd45-plate.avif\"><img src=\"/uploads/sections/testi-cindy-surabaya/m-fdfd45-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(-15.055*var(--k));top:calc(0*var(--k));width:calc(1500*var(--k));height:calc(2508*var(--k))\"></picture><blockquote class=\"a nw ff-libre\" data-b=\"0\" style=\"left:calc(717.596*var(--k));top:calc(167.71*var(--k));font-size:calc(51.478*var(--k));line-height:calc(64*var(--k));font-weight:700;color:#2a2a2a;transform:translateX(-50%);text-align:center;\">“ Happy bgt, kesampaian buat ngecilin<br>lingkar pinggang. Udh susut 8 cm.<br>Enjoy banget tiap harinya ”</blockquote><p class=\"a nw ff-libre\" data-b=\"1\" style=\"left:calc(727.524*var(--k));top:calc(397.91*var(--k));font-size:calc(50.753*var(--k));line-height:calc(60.903*var(--k));font-weight:700;color:#2a2a2a;transform:translateX(-50%);text-align:center;\">- Cindy 34th, Surabaya</p></div><div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.218/320);--x:-3;--w:327;--h:199;--mt:14\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/testi-cindy-surabaya/m-b855d2-plate.avif\"><img src=\"/uploads/sections/testi-cindy-surabaya/m-b855d2-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(0*var(--k));top:calc(-23.578*var(--k));width:calc(1500*var(--k));height:calc(960*var(--k))\"></picture><h2 class=\"a nw ff-caveat\" data-b=\"0\" style=\"left:calc(954.874*var(--k));top:calc(165.79*var(--k));font-size:calc(114.739*var(--k));line-height:calc(139.5*var(--k));font-weight:700;color:#d3575d;transform:translateX(-50%);text-align:center;\">Lingkar Tubuh Kecil<br>Bikin Kamu Confident<br>Pake Baju Apapun !</h2></div>",
+      "_items": [
+        {
+          "src": "/uploads/seed/m-fdfd45",
+          "alt": "Testimoni Cindy 34th, Surabaya: lingkar pinggang susut 8 cm",
+          "w": 320,
+          "h": 546,
+          "mt": -6
+        },
+        {
+          "src": "/uploads/seed/m-b855d2",
+          "alt": "Lingkar tubuh kecil bikin kamu confident pakai baju apapun",
+          "x": -3,
+          "w": 327,
+          "h": 199,
+          "mt": 14
+        }
+      ],
+      "mt": -6
+    },
+    {
+      "id": "testi-maria-yolanda",
+      "name": "Testimoni Maria Yolanda",
+      "type": "html",
+      "html": "<div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.214/320);--x:0;--w:320;--h:142;--mt:0\" role=\"group\" aria-label=\"Testimoni Maria Yolanda\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/testi-maria-yolanda/m-381e69-plate.avif\"><img src=\"/uploads/sections/testi-maria-yolanda/m-381e69-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(0*var(--k));top:calc(-0.963*var(--k));width:calc(1492*var(--k));height:calc(664*var(--k))\"></picture><blockquote class=\"a nw ff-libre\" data-b=\"0\" style=\"left:calc(744.031*var(--k));top:calc(201.694*var(--k));font-size:calc(85.304*var(--k));line-height:calc(104*var(--k));font-weight:700;color:#2a2825;transform:translateX(-50%);text-align:center;\">Bebas Beli Baju Apapun<br>itu Happy Banget</blockquote><p class=\"a nw ff-libre\" data-b=\"1\" style=\"left:calc(737.986*var(--k));top:calc(430.468*var(--k));font-size:calc(54.78*var(--k));line-height:calc(65.736*var(--k));font-weight:700;color:#2a2621;transform:translateX(-50%);text-align:center;\">- Maria Yolanda, Indonesia’s Next Top Model 2</p></div>",
+      "_items": [
+        {
+          "src": "/uploads/seed/m-381e69",
+          "alt": "Bebas beli baju apapun itu happy banget, Maria Yolanda, Indonesia's Next Top Model 2",
+          "w": 320,
+          "h": 142,
+          "mt": 5
+        }
+      ],
+      "mt": 5
+    },
+    {
+      "id": "video-maria-yolanda",
+      "name": "Video: Testimoni Maria Yolanda",
+      "type": "html",
+      "mt": 25,
+      "html": "<div class=\"lp-yt\" data-yt=\"UhOouaoz0Dg\" data-start=\"1\" data-title=\"Bebas Beli Baju Apapun Itu Happy Banget\" style=\"--x:-3;--w:327;--h:180\"></div>"
+    },
+    {
+      "id": "testi-sherly",
+      "name": "Testimoni Sherly (Dipuji Suami)",
+      "type": "html",
+      "html": "<div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.401/320);--x:0;--w:321;--h:118;--mt:0\" role=\"group\" aria-label=\"Testimoni Sherly, Surabaya\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/testi-sherly/m-a8b007-plate.avif\"><img src=\"/uploads/sections/testi-sherly/m-a8b007-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(0*var(--k));top:calc(-1.46*var(--k));width:calc(800*var(--k));height:calc(297*var(--k))\"></picture><blockquote class=\"a nw ff-libre\" data-b=\"0\" style=\"left:calc(399.206*var(--k));top:calc(51.368*var(--k));font-size:calc(49.743*var(--k));line-height:calc(58*var(--k));font-weight:700;color:#2d2a26;transform:translateX(-50%);text-align:center;\">Dipuji Suami Lingkar<br>Perut Susut 8 CM!</blockquote><p class=\"a nw ff-libre\" data-b=\"1\" style=\"left:calc(396.12*var(--k));top:calc(175.767*var(--k));font-size:calc(31.469*var(--k));line-height:calc(37.763*var(--k));font-weight:700;color:#2f2a23;transform:translateX(-50%);text-align:center;\">- Sherly 40 th, Surabaya</p></div>",
+      "_items": [
+        {
+          "src": "/uploads/seed/m-a8b007",
+          "alt": "Dipuji suami lingkar perut susut 8 cm, Sherly 40th, Surabaya",
+          "w": 321,
+          "h": 118,
+          "mt": 2
+        }
+      ],
+      "mt": 2
+    },
+    {
+      "id": "video-sherly",
+      "name": "Video: Testimoni Sherly",
+      "type": "html",
+      "mt": 28,
+      "html": "<div class=\"lp-yt\" data-yt=\"a0JZLu7GAtg\" data-title=\"Testimoni Bu Sherly: Dipuji Suami Lingkar Perut Susut 8 CM\"></div>"
+    },
+    {
+      "id": "testi-adelia",
+      "name": "Testimoni Adelia (Day 1 - Day 53)",
+      "type": "html",
+      "html": "<div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.214/320);--x:0;--w:320;--h:447;--mt:0\" role=\"group\" aria-label=\"Testimoni Adelia, Surabaya: Day 1 100kg, Day 53 86kg\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/testi-adelia/m-b35c92-plate.avif\"><img src=\"/uploads/sections/testi-adelia/m-b35c92-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(-1.544*var(--k));top:calc(0*var(--k));width:calc(1500*var(--k));height:calc(2091*var(--k))\"></picture><blockquote class=\"a nw ff-libre\" data-b=\"0\" style=\"left:calc(750.201*var(--k));top:calc(131.601*var(--k));font-size:calc(60.182*var(--k));line-height:calc(78.5*var(--k));font-weight:700;color:#2b2722;transform:translateX(-50%);text-align:center;\">“Capek dibvlly dan dipanggil “gendut”.<br>Berkat MealBlend aku bisa<br>bangkit lagi 💛”</blockquote><p class=\"a nw ff-libre\" data-b=\"1\" style=\"left:calc(761.519*var(--k));top:calc(425.847*var(--k));font-size:calc(51.261*var(--k));line-height:calc(61.513*var(--k));font-weight:700;color:#2b261f;transform:translateX(-50%);text-align:center;\">- Adelia 30th, Surabaya</p><p class=\"a nw ff-inter\" data-b=\"2\" style=\"left:calc(355.616*var(--k));top:calc(669.252*var(--k));font-size:calc(58.528*var(--k));line-height:calc(70.234*var(--k));font-weight:800;font-style:italic;color:#010101;transform:translateX(-50%);text-align:center;\">Day 1</p><p class=\"a nw ff-inter\" data-b=\"3\" style=\"left:calc(1162.157*var(--k));top:calc(669.613*var(--k));font-size:calc(59.5*var(--k));line-height:calc(71.4*var(--k));font-weight:800;font-style:italic;color:#010101;transform:translateX(-50%);text-align:center;\">Day 53</p><p class=\"a nw ff-inter\" data-b=\"4\" style=\"left:calc(35.676*var(--k));top:calc(792.652*var(--k));font-size:calc(58.192*var(--k));line-height:calc(69.831*var(--k));font-weight:400;font-style:italic;color:#020202;\">Before: <b style=\"font-weight:800\">100</b><b style=\"font-weight:800;font-size:.6em\">kg</b></p><p class=\"a nw ff-inter\" data-b=\"5\" style=\"left:calc(1420.642*var(--k));top:calc(791.662*var(--k));font-size:calc(58.443*var(--k));line-height:calc(70.132*var(--k));font-weight:400;font-style:italic;color:#020202;transform:translateX(-100%);text-align:right;\">After: <b style=\"font-weight:800\">86</b><b style=\"font-weight:800;font-size:.6em\">kg</b></p></div>",
+      "_items": [
+        {
+          "src": "/uploads/seed/m-b35c92",
+          "alt": "Testimoni Adelia 30th, Surabaya: dari 100 kg menjadi 86 kg dalam 53 hari",
+          "w": 320,
+          "h": 447,
+          "mt": 5
+        }
+      ],
+      "mt": 5
+    },
+    {
+      "id": "artisan-tea-2",
+      "name": "Artisan Tea Series (Nutrisi)",
+      "type": "image",
+      "items": [
+        {
+          "src": "/uploads/seed/m-dcc7f8",
+          "alt": "Feel the taste of your favorite artisan tea: Jasmine dan Peach Oolong, 0% added sugar, 9 g fiber, 15 g protein, 140 kkal",
+          "w": 320,
+          "h": 467,
+          "mt": 20
+        }
+      ]
+    },
+    {
+      "id": "resep-bekerja",
+      "name": "Resep Kami Sudah Bekerja",
+      "type": "html",
+      "html": "<div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.221/320);--x:20;--w:280;--h:99;--mt:0\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/resep-bekerja/m-cf57a8-plate.avif\"><img src=\"/uploads/sections/resep-bekerja/m-cf57a8-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(-116.465*var(--k));top:calc(0*var(--k));width:calc(1500*var(--k));height:calc(448*var(--k))\"></picture><h2 class=\"a nw ff-libre\" data-b=\"0\" style=\"left:calc(626.533*var(--k));top:calc(56.748*var(--k));font-size:calc(77.097*var(--k));line-height:calc(92.517*var(--k));font-weight:700;color:#000000;transform:translateX(-50%);text-align:center;\">Resep Kami <span style=\"color:#e86c72\">Sudah Bekerja</span></h2><p class=\"a nw ff-libre\" data-b=\"1\" style=\"left:calc(635.795*var(--k));top:calc(149.696*var(--k));font-size:calc(57.632*var(--k));line-height:calc(80*var(--k));font-weight:400;color:#000000;transform:translateX(-50%);text-align:center;\">Mengecilkan Hingga Ratusan Centimeter<br>Total Lingkar Tangan, Perut &amp; Paha Dari</p><p class=\"a nw ff-libre\" data-b=\"2\" style=\"left:calc(634.112*var(--k));top:calc(315.19*var(--k));font-size:calc(57.706*var(--k));line-height:calc(69.247*var(--k));font-weight:700;color:#000000;transform:translateX(-50%);text-align:center;\">Ratusan Customer.</p></div>",
+      "_items": [
+        {
+          "src": "/uploads/seed/m-cf57a8",
+          "alt": "Resep kami sudah bekerja mengecilkan hingga ratusan centimeter dari ratusan customer",
+          "x": 20,
+          "w": 280,
+          "h": 99
+        }
+      ]
+    },
+    {
+      "id": "promo-banner",
+      "name": "[PROMO] Banner",
+      "type": "promo",
+      "part": "banner",
+      "x": -6,
+      "w": 327,
+      "mt": 11
+    },
+    {
+      "id": "cta-1",
+      "name": "CTA Chat Admin",
+      "type": "html",
+      "html": "<div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.214/320);--x:1;--w:320;--h:177;--mt:0\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/cta-1/cta-siap-plate.avif\"><img src=\"/uploads/sections/cta-1/cta-siap-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(-0.621*var(--k));top:calc(0*var(--k));width:calc(1500*var(--k));height:calc(829*var(--k))\"></picture><h2 class=\"a nw ff-caveat\" data-b=\"0\" style=\"left:calc(750.334*var(--k));top:calc(149.48*var(--k));font-size:calc(128.216*var(--k));line-height:calc(129*var(--k));font-weight:700;color:#e1797e;transform:translateX(-50%);text-align:center;\">Kamu Siap Memiliki<br>Lingkar Tubuh Kecil Mu ?</h2><p class=\"a nw ff-libre\" data-b=\"1\" style=\"left:calc(747.081*var(--k));top:calc(467.4*var(--k));font-size:calc(61.613*var(--k));line-height:calc(80*var(--k));font-weight:700;color:#020100;transform:translateX(-50%);text-align:center;\">Kalau Nggak Percaya, Buktiin Aja<br>Khasiatnya <span style=\"color:#e3727a\">Dalam 2 Minggu !</span></p><p class=\"a nw ff-libre\" data-b=\"2\" style=\"left:calc(748.317*var(--k));top:calc(750.638*var(--k));font-size:calc(61.392*var(--k));line-height:calc(73.67*var(--k));font-weight:700;color:#020000;transform:translateX(-50%);text-align:center;\">Cobain Sendiri Disini :</p></div><a class=\"lp-box fx\" href=\"https://api.whatsapp.com/send?phone=6282229319391&text=Hi%20kak%2C%20mau%20info%20Spencer%27s%20MealBlend%20nya%20dong%20kak.%20%5BSPGM1%5D\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"--k:calc(100cqw*0.213/320);--x:0;--w:320;--h:69;--mt:0\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/cta-1/btn-chat-admin-plate.avif\"><img src=\"/uploads/sections/cta-1/btn-chat-admin-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(0*var(--k));top:calc(-0.781*var(--k));width:calc(1500*var(--k));height:calc(325*var(--k))\"></picture><p class=\"a nw ff-opensans\" data-b=\"0\" style=\"left:calc(550.196*var(--k));top:calc(60.677*var(--k));font-size:calc(76.278*var(--k));line-height:calc(91.534*var(--k));font-weight:700;color:#ffffff;\">Chat Admin</p></a>",
+      "_items": [
+        {
+          "src": "/uploads/seed/cta-siap",
+          "alt": "Kamu siap memiliki lingkar tubuh kecil mu? Buktiin aja khasiatnya dalam 2 minggu. Cobain sendiri disini:",
+          "x": 1,
+          "w": 320,
+          "h": 177
+        },
+        {
+          "src": "/uploads/seed/btn-chat-admin",
+          "alt": "Chat Admin via WhatsApp",
+          "w": 320,
+          "h": 69,
+          "href": "https://api.whatsapp.com/send?phone=6282229319391&text=Hi%20kak%2C%20mau%20info%20Spencer%27s%20MealBlend%20nya%20dong%20kak.%20%5BSPGM1%5D"
+        }
+      ]
+    },
+    {
+      "id": "pembayaran-distributor-1",
+      "name": "Pembayaran Resmi & Peluang Distributor",
+      "type": "html",
+      "html": "<div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.213/320);--x:0;--w:320;--h:217;--mt:0\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/pembayaran-distributor-1/pembayaran-plate.avif\"><img src=\"/uploads/sections/pembayaran-distributor-1/pembayaran-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(-1.926*var(--k));top:calc(0*var(--k));width:calc(1508*var(--k));height:calc(1020*var(--k))\"></picture><p class=\"a nw ff-inter\" data-b=\"0\" style=\"left:calc(754.873*var(--k));top:calc(221.421*var(--k));font-size:calc(43.852*var(--k));line-height:calc(52.623*var(--k));font-weight:700;color:#000000;transform:translateX(-50%);text-align:center;\">Pembayaran Official &amp; Trusted hanya melalui Paper.id</p><p class=\"a nw ff-inter\" data-b=\"1\" style=\"left:calc(754.98*var(--k));top:calc(283.985*var(--k));font-size:calc(43.72*var(--k));line-height:calc(52.464*var(--k));font-weight:400;color:#000000;transform:translateX(-50%);text-align:center;\">sebagai Payment Gateway resmi Spencer's Indonesia.</p><p class=\"a nw ff-inter\" data-b=\"2\" style=\"left:calc(274.366*var(--k));top:calc(378.108*var(--k));font-size:calc(45.132*var(--k));line-height:calc(54.158*var(--k));font-weight:700;color:#000000;\">Pastikan rekening tertera atas nama PAPER.ID.</p><p class=\"a nw ff-inter\" data-b=\"3\" style=\"left:calc(752.504*var(--k));top:calc(520.477*var(--k));font-size:calc(39.117*var(--k));line-height:calc(44*var(--k));font-weight:500;font-style:italic;color:#000000;transform:translateX(-50%);text-align:center;\">Spencer's Indonesia tidak pernah menggunakan<br>Rekening atas nama perseorangan</p><p class=\"a nw ff-inter\" data-b=\"4\" style=\"left:calc(248.835*var(--k));top:calc(682.837*var(--k));font-size:calc(31.981*var(--k));line-height:calc(36*var(--k));font-weight:400;color:#30505f;\">Bekerjasama dengan mitra<br>berizin dan diawasi oleh</p><p class=\"a nw ff-inter\" data-b=\"5\" style=\"left:calc(1034.034*var(--k));top:calc(816.722*var(--k));font-size:calc(28.738*var(--k));line-height:calc(36*var(--k));font-weight:400;color:#658493;\">Tersertifikasi<br>ISO 27001 · KAN</p></div><a class=\"lp-box fx\" href=\"https://www.spencers.id/agentslimdistributorretail1\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"--k:calc(100cqw*0.4/320);--x:1;--w:320;--h:63;--mt:0\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/pembayaran-distributor-1/btn-distributor-plate.avif\"><img src=\"/uploads/sections/pembayaran-distributor-1/btn-distributor-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(0*var(--k));top:calc(-10.75*var(--k));width:calc(800*var(--k));height:calc(179*var(--k))\"></picture><p class=\"a nw ff-opensans\" data-b=\"0\" style=\"left:calc(198.177*var(--k));top:calc(69.488*var(--k));font-size:calc(35.283*var(--k));line-height:calc(42.339*var(--k));font-weight:700;color:#ffffff;\">Info Peluang Distributor</p></a><div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.461/320);--x:1;--w:320;--h:247;--mt:0\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/pembayaran-distributor-1/m-60f0a6-plate.avif\"><img src=\"/uploads/sections/pembayaran-distributor-1/m-60f0a6-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(-52.794*var(--k));top:calc(0*var(--k));width:calc(800*var(--k));height:calc(536*var(--k))\"></picture><h2 class=\"a nw ff-poppins\" data-b=\"0\" style=\"left:calc(346.726*var(--k));top:calc(39.249*var(--k));font-size:calc(44.756*var(--k));line-height:calc(49*var(--k));font-weight:700;color:#ffffff;transform:translateX(-50%);text-align:center;\">Mau jadi Distributor /<br>Stockist MealBlend?</h2><p class=\"a nw ff-inter\" data-b=\"1\" style=\"left:calc(347.166*var(--k));top:calc(184.922*var(--k));font-size:calc(29.796*var(--k));line-height:calc(36.5*var(--k));font-weight:400;color:#020202;transform:translateX(-50%);text-align:center;\">Bantu kami menerima <b>besarnya antusiasme</b><br><b>permintaan Spencer’s MealBlend</b> secara<br>merata ke seluruh Indonesia.</p><p class=\"a nw ff-inter\" data-b=\"2\" style=\"left:calc(346.579*var(--k));top:calc(347.961*var(--k));font-size:calc(34.207*var(--k));line-height:calc(41.049*var(--k));font-weight:700;color:#5b63bb;transform:translateX(-50%);text-align:center;\">Dapatkan kesempatan</p><p class=\"a nw ff-inter\" data-b=\"3\" style=\"left:calc(351.096*var(--k));top:calc(389.78*var(--k));font-size:calc(30.34*var(--k));line-height:calc(36.408*var(--k));font-weight:400;color:#050505;transform:translateX(-50%);text-align:center;\">menghasilkan keuntungan</p><p class=\"a nw ff-inter\" data-b=\"4\" style=\"left:calc(324.916*var(--k));top:calc(424.738*var(--k));font-size:calc(27.357*var(--k));line-height:calc(32.829*var(--k));font-weight:400;color:#ffffff;transform:translateX(-50%);text-align:center;\">Puluhan hingga Ratusan juta rupiah /bln</p><p class=\"a nw ff-inter\" data-b=\"5\" style=\"left:calc(346.77*var(--k));top:calc(455.932*var(--k));font-size:calc(29.601*var(--k));line-height:calc(35.521*var(--k));font-weight:400;color:#050505;transform:translateX(-50%);text-align:center;\">dari penjualan Spencer’s MealBlend,</p></div>",
+      "_items": [
+        {
+          "src": "/uploads/seed/pembayaran",
+          "alt": "Pembayaran official dan trusted hanya melalui Paper.id",
+          "w": 320,
+          "h": 217,
+          "mt": 9
+        },
+        {
+          "src": "/uploads/seed/btn-distributor",
+          "alt": "Info peluang distributor",
+          "x": 1,
+          "w": 320,
+          "h": 63,
+          "href": "https://www.spencers.id/agentslimdistributorretail1"
+        },
+        {
+          "src": "/uploads/seed/m-60f0a6",
+          "alt": "Mau jadi distributor / stockist MealBlend? Dapatkan kesempatan menghasilkan keuntungan",
+          "x": 1,
+          "w": 320,
+          "h": 247
+        }
+      ],
+      "mt": 9
+    },
+    {
+      "id": "offline-judul",
+      "name": "Offline Experiences (Judul)",
+      "type": "html",
+      "html": "<div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.213/320);--x:0;--w:320;--h:96;--mt:0\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/offline-judul/m-37a252-plate.avif\"><img src=\"/uploads/sections/offline-judul/m-37a252-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(0*var(--k));top:calc(-17*var(--k));width:calc(1500*var(--k));height:calc(484*var(--k))\"></picture><h2 class=\"a nw ff-libre\" data-b=\"0\" style=\"left:calc(81.613*var(--k));top:calc(179.622*var(--k));font-size:calc(84.572*var(--k));line-height:calc(101.486*var(--k));font-weight:700;color:transparent;background-image:linear-gradient(90deg,#000 0%,#3a1530 40%,#a32a7a 70%,#ff40b8 100%);-webkit-background-clip:text;background-clip:text;\">OFFLINE EXPERIENCES</h2><p class=\"a nw ff-inter\" data-b=\"1\" style=\"left:calc(92.587*var(--k));top:calc(304.061*var(--k));font-size:calc(48.256*var(--k));line-height:calc(60*var(--k));font-weight:400;color:#000000;\">Beyond Presence, Into Connection.<br>Closer to a Better You.</p></div>",
+      "_items": [
+        {
+          "src": "/uploads/seed/m-37a252",
+          "alt": "Spencer's MealBlend offline experiences: beyond presence, into connection",
+          "w": 320,
+          "h": 96,
+          "mt": 8
+        }
+      ],
+      "mt": 8
+    },
+    {
+      "id": "offline-slider",
+      "name": "Offline Experiences (Slider Foto & Video)",
+      "type": "html",
+      "html": "<div class=\"lp-slider\" data-transition=\"slide\" data-interval=\"5000\" data-dots=\"square-light\" style=\"--sh:604\" aria-label=\"Offline experiences\"><div class=\"lp-slide\"><div class=\"lp-box\" style=\"--x:0;--w:319;--h:382;--mt:25\"><img src=\"/uploads/seed/offline-slide-1.webp\" alt=\"MealBlend Sparkling Winter with Catherine Njoo\" loading=\"lazy\" decoding=\"async\"></div><div class=\"lp-yt\" data-yt=\"9tGn6K70kvA\" data-title=\"MealBlend Offline Experience\"></div></div><div class=\"lp-slide\"><div class=\"lp-box\" style=\"--x:0;--w:319;--h:382;--mt:25\"><img src=\"/uploads/seed/offline-slide-2.webp\" alt=\"MealBlend offline experience\" loading=\"lazy\" decoding=\"async\"></div><div class=\"lp-yt\" data-yt=\"MeM7UE_xiCE\" data-title=\"MealBlend Offline Experience\"></div></div><div class=\"lp-slide\"><div class=\"lp-box\" style=\"--x:0;--w:319;--h:382;--mt:25\"><img src=\"/uploads/seed/offline-slide-3.webp\" alt=\"MealBlend offline experience\" loading=\"lazy\" decoding=\"async\"></div><div class=\"lp-yt\" data-yt=\"j2LYgLei0sY\" data-title=\"MealBlend Offline Experience\"></div></div><div class=\"lp-slide\"><div class=\"lp-box\" style=\"--x:0;--w:319;--h:382;--mt:25\"><img src=\"/uploads/seed/offline-slide-4.webp\" alt=\"MealBlend offline experience\" loading=\"lazy\" decoding=\"async\"></div><div class=\"lp-yt\" data-yt=\"gXwuQzmMRuc\" data-start=\"1\" data-title=\"MealBlend Offline Experience\"></div></div></div>"
+    },
+    {
+      "id": "selera-wanita",
+      "name": "Kami Memahami Selera Wanita",
+      "type": "html",
+      "html": "<div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.213/320);--x:0;--w:320;--h:788;--mt:0\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/selera-wanita/m-02bd6a-plate.avif\"><img src=\"/uploads/sections/selera-wanita/m-02bd6a-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(0*var(--k));top:calc(-19.125*var(--k));width:calc(1500*var(--k));height:calc(3732*var(--k))\"></picture><p class=\"a nw ff-josefin\" data-b=\"0\" style=\"left:calc(751.072*var(--k));top:calc(365.64*var(--k));font-size:calc(53.924*var(--k));line-height:calc(64.708*var(--k));font-weight:700;color:#f19094;transform:translateX(-50%);text-align:center;\">Breakfast N Dinner Praktis</p><p class=\"a nw ff-josefin\" data-b=\"1\" style=\"left:calc(752.726*var(--k));top:calc(473.849*var(--k));font-size:calc(45.357*var(--k));line-height:calc(39*var(--k));font-weight:700;color:#1a1a1a;transform:translateX(-50%);text-align:center;\">Dengan Resep Nutrisi Alami &amp; Ilmiah<br>Yang <span style=\"color:#f5a300\">BEKERJA</span> Kecilkan Lingkar Tubuh Kamu</p><p class=\"a nw ff-libre\" data-b=\"2\" style=\"left:calc(749.343*var(--k));top:calc(1039.417*var(--k));font-size:calc(38.761*var(--k));line-height:calc(48*var(--k));font-weight:700;color:#2a2a2a;transform:translateX(-50%);text-align:center;\">Menyusutkan<br>Lingkar Pinggang<br>2-3cm /Week</p><p class=\"a nw ff-libre\" data-b=\"3\" style=\"left:calc(344.464*var(--k));top:calc(1300.476*var(--k));font-size:calc(38.857*var(--k));line-height:calc(48*var(--k));font-weight:700;color:#2a2a2a;transform:translateX(-50%);text-align:center;\">Mengencangkan<br>Tangan Bergelambir<br>1cm /Week</p><p class=\"a nw ff-libre\" data-b=\"4\" style=\"left:calc(1161.756*var(--k));top:calc(1319.436*var(--k));font-size:calc(38.874*var(--k));line-height:calc(48*var(--k));font-weight:700;color:#2a2a2a;transform:translateX(-50%);text-align:center;\">Mengikis Timbunan<br>Lemak Paha<br>1-2cm /Week</p><p class=\"a nw ff-libre\" data-b=\"5\" style=\"left:calc(204.134*var(--k));top:calc(1737.271*var(--k));font-size:calc(38.706*var(--k));line-height:calc(48*var(--k));font-weight:700;color:#2a2a2a;transform:translateX(-50%);text-align:center;\">BB Turun Alami<br>2-8kg Dalam<br>2 Minggu</p><p class=\"a nw ff-libre\" data-b=\"6\" style=\"left:calc(1311.093*var(--k));top:calc(1737.47*var(--k));font-size:calc(38.74*var(--k));line-height:calc(48*var(--k));font-weight:700;color:#2a2a2a;transform:translateX(-50%);text-align:center;\">Mengurangi<br>Lipatan Kulit<br>Dalam 2 Minggu</p><p class=\"a nw ff-inter\" data-b=\"7\" style=\"left:calc(1202.406*var(--k));top:calc(3105.591*var(--k));font-size:calc(33.593*var(--k));line-height:calc(23*var(--k));font-weight:500;font-style:italic;color:#4e2f31;transform:translateX(-100%);text-align:right;\">Minuman Serbuk Biji-Bijian<br>dan Kacang-Kacangan</p><p class=\"a nw ff-inter\" data-b=\"8\" style=\"left:calc(772.08*var(--k));top:calc(3185.643*var(--k));font-size:calc(47.668*var(--k));line-height:calc(46*var(--k));font-weight:400;font-style:italic;color:#9c9c9c;transform:translateX(-50%);text-align:center;\">*berdasarkan survey 1.860 customer yang telah<br>mengikuti program Spencer’s MealBlend</p><h2 class=\"a nw ff-caveat\" data-b=\"9\" style=\"left:calc(758.223*var(--k));top:calc(3392.229*var(--k));font-size:calc(121.604*var(--k));line-height:calc(104*var(--k));font-weight:700;color:#ffffff;transform:translateX(-50%);text-align:center;\">Kami memahami bahwa selera<br>itu penting bagi wanita.</h2></div>",
+      "_items": [
+        {
+          "src": "/uploads/seed/m-02bd6a",
+          "alt": "Spencer's MealBlend Breakfast N Dinner Praktis: kami memahami bahwa selera itu penting bagi wanita",
+          "w": 320,
+          "h": 788,
+          "mt": 19
+        }
+      ],
+      "mt": 19
+    },
+    {
+      "id": "soal-rasa",
+      "name": "Soal Rasa, Halal & Chef Wina",
+      "type": "html",
+      "html": "<div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.217/320);--x:0;--w:315;--h:134;--mt:0\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/soal-rasa/m-237c42-plate.avif\"><img src=\"/uploads/sections/soal-rasa/m-237c42-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(-23.795*var(--k));top:calc(0*var(--k));width:calc(1498*var(--k));height:calc(617*var(--k))\"></picture><p class=\"a nw ff-libre\" data-b=\"0\" style=\"left:calc(727.93*var(--k));top:calc(44.686*var(--k));font-size:calc(63.994*var(--k));line-height:calc(76*var(--k));font-weight:400;color:#020202;transform:translateX(-50%);text-align:center;\">Soal rasa,<br>kami berkolaborasi dengan para chef<br>&amp; Tim RnD terbaik di bidangnya.</p><h2 class=\"a nw ff-libre\" data-b=\"1\" style=\"left:calc(725.22*var(--k));top:calc(355.785*var(--k));font-size:calc(74.744*var(--k));line-height:calc(88*var(--k));font-weight:700;color:#e85662;transform:translateX(-50%);text-align:center;\">Memberikan pengalaman kelezatan<br>terbaik untuk selera Kamu.</h2></div><div class=\"lp-box\" style=\"--x:0;--w:320;--h:158;--mt:20\"><img src=\"/uploads/seed/m-eaac13.gif\" alt=\"\" loading=\"lazy\" decoding=\"async\"></div><div class=\"lp-box\" style=\"--x:-1;--w:320;--h:77;--mt:20\"><picture><source type=\"image/avif\" srcset=\"/uploads/seed/m-2db833.avif\"><img src=\"/uploads/seed/m-2db833.webp\" alt=\"Halal certified dan delicious approved by Chef Wina, Master Chef Indonesia\" loading=\"lazy\" decoding=\"async\"></picture></div>",
+      "_items": [
+        {
+          "src": "/uploads/seed/m-237c42",
+          "alt": "Soal rasa, kami berkolaborasi dengan para chef dan tim RnD terbaik",
+          "w": 315,
+          "h": 134,
+          "mt": 31
+        },
+        {
+          "src": "/uploads/seed/m-eaac13",
+          "ext": "gif",
+          "alt": "",
+          "w": 320,
+          "h": 158,
+          "mt": 20
+        },
+        {
+          "src": "/uploads/seed/m-2db833",
+          "alt": "Halal certified dan delicious approved by Chef Wina, Master Chef Indonesia",
+          "x": -1,
+          "w": 320,
+          "h": 77,
+          "mt": 20
+        }
+      ],
+      "mt": 31
+    },
+    {
+      "id": "flavors",
+      "name": "Explore 10 Delightful Flavors",
+      "type": "html",
+      "html": "<div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.431/320);--x:0;--w:320;--h:648;--mt:0\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/flavors/m-22552d-plate.avif\"><img src=\"/uploads/sections/flavors/m-22552d-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(-29.136*var(--k));top:calc(0*var(--k));width:calc(800*var(--k));height:calc(1502*var(--k))\"></picture><div class=\"a\" style=\"left:calc(-29.136*var(--k));top:calc(139*var(--k));width:calc(264*var(--k));height:calc(251*var(--k))\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/flavors/m-22552d-tile-1.avif\"><img src=\"/uploads/sections/flavors/m-22552d-tile-1.webp\" alt=\"Pina Colada Mocktail\" loading=\"lazy\" decoding=\"async\" style=\"width:100%;height:100%\"></picture></div><div class=\"a\" style=\"left:calc(240.864*var(--k));top:calc(139*var(--k));width:calc(262*var(--k));height:calc(251*var(--k))\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/flavors/m-22552d-tile-2.avif\"><img src=\"/uploads/sections/flavors/m-22552d-tile-2.webp\" alt=\"Vanilla Ice Cream\" loading=\"lazy\" decoding=\"async\" style=\"width:100%;height:100%\"></picture></div><div class=\"a\" style=\"left:calc(507.864*var(--k));top:calc(139*var(--k));width:calc(260*var(--k));height:calc(251*var(--k))\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/flavors/m-22552d-tile-3.avif\"><img src=\"/uploads/sections/flavors/m-22552d-tile-3.webp\" alt=\"Wild Blueberry Splash\" loading=\"lazy\" decoding=\"async\" style=\"width:100%;height:100%\"></picture></div><div class=\"a\" style=\"left:calc(-29.136*var(--k));top:calc(396*var(--k));width:calc(394*var(--k));height:calc(381*var(--k))\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/flavors/m-22552d-tile-4.avif\"><img src=\"/uploads/sections/flavors/m-22552d-tile-4.webp\" alt=\"Belgian Dark Choco\" loading=\"lazy\" decoding=\"async\" style=\"width:100%;height:100%\"></picture></div><div class=\"a\" style=\"left:calc(373.864*var(--k));top:calc(396*var(--k));width:calc(397*var(--k));height:calc(381*var(--k))\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/flavors/m-22552d-tile-5.avif\"><img src=\"/uploads/sections/flavors/m-22552d-tile-5.webp\" alt=\"Naked Strawberry\" loading=\"lazy\" decoding=\"async\" style=\"width:100%;height:100%\"></picture></div><div class=\"a\" style=\"left:calc(-28.136*var(--k));top:calc(784*var(--k));width:calc(263*var(--k));height:calc(266*var(--k))\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/flavors/m-22552d-tile-6.avif\"><img src=\"/uploads/sections/flavors/m-22552d-tile-6.webp\" alt=\"Popcorn Marshmallow\" loading=\"lazy\" decoding=\"async\" style=\"width:100%;height:100%\"></picture></div><div class=\"a\" style=\"left:calc(239.864*var(--k));top:calc(784*var(--k));width:calc(261*var(--k));height:calc(266*var(--k))\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/flavors/m-22552d-tile-7.avif\"><img src=\"/uploads/sections/flavors/m-22552d-tile-7.webp\" alt=\"Royal Taro Delight\" loading=\"lazy\" decoding=\"async\" style=\"width:100%;height:100%\"></picture></div><div class=\"a\" style=\"left:calc(505.864*var(--k));top:calc(784*var(--k));width:calc(263*var(--k));height:calc(266*var(--k))\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/flavors/m-22552d-tile-8.avif\"><img src=\"/uploads/sections/flavors/m-22552d-tile-8.webp\" alt=\"Korean Banana Milk\" loading=\"lazy\" decoding=\"async\" style=\"width:100%;height:100%\"></picture></div><div class=\"a\" style=\"left:calc(-29.136*var(--k));top:calc(1055*var(--k));width:calc(406*var(--k));height:calc(393*var(--k))\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/flavors/m-22552d-tile-9.avif\"><img src=\"/uploads/sections/flavors/m-22552d-tile-9.webp\" alt=\"Cookies &amp; Cream\" loading=\"lazy\" decoding=\"async\" style=\"width:100%;height:100%\"></picture></div><div class=\"a\" style=\"left:calc(384.864*var(--k));top:calc(1055*var(--k));width:calc(386*var(--k));height:calc(393*var(--k))\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/flavors/m-22552d-tile-10.avif\"><img src=\"/uploads/sections/flavors/m-22552d-tile-10.webp\" alt=\"Venetian Cappuccino\" loading=\"lazy\" decoding=\"async\" style=\"width:100%;height:100%\"></picture></div><h2 class=\"a nw ff-caveat\" data-b=\"0\" style=\"left:calc(360.421*var(--k));top:calc(9.711*var(--k));font-size:calc(68.043*var(--k));line-height:calc(81.652*var(--k));font-weight:700;color:#ee5764;transform:translateX(-50%);text-align:center;\">Explore 10 Delightful Flavors</h2></div>",
+      "_items": [
+        {
+          "src": "/uploads/seed/m-22552d",
+          "alt": "Explore 10 delightful flavors Spencer's MealBlend",
+          "w": 320,
+          "h": 648,
+          "mt": 20
+        }
+      ],
+      "mt": 20
+    },
+    {
+      "id": "video-chef-wina",
+      "name": "Video: Approved by Chef Wina",
+      "type": "html",
+      "mt": 23,
+      "html": "<div class=\"lp-yt\" data-yt=\"B3r9DepBtOU\" data-title=\"Spencer's MealBlend Approved by Chef Wina\"></div>"
+    },
+    {
+      "id": "promo-banner-2",
+      "name": "[PROMO] Banner (2)",
+      "type": "promo",
+      "part": "banner",
+      "x": 0,
+      "w": 320,
+      "mt": 32
+    },
+    {
+      "id": "cta-2",
+      "name": "CTA Chat Admin (2)",
+      "type": "html",
+      "html": "<div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.207/320);--x:2;--w:311;--h:171;--mt:23\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/cta-2/cta-siap-plate.avif\"><img src=\"/uploads/sections/cta-2/cta-siap-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(0*var(--k));top:calc(-2.121*var(--k));width:calc(1500*var(--k));height:calc(829*var(--k))\"></picture><h2 class=\"a nw ff-caveat\" data-b=\"0\" style=\"left:calc(750.956*var(--k));top:calc(147.359*var(--k));font-size:calc(128.216*var(--k));line-height:calc(129*var(--k));font-weight:700;color:#e1797e;transform:translateX(-50%);text-align:center;\">Kamu Siap Memiliki<br>Lingkar Tubuh Kecil Mu ?</h2><p class=\"a nw ff-libre\" data-b=\"1\" style=\"left:calc(747.702*var(--k));top:calc(465.28*var(--k));font-size:calc(61.613*var(--k));line-height:calc(80*var(--k));font-weight:700;color:#020100;transform:translateX(-50%);text-align:center;\">Kalau Nggak Percaya, Buktiin Aja<br>Khasiatnya <span style=\"color:#e3727a\">Dalam 2 Minggu !</span></p><p class=\"a nw ff-libre\" data-b=\"2\" style=\"left:calc(748.939*var(--k));top:calc(748.518*var(--k));font-size:calc(61.392*var(--k));line-height:calc(73.67*var(--k));font-weight:700;color:#020000;transform:translateX(-50%);text-align:center;\">Cobain Sendiri Disini :</p></div><a class=\"lp-box fx\" href=\"https://api.whatsapp.com/send?phone=6282229319391&text=Hi%20kak%2C%20mau%20info%20Spencer%27s%20MealBlend%20nya%20dong%20kak.%20%5BSPGM1%5D\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"--k:calc(100cqw*0.209/320);--x:5;--w:305;--h:68;--mt:0\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/cta-2/btn-chat-admin-plate.avif\"><img src=\"/uploads/sections/cta-2/btn-chat-admin-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(-21.14*var(--k));top:calc(0*var(--k));width:calc(1500*var(--k));height:calc(325*var(--k))\"></picture><p class=\"a nw ff-opensans\" data-b=\"0\" style=\"left:calc(529.056*var(--k));top:calc(61.458*var(--k));font-size:calc(76.278*var(--k));line-height:calc(91.534*var(--k));font-weight:700;color:#ffffff;\">Chat Admin</p></a>",
+      "_items": [
+        {
+          "src": "/uploads/seed/cta-siap",
+          "alt": "Kamu siap memiliki lingkar tubuh kecil mu? Buktiin aja khasiatnya dalam 2 minggu. Cobain sendiri disini:",
+          "x": 2,
+          "w": 311,
+          "h": 171,
+          "mt": 23
+        },
+        {
+          "src": "/uploads/seed/btn-chat-admin",
+          "alt": "Chat Admin via WhatsApp",
+          "x": 5,
+          "w": 305,
+          "h": 68,
+          "href": "https://api.whatsapp.com/send?phone=6282229319391&text=Hi%20kak%2C%20mau%20info%20Spencer%27s%20MealBlend%20nya%20dong%20kak.%20%5BSPGM1%5D"
+        }
+      ]
+    },
+    {
+      "id": "pembayaran-distributor-2",
+      "name": "Pembayaran Resmi & Peluang Distributor (2)",
+      "type": "html",
+      "html": "<div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.213/320);--x:0;--w:320;--h:217;--mt:0\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/pembayaran-distributor-2/pembayaran-plate.avif\"><img src=\"/uploads/sections/pembayaran-distributor-2/pembayaran-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(-1.926*var(--k));top:calc(0*var(--k));width:calc(1508*var(--k));height:calc(1020*var(--k))\"></picture><p class=\"a nw ff-inter\" data-b=\"0\" style=\"left:calc(754.873*var(--k));top:calc(221.421*var(--k));font-size:calc(43.852*var(--k));line-height:calc(52.623*var(--k));font-weight:700;color:#000000;transform:translateX(-50%);text-align:center;\">Pembayaran Official &amp; Trusted hanya melalui Paper.id</p><p class=\"a nw ff-inter\" data-b=\"1\" style=\"left:calc(754.98*var(--k));top:calc(283.985*var(--k));font-size:calc(43.72*var(--k));line-height:calc(52.464*var(--k));font-weight:400;color:#000000;transform:translateX(-50%);text-align:center;\">sebagai Payment Gateway resmi Spencer's Indonesia.</p><p class=\"a nw ff-inter\" data-b=\"2\" style=\"left:calc(274.366*var(--k));top:calc(378.108*var(--k));font-size:calc(45.132*var(--k));line-height:calc(54.158*var(--k));font-weight:700;color:#000000;\">Pastikan rekening tertera atas nama PAPER.ID.</p><p class=\"a nw ff-inter\" data-b=\"3\" style=\"left:calc(752.504*var(--k));top:calc(520.477*var(--k));font-size:calc(39.117*var(--k));line-height:calc(44*var(--k));font-weight:500;font-style:italic;color:#000000;transform:translateX(-50%);text-align:center;\">Spencer's Indonesia tidak pernah menggunakan<br>Rekening atas nama perseorangan</p><p class=\"a nw ff-inter\" data-b=\"4\" style=\"left:calc(248.835*var(--k));top:calc(682.837*var(--k));font-size:calc(31.981*var(--k));line-height:calc(36*var(--k));font-weight:400;color:#30505f;\">Bekerjasama dengan mitra<br>berizin dan diawasi oleh</p><p class=\"a nw ff-inter\" data-b=\"5\" style=\"left:calc(1034.034*var(--k));top:calc(816.722*var(--k));font-size:calc(28.738*var(--k));line-height:calc(36*var(--k));font-weight:400;color:#658493;\">Tersertifikasi<br>ISO 27001 · KAN</p></div><a class=\"lp-box fx\" href=\"https://www.spencers.id/agentslimdistributorretail1\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"--k:calc(100cqw*0.4/320);--x:1;--w:320;--h:71;--mt:20\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/pembayaran-distributor-2/btn-distributor-plate.avif\"><img src=\"/uploads/sections/pembayaran-distributor-2/btn-distributor-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(0*var(--k));top:calc(-0.75*var(--k));width:calc(800*var(--k));height:calc(179*var(--k))\"></picture><p class=\"a nw ff-opensans\" data-b=\"0\" style=\"left:calc(198.177*var(--k));top:calc(79.488*var(--k));font-size:calc(35.283*var(--k));line-height:calc(42.339*var(--k));font-weight:700;color:#ffffff;\">Info Peluang Distributor</p></a><div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.4/320);--x:0;--w:320;--h:247;--mt:0\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/pembayaran-distributor-2/m-f676f9-plate.avif\"><img src=\"/uploads/sections/pembayaran-distributor-2/m-f676f9-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(-0.324*var(--k));top:calc(0*var(--k));width:calc(800*var(--k));height:calc(617*var(--k))\"></picture><h2 class=\"a nw ff-poppins\" data-b=\"0\" style=\"left:calc(400.125*var(--k));top:calc(38.373*var(--k));font-size:calc(44.869*var(--k));line-height:calc(49*var(--k));font-weight:700;color:#ffffff;transform:translateX(-50%);text-align:center;\">Mau jadi Distributor /<br>Stockist MealBlend?</h2><p class=\"a nw ff-inter\" data-b=\"1\" style=\"left:calc(401.111*var(--k));top:calc(187.65*var(--k));font-size:calc(29.842*var(--k));line-height:calc(37*var(--k));font-weight:400;color:#020202;transform:translateX(-50%);text-align:center;\">Bantu kami menerima <b>besarnya antusiasme</b><br><b>permintaan Spencer’s MealBlend</b> secara<br>merata ke seluruh Indonesia.</p><p class=\"a nw ff-inter\" data-b=\"2\" style=\"left:calc(400.05*var(--k));top:calc(347.961*var(--k));font-size:calc(34.208*var(--k));line-height:calc(41.049*var(--k));font-weight:700;color:#5a63bb;transform:translateX(-50%);text-align:center;\">Dapatkan kesempatan</p><p class=\"a nw ff-inter\" data-b=\"3\" style=\"left:calc(404.187*var(--k));top:calc(391.768*var(--k));font-size:calc(30.402*var(--k));line-height:calc(36.482*var(--k));font-weight:400;color:#050505;transform:translateX(-50%);text-align:center;\">menghasilkan keuntungan</p><p class=\"a nw ff-inter\" data-b=\"4\" style=\"left:calc(377.386*var(--k));top:calc(424.738*var(--k));font-size:calc(27.357*var(--k));line-height:calc(32.829*var(--k));font-weight:400;color:#ffffff;transform:translateX(-50%);text-align:center;\">Puluhan hingga Ratusan juta rupiah /bln</p><p class=\"a nw ff-inter\" data-b=\"5\" style=\"left:calc(400.242*var(--k));top:calc(455.932*var(--k));font-size:calc(29.601*var(--k));line-height:calc(35.522*var(--k));font-weight:400;color:#030303;transform:translateX(-50%);text-align:center;\">dari penjualan Spencer’s MealBlend,</p><p class=\"a nw ff-inter\" data-b=\"6\" style=\"left:calc(400.184*var(--k));top:calc(542.215*var(--k));font-size:calc(29.654*var(--k));line-height:calc(35.585*var(--k));font-weight:700;font-style:italic;color:#020202;transform:translateX(-50%);text-align:center;text-decoration:underline;text-underline-offset:.12em\">Seperti kisah nyata mereka:</p></div>",
+      "_items": [
+        {
+          "src": "/uploads/seed/pembayaran",
+          "alt": "Pembayaran official dan trusted hanya melalui Paper.id",
+          "w": 320,
+          "h": 217,
+          "mt": 29
+        },
+        {
+          "src": "/uploads/seed/btn-distributor",
+          "alt": "Info peluang distributor",
+          "x": 1,
+          "w": 320,
+          "h": 71,
+          "mt": 20,
+          "href": "https://www.spencers.id/agentslimdistributorretail1"
+        },
+        {
+          "src": "/uploads/seed/m-f676f9",
+          "alt": "Mau jadi distributor / stockist MealBlend? Seperti kisah nyata mereka",
+          "w": 320,
+          "h": 247
+        }
+      ],
+      "mt": 29
+    },
+    {
+      "id": "video-distributor",
+      "name": "Video: Kisah Distributor",
+      "type": "html",
+      "mt": 28,
+      "html": "<div class=\"lp-yt\" data-yt=\"Ao_7jXNfEps\" data-title=\"Kisah nyata distributor Spencer's MealBlend\"></div><div class=\"lp-yt\" data-yt=\"ZX5IxT7LcgI\" data-title=\"Kisah nyata distributor Spencer's MealBlend\" style=\"--mt:20;--x:-4;--w:328;--h:180\"></div>"
+    },
+    {
+      "id": "testimoni-judul",
+      "name": "Testimoni (Judul)",
+      "type": "html",
+      "html": "<div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.428/320);--x:0;--w:321;--h:60;--mt:0\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/testimoni-judul/testimoni-header-plate.avif\"><img src=\"/uploads/sections/testimoni-judul/testimoni-header-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(0*var(--k));top:calc(-4.407*var(--k));width:calc(750*var(--k));height:calc(149*var(--k))\"></picture><h2 class=\"a nw ff-libre\" data-b=\"0\" style=\"left:calc(125*var(--k));top:calc(68.385*var(--k));font-size:calc(35.116*var(--k));line-height:calc(42.139*var(--k));font-weight:700;color:#db767c;\">Testimoni</h2></div>",
+      "_items": [
+        {
+          "src": "/uploads/seed/testimoni-header",
+          "alt": "Testimoni Spencer's MealBlend",
+          "w": 321,
+          "h": 60,
+          "mt": 20
+        }
+      ],
+      "mt": 20
+    },
+    {
+      "id": "testimoni-chat-slider",
+      "name": "Testimoni Chat (Slider)",
+      "type": "image",
+      "layout": "slider",
+      "slider": {
+        "transition": "fade",
+        "interval": 5000,
+        "dots": "square-dark",
+        "arrows": true
+      },
+      "box": {
+        "w": 320,
+        "h": 629,
+        "mt": 20
+      },
+      "slideBox": {
+        "x": 1,
+        "w": 316,
+        "h": 619
+      },
+      "items": [
+        {
+          "src": "/uploads/seed/chat-1",
+          "alt": "Testimoni chat customer Spencer's MealBlend"
+        },
+        {
+          "src": "/uploads/seed/chat-2",
+          "alt": "Testimoni chat customer Spencer's MealBlend"
+        },
+        {
+          "src": "/uploads/seed/chat-3",
+          "alt": "Testimoni chat customer Spencer's MealBlend"
+        },
+        {
+          "src": "/uploads/seed/chat-4",
+          "alt": "Testimoni chat customer Spencer's MealBlend"
+        },
+        {
+          "src": "/uploads/seed/chat-5",
+          "alt": "Testimoni chat customer Spencer's MealBlend"
+        },
+        {
+          "src": "/uploads/seed/chat-6",
+          "alt": "Testimoni chat customer Spencer's MealBlend"
+        },
+        {
+          "src": "/uploads/seed/chat-7",
+          "alt": "Testimoni chat customer Spencer's MealBlend"
+        },
+        {
+          "src": "/uploads/seed/chat-8",
+          "alt": "Testimoni chat customer Spencer's MealBlend"
+        },
+        {
+          "src": "/uploads/seed/chat-9",
+          "alt": "Testimoni chat customer Spencer's MealBlend"
+        },
+        {
+          "src": "/uploads/seed/chat-10",
+          "alt": "Testimoni chat customer Spencer's MealBlend"
+        },
+        {
+          "src": "/uploads/seed/chat-11",
+          "alt": "Testimoni chat customer Spencer's MealBlend"
+        },
+        {
+          "src": "/uploads/seed/chat-12",
+          "alt": "Testimoni chat customer Spencer's MealBlend"
+        },
+        {
+          "src": "/uploads/seed/chat-13",
+          "alt": "Testimoni chat customer Spencer's MealBlend"
+        },
+        {
+          "src": "/uploads/seed/chat-14",
+          "alt": "Testimoni chat customer Spencer's MealBlend"
+        },
+        {
+          "src": "/uploads/seed/chat-15",
+          "alt": "Testimoni chat customer Spencer's MealBlend"
+        },
+        {
+          "src": "/uploads/seed/chat-16",
+          "alt": "Testimoni chat customer Spencer's MealBlend"
+        },
+        {
+          "src": "/uploads/seed/chat-17",
+          "alt": "Testimoni chat customer Spencer's MealBlend"
+        },
+        {
+          "src": "/uploads/seed/chat-18",
+          "alt": "Testimoni chat customer Spencer's MealBlend"
+        },
+        {
+          "src": "/uploads/seed/chat-19",
+          "alt": "Testimoni chat customer Spencer's MealBlend"
+        },
+        {
+          "src": "/uploads/seed/chat-20",
+          "alt": "Testimoni chat customer Spencer's MealBlend"
+        },
+        {
+          "src": "/uploads/seed/chat-21",
+          "alt": "Testimoni chat customer Spencer's MealBlend"
+        },
+        {
+          "src": "/uploads/seed/chat-22",
+          "alt": "Testimoni chat customer Spencer's MealBlend"
+        }
+      ]
+    },
+    {
+      "id": "tips-dokter",
+      "name": "Tips Turun Berat Badan (Video Dokter)",
+      "type": "html",
+      "mt": 24,
+      "html": "<h2 class=\"lp-tips-title\"><span>Tips Turun Berat Badan</span><span>Lebih Sehat Dan Bahagia</span><small>(Menurut Dokter Ahli &amp; Senior)</small></h2><div class=\"lp-yt\" data-yt=\"_O4farj8ME0\" data-title=\"Tips Turun Berat Badan dari Dokter\" style=\"--mt:28\"></div><div class=\"lp-yt\" data-yt=\"XOitlk2BtZ8\" data-title=\"Rahasia Diet Paling Efektif\" style=\"--mt:28\"></div><div class=\"lp-yt\" data-yt=\"PFFagIw6nn8\" data-title=\"Tips Diet dari Dokter\" style=\"--mt:28\"></div><div class=\"lp-yt\" data-yt=\"ScDp7HBYSYg\" data-title=\"Tips Diet dari Dokter\" style=\"--mt:28;--x:-5;--w:330;--h:180\"></div><div class=\"lp-yt\" data-yt=\"Bi5S5SUqzlc\" data-title=\"Tips Diet dari Dokter\" style=\"--mt:28\"></div>"
+    },
+    {
+      "id": "faq",
+      "name": "FAQ Spencer's MealBlend",
+      "type": "html",
+      "mt": 20,
+      "html": "<div class=\"lp-box\" style=\"--x:-1;--w:319;--h:81\"><img src=\"/uploads/seed/faq-header.webp\" alt=\"Solusi Langsing Mu: FAQ Spencer's MealBlend\" loading=\"lazy\" decoding=\"async\"></div><div class=\"lp-faq\" style=\"--mt:-5\"><details><summary><h3>Apa itu Spencer’s MealBlend?</h3></summary><div class=\"lp-faq-a\"><p>Spencer's MealBlend adalah Resep Nutrisi Alami &amp; Ilmiah yang bekerja Mengecilkan Lingkar Tubuh Anda dan memiliki kandungan nutrisi makro yang bisa mengurangi atau menggantikan 1 kali porsi makan mu.</p><p>• 15gr Protein bersumber dari Pea (Setara 1 porsi ikan salmon)<br>• 9gr Serat Bersumber dari Chia Seeds (setara 2 mangkuk brokoli rebus)<br>• Rendah Kalori dan Rendah Gula</p><p>Kaya micro nutrients dari biji-bijian (Sesame, Quinoa, Flax Seed, Sun Flower, Soy, Almond, Pumpkin seeds 100% Vegan Friendly dan Lactose Free.</p></div></details><details><summary><h3>Apakah Spencer's MealBlend bisa dikonsumsi setiap hari?</h3></summary><div class=\"lp-faq-a\"><p>Spencer's MealBlend memiliki kandungan 100% Natural Ingredients sehingga sangat bagus untuk di konsumsi setiap hari dalam jangka waktu lama.</p></div></details><details><summary><h3>Apakah Spencer's MealBlend aman untuk Penderita MAAG/GERD?</h3></summary><div class=\"lp-faq-a\"><p>Secara bahan serat alami utama dari Spencer’s MealBlend adalah Chia Seeds yang dikenal sebagai salah satu Superfood yang memiliki kandungan <b>soluble</b> dan <b>insoluble fiber</b> yang paling seimbang.</p><p>Chia Seeds sendiri sangat baik untuk mengurangi gejala GERD dan dikonsumsi oleh penderita Maag karena kandungan serat yang tinggi.</p></div></details><details><summary><h3>Kapan waktu terbaik untuk konsumsi Spencers Mealblend?</h3></summary><div class=\"lp-faq-a\"><p>Spencer's MealBlend bisa dikonsumsi kapanpun, kita bisa rekomendasikan untuk dikonsumsi pada:</p><p><b>Pagi hari</b> sebagai pengganti / pelengkap makan pagi</p><p><b>Siang hari</b> di konsumsi 5-10 menit sebelum makan siang untuk memastikan badan mendapatkan asupan protein - serat yang cukup dan memperlambat penyerapan Lemak dan Karbohidrat dari makan siang kita</p><p><b>Sore hari</b> sebagai snacking yang rendah kalori</p><p><b>Malam hari</b> sebagai pengganti atau pelengkap makan malam kita</p></div></details><details><summary><h3>Apakah Spencer's MealBlend aman untuk Penderita Diabetes?</h3></summary><div class=\"lp-faq-a\"><p>Spencer's MealBlend menggunakan Stevia sebagai pemanis, sehingga lonjakan gula darah tidak terlalu tinggi ketika konsumsi Spencer's MealBlend.</p><p>Gula yang terkandung dalam Spencer's MealBlend hanya 0,5gr (berdasarkan uji lab Biochem) yang bersumber dari bahan baku yang kita gunakan.</p></div></details><details><summary><h3>Apakah Spencer's MealBlend aman untuk Ibu Hamil / Menyusui?</h3></summary><div class=\"lp-faq-a\"><p>Spencer's MealBlend menggunakan bahan baku 100% realfood dengan kualitas terbaik. Bahan baku Chia Seed justru sangat bagus untuk konstipasi yang umum terjadi pada ibu hamil.</p><p>Chia Seed juga tinggi Omega-3 untuk perkembangan Kognitif pada si Kecil.</p><p>Kandungan Kacang Almond pada Spencer's MealBlend juga bagus untuk bantu Mommy berikan ASI berkualitas untuk Baby nya.</p></div></details></div>"
+    },
+    {
+      "id": "disclaimer",
+      "name": "Disclaimer & Copyright",
+      "type": "html",
+      "html": "<div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.214/320);--x:-1;--w:320;--h:287;--mt:0\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/disclaimer/disclaimer-plate.avif\"><img src=\"/uploads/sections/disclaimer/disclaimer-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(-2.962*var(--k));top:calc(0*var(--k));width:calc(1500*var(--k));height:calc(1340*var(--k))\"></picture><h2 class=\"a nw ff-libre\" data-b=\"0\" style=\"left:calc(51.593*var(--k));top:calc(63.843*var(--k));font-size:calc(47.997*var(--k));line-height:calc(57.597*var(--k));font-weight:700;color:#000000;\">IMPORTANT: MEDICAL AND LEGAL DISCLAIMERS</h2><p class=\"a nw ff-inter\" data-b=\"1\" style=\"left:calc(66.038*var(--k));top:calc(253.669*var(--k));font-size:calc(37.889*var(--k));line-height:calc(44.143*var(--k));font-weight:400;color:#000000;\">The information provided by Spencer’s (“we,” “us,” or “our”) on this website<br>is for general informational and educational purposes only. We make<br>reasonable efforts to keep it accurate and up to date, but we make no<br>warranties of any kind about its completeness or accuracy. To the extent<br>permitted by applicable law, we are not liable for any loss or damage arising<br>from your use of this website or reliance on its content. Nothing in this<br>disclaimer limits your rights as a consumer under the laws of the Republic of<br>Indonesia.</p><p class=\"a nw ff-inter\" data-b=\"2\" style=\"left:calc(64.516*var(--k));top:calc(651.112*var(--k));font-size:calc(38.046*var(--k));line-height:calc(43.833*var(--k));font-weight:400;color:#000000;\">This website does not provide medical advice, diagnosis, or treatment, and<br>using it does not create a doctor-patient relationship. The health<br>information here is not a substitute for professional medical advice. Please<br>consult a qualified healthcare professional before acting on any information<br>on this website, especially if you are pregnant, nursing, taking medication,<br>or have an existing medical condition. In an emergency, call 119 or go to the<br>nearest healthcare facility immediately.</p><p class=\"a nw ff-inter\" data-b=\"3\" style=\"left:calc(64.524*var(--k));top:calc(1001.37*var(--k));font-size:calc(37.867*var(--k));line-height:calc(44*var(--k));font-weight:400;color:#000000;\">This website may feature testimonials from users of our products. These<br>reflect the personal experiences and opinions of those users, are not<br>guarantees of results, and may not represent the typical experience.<br>Individual results may vary. If a testimonial was given in exchange for free<br>products, compensation, or any other benefit, we will disclose it.</p></div><div class=\"lp-box fx\" style=\"--k:calc(100cqw*0.238/320);--x:0;--w:320;--h:59;--mt:3\"><picture><source type=\"image/avif\" srcset=\"/uploads/sections/disclaimer/footer-copyright-plate.avif\"><img src=\"/uploads/sections/disclaimer/footer-copyright-plate.webp\" alt=\"\" loading=\"lazy\" decoding=\"async\" style=\"position:absolute;left:calc(-77.458*var(--k));top:calc(0*var(--k));width:calc(1500*var(--k));height:calc(248*var(--k))\"></picture><p class=\"a nw ff-inter\" data-b=\"0\" style=\"left:calc(133.006*var(--k));top:calc(100.572*var(--k));font-size:calc(36.235*var(--k));line-height:calc(43.482*var(--k));font-weight:400;color:#747474;\">©2026 Spencer’s MealBlend. All rights reserved.</p></div>",
+      "_items": [
+        {
+          "src": "/uploads/seed/disclaimer",
+          "alt": "Important: medical and legal disclaimers",
+          "x": -1,
+          "w": 320,
+          "h": 287,
+          "mt": 22
+        },
+        {
+          "src": "/uploads/seed/footer-copyright",
+          "alt": "© 2026 Spencer's MealBlend. All rights reserved. Halal Indonesia",
+          "w": 320,
+          "h": 59,
+          "mt": 3
+        }
+      ],
+      "mt": 22
+    },
+    {
+      "id": "footer",
+      "name": "Footer Links",
+      "type": "html",
+      "mt": 20,
+      "html": "<footer class=\"lp-footer\"><hr><nav aria-label=\"Footer\"><ul><li><a href=\"http://spencers.id/privacypolicy\">Privacy Policy</a></li><li><a href=\"http://spencers.id/paymentmethod\">Payment Method</a></li><li><a href=\"http://spencers.id/termandconditions\">Terms &amp; Conditions</a></li><li><a href=\"http://spencers.id/shippingmethod\">Shipping Method</a></li></ul><ul><li><a href=\"http://spencers.id/about-us\">About us</a></li><li><a href=\"http://spencers.id/blog\">Blog</a></li><li><a href=\"http://spencers.id/spencersnews\">News</a></li><li><a href=\"http://spencers.id/faq-spencers\">FAQ</a></li></ul></nav><p>© 2026 Spencer's Indonesia</p></footer>"
+    }
+  ],
+  "updatedAt": "2026-10-14T11:33:05.707Z",
+  "updatedBy": "admin@mealblend.test",
+  "name": "Spencer's MealBlend Complete Nutrition | Spencer's Indonesia",
+  "badges": [
+    {
+      "id": "badge-manfaat",
+      "section": "manfaat-utama",
+      "cx": 262.5,
+      "cy": 46.9,
+      "w": 120.1
+    }
+  ],
+  "category": "Mealblend Women"
+}

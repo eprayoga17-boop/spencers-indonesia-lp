@@ -1,0 +1,38 @@
+/* Injected into the admin preview iframe only (never on the public page). */
+html, body { overflow-x: hidden; }
+.lp-sec { cursor: pointer; transform-origin: 50% 50%; }
+.lp-sec:hover { outline: 1px dashed rgba(255, 140, 0, .75); outline-offset: -1px; }
+
+/* Selected section: thin orange tint + outline while selected */
+.lp-sec.mb-sel { outline: 2px solid #ff8c00; outline-offset: -2px; z-index: 3; }
+.lp-sec.mb-sel::after {
+  content: ""; position: absolute; inset: 0; z-index: 50; pointer-events: none;
+  background: rgba(255, 140, 0, .12);
+}
+
+/* Pulse: grow 3% in 250 ms, hold, settle back by ~1 s */
+.lp-sec.mb-pulse { animation: mb-pulse 1.05s cubic-bezier(.2, .8, .2, 1); z-index: 4; }
+@keyframes mb-pulse {
+  0% { transform: scale(1); }
+  24% { transform: scale(1.03); }
+  76% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+/* Hidden sections are shown faded in the admin preview so they can still be selected */
+.lp-sec--hidden { opacity: .35; filter: grayscale(.6); }
+.lp-sec--hidden::before {
+  content: "Disembunyikan"; position: absolute; top: 6px; left: 6px; z-index: 60;
+  padding: 2px 8px; border-radius: 99px; background: #1d1719; color: #fff;
+  font: 600 11px/1.6 Arial, sans-serif; letter-spacing: .02em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-sec.mb-pulse { animation: none; }
+}
+
+/* Promo badges: draggable in the admin preview */
+.lp-badge { pointer-events: auto; cursor: move; touch-action: none; }
+.lp-badge:hover, .lp-badge.mb-drag { outline: 2px dashed #ff8c00; outline-offset: 2px; }
+.lp-badge .mb-h { position: absolute; right: -8px; bottom: -8px; width: 16px; height: 16px; border: 2px solid #ff8c00; border-radius: 50%; background: #fff; cursor: nwse-resize; display: none; }
+.lp-badge:hover .mb-h, .lp-badge.mb-drag .mb-h { display: block; }

@@ -1,0 +1,53 @@
+{
+  "promos": [
+    {
+      "id": "p-1010",
+      "kind": "insidentil",
+      "name": "10.10",
+      "manual": false,
+      "start": "2026-10-10T00:00:00+07:00",
+      "end": "2026-10-10T23:59:00+07:00",
+      "banner": {
+        "src": "/uploads/sections/promos/08115fa5a9f30a74",
+        "iw": 1440,
+        "ih": 668
+      },
+      "badge": {
+        "src": "/uploads/sections/promos/ba184fa60cc1efba",
+        "iw": 443,
+        "ih": 259
+      },
+      "bar": {
+        "title": "Promo “10.10 BIG SALE”",
+        "left": "Disc up to 60%",
+        "right": "FREE Ongkir Jawa - Bali",
+        "color": "#ff0000"
+      }
+    },
+    {
+      "id": "p-14day",
+      "kind": "regular",
+      "name": "14 Day Promo",
+      "start": "2026-10-01T00:00:00+07:00",
+      "end": "2026-12-31T23:59:00+07:00",
+      "banner": {
+        "src": "/uploads/sections/promos/c7dfccf5c569c5ae",
+        "iw": 1440,
+        "ih": 668
+      },
+      "badge": {
+        "src": "/uploads/sections/promos/dfa00926295ea348",
+        "iw": 169,
+        "ih": 95
+      },
+      "bar": {
+        "title": "Promo “14 DAY SLIMMING PROGRAM”",
+        "left": "Disc up to 60%",
+        "right": "FREE Ongkir Jawa - Bali",
+        "color": "#ff0000"
+      }
+    }
+  ],
+  "updatedAt": "2026-10-14T11:25:44.700Z",
+  "updatedBy": "admin@mealblend.test"
+}
