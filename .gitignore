@@ -21,3 +21,4 @@ perbandingan-5-section.jpg
 .vercel
 .env*
 !.env.example
+src/vendor/

@@ -4,7 +4,7 @@
 //   forms, event handlers and dangerous URLs (OWASP A03 Injection / XSS).
 // - Scopes the CSS to the section so it cannot restyle the rest of the page.
 // - Rewrites references to files uploaded together with the HTML to their new URLs.
-import sanitizeHtml from 'sanitize-html';
+import sanitizeHtml from '../vendor/sanitize-html.js'; // bundled by scripts/bundle-sanitizer.mjs (Vercel cannot require() ESM)
 
 const SVG_TAGS = ['svg', 'g', 'defs', 'path', 'rect', 'circle', 'ellipse', 'line', 'polyline', 'polygon', 'text', 'tspan',
   'lineargradient', 'radialgradient', 'stop', 'clippath', 'title', 'desc'];

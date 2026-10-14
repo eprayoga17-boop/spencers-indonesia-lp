@@ -11,7 +11,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
-    "vercel-build": "node scripts/build-seed.mjs"
+    "vercel-build": "node scripts/bundle-sanitizer.mjs && node scripts/build-seed.mjs",
+    "postinstall": "node scripts/bundle-sanitizer.mjs"
   },
   "dependencies": {
     "@vercel/blob": "2.8.0",
@@ -20,11 +21,12 @@
     "helmet": "^8.0.0",
     "multer": "^2.4.0",
     "qrcode": "1.5.4",
-    "sanitize-html": "^2.18.0",
+    "sanitize-html": "2.18.0",
     "sharp": "^0.35.5",
     "ua-parser-js": "1.0.41"
   },
   "devDependencies": {
+    "esbuild": "0.28.2",
     "puppeteer-core": "^23.11.1"
   }
 }
