@@ -17,3 +17,7 @@ src/seed-data.js
 design-src/live/
 design-src/figma/
 perbandingan-5-section.jpg
+
+.vercel
+.env*
+!.env.example
