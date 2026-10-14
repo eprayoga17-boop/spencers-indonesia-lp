@@ -1,6 +1,6 @@
 import express from 'express';
 import helmet from 'helmet';
-import { fs, ensureSeeded, serveUpload } from './src/storage.js';
+import { fs, ensureSeeded, serveUpload, READONLY } from './src/storage.js';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { renderPage } from './src/render.js';
@@ -77,7 +77,13 @@ async function loadPage(slug) {
   }
 }
 
-app.use('/admin', adminRouter({ assetVersion: ASSET_VERSION }));
+if (READONLY) {
+  // Deployed without a database: pages are served from the bundled content, the admin stays off.
+  app.use('/admin', (req, res) => res.status(503).set('Cache-Control', 'no-store').type('text')
+    .send('Admin belum aktif: database (Upstash Redis) belum dihubungkan ke project Vercel ini.'));
+} else {
+  app.use('/admin', adminRouter({ assetVersion: ASSET_VERSION }));
+}
 
 // First-party analytics beacon (cookieless, see src/analytics.js). Always answers 204.
 const pageExists = async (slug) => Boolean(await loadPage(slug));

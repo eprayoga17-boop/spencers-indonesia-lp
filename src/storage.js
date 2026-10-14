@@ -147,7 +147,39 @@ const cloudFs = {
   },
 };
 
-export const fs = CLOUD ? cloudFs : nodeFs;
+// On Vercel without Redis the deployed files are all there is: serve the bundled data/ read-only
+// (landing pages work, the admin is switched off in server.js until Redis is connected).
+export const READONLY = Boolean(process.env.VERCEL) && !CLOUD;
+let seedFiles = null;
+const seed = async () => (seedFiles ||= await import('./seed-data.js').then((m) => m.default).catch(() => ({})));
+const erofs = (p) => Object.assign(new Error(`EROFS: read-only storage, '${p}'`), { code: 'EROFS' });
+const readonlyFs = {
+  async readFile(p, enc) {
+    const v = (await seed())[rel(p)];
+    if (v == null) throw enoent(p);
+    return enc ? v : Buffer.from(v, 'utf8');
+  },
+  async readdir(p) {
+    const prefix = `${rel(p)}/`;
+    return [...new Set(Object.keys(await seed()).filter((k) => k.startsWith(prefix)).map((k) => k.slice(prefix.length).split('/')[0]))];
+  },
+  async stat(p) {
+    const r = rel(p);
+    const files = await seed();
+    if (files[r] != null) return { size: files[r].length, mtimeMs: 0, mtime: new Date(0), isFile: () => true, isDirectory: () => false };
+    if (Object.keys(files).some((k) => k.startsWith(`${r}/`))) return { size: 0, mtimeMs: 0, mtime: new Date(0), isFile: () => false, isDirectory: () => true };
+    throw enoent(p);
+  },
+  async access(p) { await readonlyFs.stat(p); },
+  async mkdir() {},
+  writeFile: async (p) => { throw erofs(p); },
+  appendFile: async (p) => { throw erofs(p); },
+  unlink: async (p) => { throw erofs(p); },
+  rm: async (p) => { throw erofs(p); },
+  rename: async (p) => { throw erofs(p); },
+};
+
+export const fs = CLOUD ? cloudFs : READONLY ? readonlyFs : nodeFs;
 
 // ---------------------------------------------------------------- small key-value store with expiry
 // Sessions, login lockouts and preview links. Cloud: Redis keys. Local: memory mirrored to data/kv.json.
