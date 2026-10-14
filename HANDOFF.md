@@ -185,3 +185,13 @@ Written so far (not wired into server.js yet, untested):
 - Vercel's function loader cannot `require()` ES modules, so `sanitize-html` 2.18 (+ ESM-only htmlparser2 12) is bundled into
   `src/vendor/sanitize-html.js` by `scripts/bundle-sanitizer.mjs` (postinstall + vercel-build; gitignored). Output verified
   identical to the package with `design-src/test-sanitize.mjs`. Do not downgrade to 2.17.x (known XSS advisories).
+
+## 2026-10-14 — Admin performance
+
+- Every request logs `[timing] … total=…ms store=<calls>x/<ms>` on Vercel (`vercel logs <deployment>`); admin responses carry a
+  `Server-Timing` header. Measured live: one Upstash call ≈ 225–300 ms from sin1 because the current database's primary is not
+  in Singapore (endpoint `global-ap1` forwards). **Fix: a new Upstash Redis DB with primary region ap-southeast-1**, then copy keys.
+- Code: batched reads (`readMany`, `mtimes`), `writeAtomic` (no temp+rename in Redis), single-round-trip deletes, parallel
+  independent reads in routes, analytics range = 2 round trips. 100 ms/call simulation: dashboard 1.6→0.6 s, editor 1.7→0.6 s,
+  30-day report 1.8→0.55 s, one edit 1.1→0.65 s. Versioned assets/uploads cached immutable via vercel.json.
+- `.agents/`, `.claude/skills/`, `skills-lock.json` (Upstash agent skills added by the Upstash setup) are not committed.
