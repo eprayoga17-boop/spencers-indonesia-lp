@@ -2,6 +2,29 @@
 // Layout numbers (x, w, h, mt) are in "design units": 1 unit = page width / designWidth (320),
 // so every section scales together and always fits the page width.
 
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+// The page CSS (about 5 KB compressed) is inlined so the first paint does not wait for a separate
+// stylesheet request. Font URLs become absolute; comments and indentation are stripped.
+const CSS_FILE = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'public', 'assets', 'css', 'lp.css');
+let cssCache = null;
+function pageCss() {
+  if (cssCache && process.env.NODE_ENV === 'production') return cssCache;
+  try {
+    cssCache = fs.readFileSync(CSS_FILE, 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replaceAll('url("../fonts/', 'url("/assets/fonts/')
+      .replace(/\n\s+/g, '\n')
+      .replace(/\n{2,}/g, '\n')
+      .trim();
+  } catch {
+    cssCache = null; // fall back to the external stylesheet
+  }
+  return cssCache;
+}
+
 const esc = (s = '') =>
   String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
@@ -188,7 +211,7 @@ ${page.thumbnail ? `<meta property="og:image" content="${esc(page.thumbnail)}">`
 <meta name="theme-color" content="#ff0000">
 ${favicon ? `<link rel="icon" href="${esc(favicon)}">` : ''}
 <link rel="preload" href="/assets/fonts/poppins-600.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/css/lp.css?v=${esc(assetVersion)}">
+${(() => { const css = pageCss(); return css ? `<style>${css}</style>` : `<link rel="stylesheet" href="/assets/css/lp.css?v=${esc(assetVersion)}">`; })()}
 </head>
 <body style="--lp-outer:${esc(st.outerBackground || '#f2f2f2')}">
 <main class="lp" style="--lp-max:${maxWidth}px;--lp-bg:${esc(st.background || '#fff')}${fontVar}">
