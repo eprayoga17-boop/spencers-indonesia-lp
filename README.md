@@ -6,7 +6,8 @@ images stacked, or a slider) or an **HTML** section.
 
 All user and admin flows are drawn as flowcharts in [docs/ALUR.md](docs/ALUR.md) (technical). A non-technical
 website flowchart for the team (PDF + PNG) is in [docs/flowchart-website/](docs/flowchart-website/), built by
-`node scripts/build-flowchart.mjs`.
+`node scripts/build-flowchart.mjs`; the single-page overall flow (`Alur-Keseluruhan`) by
+`node scripts/build-flowchart-overall.mjs`.
 
 ## Run
 
