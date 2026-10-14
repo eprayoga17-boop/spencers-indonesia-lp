@@ -196,3 +196,15 @@ Written so far (not wired into server.js yet, untested):
   independent reads in routes, analytics range = 2 round trips. 100 ms/call simulation: dashboard 1.6→0.6 s, editor 1.7→0.6 s,
   30-day report 1.8→0.55 s, one edit 1.1→0.65 s. Versioned assets/uploads cached immutable via vercel.json.
 - `.agents/`, `.claude/skills/`, `skills-lock.json` (Upstash agent skills added by the Upstash setup) are not committed.
+
+## 2026-10-14 — Landing page Lighthouse (mobile)
+
+- SEO 63 → 100: the page carried `robots: "noindex"` (imported). The SEO tab checkbox only recognised
+  "noindex, nofollow"; fixed (`/noindex/i`), the owner then unticked it.
+- Performance: sections from index 4 on get `content-visibility:auto` (`.lp-cv`, placeholder `--ih` from section data,
+  first box margin moved onto the section because containment stops margin collapse; promo sections, sections with
+  badges, admin preview and heatmap keep full layout). Page CSS is inlined in the HTML (`pageCss()` in render.js).
+  Verified by full-page screenshot comparison (identical page/section heights). Local Lighthouse: 57 → ~80, TBT 660 → 0 ms,
+  style+layout 3.2 → ~1.1 s, initial bytes 989 → ~700 KiB; observed FCP/LCP ≈ 1.0 s.
+- Next candidates: subset the 21 woff2 fonts to Latin (≈430 KB loaded on the first screen) and responsive `srcset`
+  (uploads are 1440 px wide for ~412 px slots, ≈290 KB).
