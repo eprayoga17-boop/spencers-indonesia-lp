@@ -91,8 +91,48 @@ function badges(list, promo, admin) {
   return list.map((bd) => `<div class="lp-badge" data-badge="${esc(bd.id)}" style="--cx:${num(bd.cx)};--cy:${num(bd.cy)};--bw:${num(bd.w, 100)}">${picture({ ...b, alt: admin ? '' : promo.name })}</div>`).join('');
 }
 
+// Approximate height of a section in design units, used as the placeholder size of sections the
+// browser skips until they come near the screen (content-visibility). null = unknown.
+function estimateHeight(sec) {
+  if (sec.type === 'image') {
+    if (sec.layout === 'slider') return num(sec.box && sec.box.h, 0) || null;
+    let h = 0;
+    for (const it of sec.items) {
+      if (it.h != null) h += num(it.h) + num(it.mt);
+      else if (it.iw && it.ih) h += (320 * num(it.ih)) / num(it.iw) + num(it.mt);
+      else return null;
+    }
+    return h || null;
+  }
+  if (sec.type === 'html') {
+    const m = String(sec.html || '').match(/height:\s*calc\(\s*([\d.]+)\s*\*\s*var\(--u\)\s*\)/);
+    return m ? Number(m[1]) : null;
+  }
+  return null;
+}
+
+// Top margin (design units) of a section's first box. Without containment that margin collapses through
+// the section's top edge; content-visibility contains it, so it is moved onto the section instead.
+// undefined = the first child is not a known box (its margins cannot be moved safely).
+function firstBoxMargin(sec) {
+  if (sec.type === 'image') return sec.layout === 'slider' ? num(sec.box && sec.box.mt) : num(sec.items[0] && sec.items[0].mt);
+  if (sec.type === 'html' && !sec.wrap) {
+    const html = String(sec.html || '').replace(/^\s*(<style[\s\S]*?<\/style>\s*)*/i, '');
+    const m = html.match(/^<(?:div|a)\b[^>]*\bclass="lp-(?:box|slider)\b[^"]*"[^>]*>/i);
+    if (!m) return undefined;
+    const mt = m[0].match(/--mt:\s*(-?[\d.]+)/);
+    return mt ? Number(mt[1]) : 0;
+  }
+  return undefined;
+}
+// CSS margin collapsing of two adjoining margins.
+const collapse = (a, b) => (a >= 0 && b >= 0 ? Math.max(a, b) : a < 0 && b < 0 ? Math.min(a, b) : a + b);
+
+// Sections from this index on may be skipped by the browser until scrolled near (first screen renders normally).
+const LAZY_FROM = 4;
+
 function section(sec, index, ctx = {}) {
-  const { showHidden, promo, badgesBySection } = ctx;
+  const { showHidden, promo, badgesBySection, lazyLayout } = ctx;
   if (sec.visible === false && !showHidden) return '';
   let body = '';
   if (sec.type === 'image') {
@@ -104,13 +144,21 @@ function section(sec, index, ctx = {}) {
     body = sec.part === 'bar' ? promoBar(promo, showHidden) : promoBanner(sec, promo, showHidden);
     if (!body) return '';
   }
-  body += badges((badgesBySection && badgesBySection.get(sec.id)) || [], promo, showHidden);
-  const mt = sec.mt ? ` style="--smt:${num(sec.mt)}"` : '';
+  const own = (badgesBySection && badgesBySection.get(sec.id)) || [];
+  body += badges(own, promo, showHidden);
+  // content-visibility also clips overflow, so sections carrying a promo badge always render.
+  const firstMt = lazyLayout ? firstBoxMargin(sec) : undefined;
+  const lazy = lazyLayout && index >= LAZY_FROM && !own.length && sec.type !== 'promo' && firstMt !== undefined;
+  const ih = lazy ? estimateHeight(sec) : null;
+  const smt = lazy ? collapse(num(sec.mt), firstMt) : num(sec.mt);
+  const styles = [smt ? `--smt:${smt}` : '', lazy ? `--ih:${Math.round(ih || 300)}` : ''].filter(Boolean).join(';');
+  const style = styles ? ` style="${styles}"` : '';
   const scope = sec.scope ? ` data-s="${esc(sec.scope)}"` : '';
-  return `<section class="lp-sec lp-sec--${sec.type}${sec.visible === false ? ' lp-sec--hidden' : ''}" id="${esc(sec.id)}" data-name="${esc(sec.name)}"${scope}${mt}>${body}</section>`;
+  return `<section class="lp-sec lp-sec--${sec.type}${sec.visible === false ? ' lp-sec--hidden' : ''}${lazy ? ' lp-cv' : ''}" id="${esc(sec.id)}" data-name="${esc(sec.name)}"${scope}${style}>${body}</section>`;
 }
 
-export function renderPage(page, { assetVersion = '1', global = {}, showHidden = false, promo = null } = {}) {
+// fullLayout: lay out every section up front (admin preview and heatmap measure section positions).
+export function renderPage(page, { assetVersion = '1', global = {}, showHidden = false, promo = null, fullLayout = false } = {}) {
   const st = page.settings || {};
   const maxWidth = num(st.maxWidth, 0) || num(global.maxWidth, 0) || 480;
   const font = st.font != null ? st.font : global.font || '';
@@ -122,7 +170,8 @@ export function renderPage(page, { assetVersion = '1', global = {}, showHidden =
     if (!badgesBySection.has(b.section)) badgesBySection.set(b.section, []);
     badgesBySection.get(b.section).push(b);
   }
-  const sections = page.sections.map((sec, i) => section(sec, i, { showHidden, promo, badgesBySection })).join('\n');
+  const lazyLayout = !showHidden && !fullLayout;
+  const sections = page.sections.map((sec, i) => section(sec, i, { showHidden, promo, badgesBySection, lazyLayout })).join('\n');
   return `<!doctype html>
 <html lang="id">
 <head>

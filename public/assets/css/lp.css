@@ -282,3 +282,10 @@ a.lp-box:active { filter: brightness(.94); }
 }
 .lp-badge img { display: block; width: 100%; height: auto; }
 .lp-promo-empty { padding: calc(14 * var(--u)) calc(10 * var(--u)); border: 2px dashed #ff8c00; background: #fff7ed; color: #9a5b00; font: 600 calc(11 * var(--u)) / 1.3 Arial, sans-serif; text-align: center; }
+
+/* Sections below the first screen are laid out and painted only when they come near the viewport
+   (big win on long pages). The placeholder height is the estimated section height (--ih, design units);
+   "auto" keeps the real height once a section has been rendered. */
+.lp-cv { content-visibility: auto; contain-intrinsic-block-size: auto calc(var(--ih, 300) * var(--u)); }
+/* The first box's top margin is moved onto the section by the renderer (containment stops it collapsing). */
+.lp-cv > :nth-child(1 of :not(style, script)) { margin-top: 0 !important; }

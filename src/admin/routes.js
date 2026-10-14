@@ -337,7 +337,7 @@ export function adminRouter({ assetVersion = '1' } = {}) {
       const [page, global, promo] = await Promise.all([getPage(req.params.slug), getGlobal(), promos.activePromo()]);
       if (!page) return res.status(404).type('text').send('Halaman tidak ditemukan');
       res.set('Cache-Control', 'no-store');
-      res.type('html').send(renderPage({ ...page, robots: 'noindex, nofollow' }, { assetVersion, global: { ...global, ga4Id: '' }, promo }));
+      res.type('html').send(renderPage({ ...page, robots: 'noindex, nofollow' }, { assetVersion, global: { ...global, ga4Id: '' }, promo, fullLayout: true }));
     } catch (e) {
       next(e);
     }
