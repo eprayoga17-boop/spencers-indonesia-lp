@@ -1452,7 +1452,8 @@
 
     // ============================================================ tab: SEO
     function renderSeo() {
-      const hide = h('input', { type: 'checkbox', checked: page.robots === 'noindex, nofollow', onchange: (e) => patch({ robots: e.target.checked ? 'noindex, nofollow' : '' }, e.target.checked ? 'Halaman disembunyikan dari mesin pencari.' : 'Halaman boleh diindeks.') });
+      // Any robots value containing "noindex" hides the page (imported pages may carry just "noindex").
+      const hide = h('input', { type: 'checkbox', checked: /noindex/i.test(page.robots || ''), onchange: (e) => patch({ robots: e.target.checked ? 'noindex, nofollow' : '' }, e.target.checked ? 'Halaman disembunyikan dari mesin pencari.' : 'Halaman boleh diindeks.') });
       const title = h('input', { type: 'text', maxlength: 160, value: page.title, onchange: (e) => patch({ title: e.target.value }, 'Judul halaman diubah.') });
       const count = h('span', { class: 'hint' });
       const desc = h('textarea', { maxlength: 500, rows: 4, class: 'input', onchange: (e) => patch({ description: e.target.value }, 'Meta deskripsi diubah.') });
