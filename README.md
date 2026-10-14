@@ -4,7 +4,9 @@ Mobile-only landing pages for Spencer's Indonesia (MealBlend), built as an order
 topic-based sections. Each section is either an **image** section (one or more
 images stacked, or a slider) or an **HTML** section.
 
-All user and admin flows are drawn as flowcharts in [docs/ALUR.md](docs/ALUR.md).
+All user and admin flows are drawn as flowcharts in [docs/ALUR.md](docs/ALUR.md) (technical). A non-technical
+website flowchart for the team (PDF + PNG) is in [docs/flowchart-website/](docs/flowchart-website/), built by
+`node scripts/build-flowchart.mjs`.
 
 ## Run
 
