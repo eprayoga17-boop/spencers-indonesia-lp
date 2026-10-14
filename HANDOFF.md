@@ -1,9 +1,40 @@
 # HANDOFF — context for the next AI session (read this first)
 
-Project root: `C:\Users\RIGA\OneDrive\Documents\mealblend-lp` (Windows 11, Node 24, not a git repo yet).
-User: Indonesian speaker (reply in Bahasa Indonesia), product/marketing person for Spencer's MealBlend.
-User preferences: prioritise progress over reports; short reports; few screenshots; build the whole thing first,
-then revise piece by piece; ask only when genuinely blocked. Wants the `ui-ux-pro-max` skill used for UI work.
+## Quick start (state on 2026-10-15)
+- **Code**: https://github.com/eprayoga17-boop/spencers-indonesia-lp (public, branch `main`). Local working copy on the
+  user's PC: `C:\Users\RIGA\OneDrive\Documents\mealblend-lp` (Windows 11, Node 24).
+- **Live site**: https://spencers-indonesia-lp.vercel.app/slimmealsolutionmintidn2 — admin at `/admin`.
+  Vercel project `spencers-indonesia-lp` (account `eprayoga17-boop`, Hobby plan, region sin1). Every push to `main`
+  deploys automatically. Environment-variable changes need a redeploy (`vercel redeploy <deployment-url> --target production`).
+- **Storage on Vercel**: Upstash Redis `spencers-redis-sg` (primary Singapore, Free, eviction off; env `KV_REST_API_URL/TOKEN`)
+  holds pages, drafts, promos, global settings, sessions, analytics and the audit log. Vercel Blob `spencers-indonesia-uploads`
+  (public; env `BLOB_READ_WRITE_TOKEN`) holds images uploaded in the admin. Locally the same code uses files in `data/`.
+  **The live content lives in Redis, not in the repo's `data/` folder** (that folder only seeded the first deploy).
+- **Secrets are not in GitHub**: `.env` (ADMIN_USERS, EXPORT_SECRET) and `data/secrets/admin-credentials.txt` (dummy admin
+  `admin@mealblend.test` password) exist only on the user's PC; ADMIN_USERS/EXPORT_SECRET are also Vercel env vars (sensitive).
+  Ask the user if a password is needed; never print it.
+- **Tools**: Vercel CLI (logged in) for `ls / inspect / logs / env / redeploy` — the Vercel MCP connector gets 403 on this
+  personal account. GitHub CLI at `C:\Program Files\GitHub CLI\gh.exe` (logged in). `vercel logs <url>` shows one
+  `[timing] … store=<calls>x/<ms>` line per request.
+- **Docs**: `README.md` (run/deploy), `SECURITY.md` (OWASP/PDP/SOC mapping), `docs/ALUR.md` (technical flows, Mermaid),
+  `docs/flowchart-website/` (non-technical flowcharts for the team: 5-page PDF/PNG + single-page `Alur-Keseluruhan`;
+  rebuild with `node scripts/build-flowchart.mjs` / `node scripts/build-flowchart-overall.mjs`).
+
+## How to work with this user
+- Indonesian speaker (reply in Bahasa Indonesia), product/marketing person for Spencer's Indonesia (brand: Spencer's MealBlend).
+- **Work in the GitHub repo and verify on the live site** (user's instruction 2026-10-14: "kerjakan langsung di Repo GitHub,
+  jangan lokal"). Commit + push to `main`, check the Vercel deployment and logs. Do not rely on the local dev server/data.
+- **Confirm before significant changes** (the user regularly asks "konfirmasi dulu"); for small fixes just do them.
+- Do not log in to the live admin with credentials yourself; ask the user to try flows that need a login.
+- Prioritise progress over reports; short reports; few screenshots. Wants `ui-ux-pro-max` for UI work; QA skills from
+  `petrkindlmann/qa-skills` are installed globally (e.g. `performance-testing`).
+
+## Open items / ideas (not started; ask the user first)
+- 2FA (TOTP) and a real admin account (the dummy admin is reachable on the internet); admin roles (who sees security logs).
+- Vercel Hobby is non-commercial by Vercel's terms — company use needs Pro.
+- Landing page speed: subset the woff2 fonts to Latin and add responsive `srcset` for images (see the Lighthouse section).
+- Scheduled backup/export of Redis; consent notice before enabling GA4; delete sample analytics once real data exists.
+- `data/promos.json` / `data/promos-draft.json` changes on the user's PC are local tests — do not commit them.
 
 ## The user's original brief (6 points)
 1. Mobile-only landing page (no desktop version) identical to the live Wix page
@@ -23,7 +54,7 @@ then revise piece by piece; ask only when genuinely blocked. Wants the `ui-ux-pr
    Admin login = email + password only (NO Google Authenticator/2FA yet).
 
 Answers already given by the user for phase 2:
-- Hosting: **local only for now**.
+- Hosting: local only at first; since 2026-10-14 on Vercel (see Quick start).
 - Admin email: **dummy** for now (e.g. `admin@mealblend.test`).
 - Login: **email + dummy password** (not magic link).
 
@@ -39,7 +70,7 @@ Answers already given by the user for phase 2:
   click-to-load YouTube facade via `.lp-yt[data-yt=ID]`, FAQ uses `<details>`). Fonts self-hosted in
   `public/assets/fonts`. Images: `public/uploads/seed` (from live page), `public/uploads/sections/<sectionId>/`.
 - Dev-only query `?only=id1,id2` renders just those sections (used by calibration tools).
-- 48 sections, 41 are real HTML text over "clean plate" background images. User rules for this conversion:
+- 48 original sections (50 now, incl. 3 [PROMO] sections after the promo migration), 41 are real HTML text over "clean plate" background images. User rules for this conversion:
   posters/product-box art stay ONE image (Award "National Best Brand", Artisan Tea x2, "200.000++ customer",
   CTA promo banner), badges stay images (Instant Effect, 14-Day promo badge), WhatsApp chat screenshots stay
   images, "Explore 10 Flavors" = 10 separate images, YouTube "Langsung Kenyang, Tahan Lama!" box = 4:5.
@@ -47,7 +78,7 @@ Answers already given by the user for phase 2:
   overlays HTML text, auto-calibrates with puppeteer-core + headless Chrome), specs in `plates-spec.mjs` +
   `plates-spec-2.mjs`, calibration state `plates-calib.json`, first 5 sections from Figma via
   `build-sections.mjs`, visual diff `compare-section.mjs <ids>`, final small edits `post-fixes.mjs`.
-  Live originals in `design-src/live/`. Figma MCP is on the Starter plan and its quota ran out.
+  Live originals in `design-src/live/` (only on the user's PC, not in git). Figma MCP is on the Starter plan and its quota ran out.
 
 ### Phase 2–4 + 6 — admin (DONE 2026-10-14, tested end-to-end)
 Admin at `/admin` (login, Halaman, Editor, Riwayat, Log Aktivitas). Files: `src/admin/{security,sanitize,media,routes}.js`,
@@ -56,8 +87,8 @@ Dummy admin `admin@mealblend.test`; password only in `data/secrets/admin-credent
 Section JSON additions: `scope` (CSS scope key → `data-s` attr), `source` (unscoped sanitized HTML shown in editor),
 `wrap: true` (uploaded HTML wrapped in `.lp-html`, clipped to page width), image items `iw/ih` (pixel size).
 Tests: `node design-src/test-sanitize.mjs` (existing 46 HTML sections survive re-sanitize; attack samples clean).
-Sessions are in-memory: `node --watch` restarts (any server-side file edit) log the admin out.
-Possible next steps (ask user): 2FA later, real admin email, hosting/HTTPS + backups, user feedback on admin UI.
+Sessions now live in the shared key-value store (`kv` in src/storage.js: Redis on Vercel, `data/kv.json` locally).
+Next steps: see "Open items" at the top.
 
 ### Editor v2 (Berdu-style) — DONE 2026-10-14
 User asked to mirror Berdu's page editor. Header: Kembali · name · status · undo/redo · Lihat live · **Simpan**.
@@ -90,7 +121,7 @@ red bar text (title, left, right, colour). Banner link is static per page sectio
 - Migration `scripts/migrate-promo.mjs` (already run): promo bar + both CTA banners → [PROMO] sections (CTA rest
   renamed "CTA Chat Admin"), the SVG 14-Day badge in "Manfaat Utama" → floating badge. Seeded promos: 10.10
   (insidentil, 10 Okt 2026) and 14 Day Promo (regular, 1 Okt – 31 Des 2026 — assumed, user can change).
-- Admin sessions are now mirrored (hashed ids) to `data/sessions.json` so dev restarts don't log out.
+- (Superseded) sessions were mirrored to `data/sessions.json`; they now use the `kv` store (see GitHub + Vercel).
 
 ### Admin redesign + Laporan — DONE 2026-10-14
 - Shell: dark sidebar (Dashboard · Laporan · Halaman · Logout; collapsible, off-canvas on mobile), app bar with
@@ -115,7 +146,7 @@ red bar text (title, left, right, colour). Banner link is static per page sectio
 - Split-screen login (`login-hero.webp` cropped from manfaat-utama bg). `?next=` return-to-page after login
   (validated by `safeNext`, admin paths only). Idle warning 2 min before the 30-min logout ("Tetap masuk" → `/admin/api/ping`).
 - Editor: sidebar navigation asks Simpan/Pindah/Batal when the draft is dirty; "Coba di HP" → QR + 1-hour link
-  `/p/<token>` (`src/preview-links.js`, hashed tokens in data/preview-links.json, LAN IP in dev; renders the draft,
+  `/p/<token>` (`src/preview-links.js`, hashed tokens in the `kv` store, LAN IP in dev; renders the draft,
   noindex, not tracked); warning box when the live promo has no badge/banner/bar for this page.
 - Nav dots (`/admin/api/status`) for unsaved page drafts / unpublished promo draft; promo toasts offer "Publish sekarang";
   promo timeline (100 days, same resolution rules as server) with "Tidak ada promo" gap warning.
@@ -126,11 +157,11 @@ red bar text (title, left, right, colour). Banner link is static per page sectio
   section and clicks [section, kind, x, y in design units]; `sectionReport()` aggregates; heatmap = `/admin/live/:slug`
   in an iframe with attention tint (reach %) or click dots. Sample data includes engagement for the main page.
 
-#### Original admin plan (kept for reference)
+#### Original admin plan (historical — everything below is implemented and tested)
 Installed deps: express, helmet, sharp@0.35.5 (upgraded for CVEs; `npm audit` = 0), multer@2,
 sanitize-html@2, express-rate-limit@7; dev: puppeteer-core.
 
-Written so far (not wired into server.js yet, untested):
+First files written:
 - `src/store.js` — page JSON storage: `getPage/listPages/savePage/createPage/archivePage`, atomic writes,
   history snapshot on every save in `data/history/<slug>/<ts>.json` (keep 50), `listHistory/readHistory`,
   per-page write lock `withPageLock`, `isValidSlug` (reserved: admin, assets, uploads, api…), `newSectionId`.
