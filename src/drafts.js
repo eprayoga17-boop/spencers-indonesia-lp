@@ -1,9 +1,8 @@
 // Draft editing with undo/redo. Edits never touch the live page until "Simpan" (publish).
 // data/drafts/<slug>/meta.json  { rev, pos, savedPos, ids: [n...], next, baseVersion }
 // data/drafts/<slug>/<n>.json   one full editor state { page, global } per step
-import { fs } from './storage.js';
+import { fs, writeAtomic, readMany } from './storage.js';
 import path from 'node:path';
-import crypto from 'node:crypto';
 import { ROOT, isValidSlug } from './store.js';
 
 const DIR = path.join(ROOT, 'data', 'drafts');
@@ -14,11 +13,7 @@ const dirOf = (slug) => {
   return path.join(DIR, slug);
 };
 
-async function writeJson(file, data) {
-  const tmp = `${file}.${crypto.randomBytes(6).toString('hex')}.tmp`;
-  await fs.writeFile(tmp, JSON.stringify(data));
-  await fs.rename(tmp, file);
-}
+const writeJson = (file, data) => writeAtomic(file, JSON.stringify(data));
 async function readJson(file) {
   try {
     return JSON.parse(await fs.readFile(file, 'utf8'));
@@ -48,7 +43,7 @@ export async function openDraft(slug, initial) {
     if (state) return { meta, state };
   }
   const state = await initial();
-  await fs.rm(dir, { recursive: true, force: true });
+  if (meta) await fs.rm(dir, { recursive: true, force: true }); // broken draft: start clean
   await fs.mkdir(dir, { recursive: true });
   meta = { rev: 1, pos: 0, savedPos: 0, ids: [1], next: 2, baseVersion: state.page.updatedAt || null };
   await writeJson(path.join(dir, '1.json'), state);
@@ -59,7 +54,7 @@ export async function openDraft(slug, initial) {
 /** Records a new step (drops any redo steps after the current position). */
 export async function pushState(slug, meta, state) {
   const dir = dirOf(slug);
-  for (const id of meta.ids.splice(meta.pos + 1)) await fs.rm(path.join(dir, `${id}.json`), { force: true });
+  await Promise.all(meta.ids.splice(meta.pos + 1).map((id) => fs.rm(path.join(dir, `${id}.json`), { force: true })));
   const id = meta.next++;
   await writeJson(path.join(dir, `${id}.json`), state);
   meta.ids.push(id);
@@ -78,8 +73,9 @@ export async function step(slug, meta, delta) {
   if (pos < 0 || pos >= meta.ids.length) return null;
   meta.pos = pos;
   meta.rev += 1;
-  await writeJson(path.join(dirOf(slug), 'meta.json'), meta);
-  return readJson(path.join(dirOf(slug), `${meta.ids[pos]}.json`));
+  // Save the new position and load that step at the same time.
+  const [, state] = await Promise.all([writeJson(path.join(dirOf(slug), 'meta.json'), meta), readJson(path.join(dirOf(slug), `${meta.ids[pos]}.json`))]);
+  return state;
 }
 
 export async function markSaved(slug, meta, baseVersion) {
@@ -98,4 +94,10 @@ export async function moveDraft(from, to) {
 
 export async function discardDraft(slug) {
   await fs.rm(dirOf(slug), { recursive: true, force: true });
+}
+
+/** Draft metadata of several pages in one batch -> array (null where a page has no draft). */
+export async function readMetas(slugs) {
+  const texts = await readMany(slugs.map((slug) => path.join(dirOf(slug), 'meta.json')));
+  return texts.map((t) => (t == null ? null : JSON.parse(t)));
 }

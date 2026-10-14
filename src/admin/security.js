@@ -6,7 +6,7 @@
 // - Brute force: per account+IP lockout after repeated failures (plus route rate limit).
 // - Audit: append-only JSONL per month, no secrets or passwords are ever written.
 import crypto from 'node:crypto';
-import { fs, kv } from '../storage.js';
+import { fs, kv, readMany } from '../storage.js';
 import path from 'node:path';
 import { ROOT } from '../store.js';
 
@@ -178,8 +178,9 @@ export async function readAudit(limit = 200) {
   try {
     const files = (await fs.readdir(AUDIT_DIR)).filter((f) => f.endsWith('.log')).sort().reverse();
     const out = [];
-    for (const f of files) {
-      const lines = (await fs.readFile(path.join(AUDIT_DIR, f), 'utf8')).trim().split('\n').reverse();
+    const texts = await readMany(files.map((f) => path.join(AUDIT_DIR, f))); // all months in one batch
+    for (const text of texts) {
+      const lines = String(text || '').trim().split('\n').reverse();
       for (const l of lines) { if (l) out.push(JSON.parse(l)); if (out.length >= limit) return out; }
     }
     return out;

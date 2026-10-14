@@ -37,13 +37,13 @@ app.use((req, res, next) => {
   coldStart = false;
   const writeHead = res.writeHead;
   res.writeHead = function (...args) {
-    if (req.path.startsWith('/admin') && !res.headersSent) {
+    if (req.originalUrl.startsWith('/admin') && !res.headersSent) {
       res.setHeader('Server-Timing', `store;desc="${st.n} calls";dur=${st.ms.toFixed(0)}, total;dur=${(performance.now() - st.t0).toFixed(0)}`);
     }
     return writeHead.apply(this, args);
   };
   if (process.env.VERCEL) {
-    res.on('finish', () => console.log(`[timing] ${req.method} ${req.path} ${res.statusCode} total=${(performance.now() - st.t0).toFixed(0)}ms store=${st.n}x/${st.ms.toFixed(0)}ms${st.cold ? ' cold' : ''}`));
+    res.on('finish', () => console.log(`[timing] ${req.method} ${req.originalUrl.split('?')[0]} ${res.statusCode} total=${(performance.now() - st.t0).toFixed(0)}ms store=${st.n}x/${st.ms.toFixed(0)}ms${st.cold ? ' cold' : ''}`));
   }
   timing.run(st, next);
 });
@@ -105,7 +105,8 @@ if (READONLY) {
 }
 
 // First-party analytics beacon (cookieless, see src/analytics.js). Always answers 204.
-const pageExists = async (slug) => Boolean(await loadPage(slug));
+// Existence check without downloading the page JSON.
+const pageExists = async (slug) => SLUG.test(slug) && fs.access(path.join(PAGES_DIR, `${slug}.json`)).then(() => true, () => false);
 app.post('/t', rateLimit({ windowMs: 60 * 1000, limit: 120, standardHeaders: false, legacyHeaders: false }),
   express.text({ type: '*/*', limit: '2kb' }), async (req, res) => {
     try {
@@ -147,14 +148,15 @@ app.get('/', (req, res) => res.redirect(302, '/slimmealsolutionmintidn2'));
 app.get('/:slug', async (req, res, next) => {
   try {
     const slug = req.params.slug.toLowerCase();
-    const page = await loadPage(slug);
+    if (!SLUG.test(slug)) return next(); // favicon.ico, robots.txt, … : no storage reads
+    // Page, global settings and the active promo are independent: read them in parallel.
+    const [page, global, promo] = await Promise.all([loadPage(slug), getGlobal(), activePromo()]);
     if (!page) {
       // Pages whose link was changed in the admin keep working via a permanent redirect.
       const to = (await getRedirects())[slug];
       if (to && SLUG.test(to)) return res.redirect(301, `/${to}${req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : ''}`);
       return next();
     }
-    const [global, promo] = await Promise.all([getGlobal(), activePromo()]);
     // Dev-only: ?only=id1,id2 renders just those sections (used by design-src calibration tools)
     if (!PROD && typeof req.query.only === 'string') {
       const ids = new Set(req.query.only.split(','));

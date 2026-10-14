@@ -60,11 +60,18 @@ function linkParents(r) {
   for (let cur = r; cur.includes('/'); cur = dirOf(cur)) cmds.push(['SADD', `d:${dirOf(cur)}`, baseOf(cur)]);
   return cmds;
 }
-async function unlinkEmptyParents(r) {
-  for (let dir = dirOf(r); dir.includes('/'); dir = dirOf(dir)) {
-    if ((await redis(['SCARD', `d:${dir}`])) > 0) return;
+// Removes now-empty directories above r. `known` = child count of r's parent if already fetched.
+async function unlinkEmptyParents(r, known) {
+  for (let dir = dirOf(r), first = true; dir.includes('/'); dir = dirOf(dir), first = false) {
+    const n = first && known != null ? known : await redis(['SCARD', `d:${dir}`]);
+    if (n > 0) return;
     await redis(['SREM', `d:${dirOf(dir)}`, baseOf(dir)]);
   }
+}
+// One round trip to delete a file: -> { deleted, siblings } (siblings = files left in its directory)
+async function dropFile(r) {
+  const [n, , , left] = await pipeline([['DEL', `f:${r}`], ['HDEL', 'm', r], ['SREM', `d:${dirOf(r)}`, baseOf(r)], ['SCARD', `d:${dirOf(r)}`]]);
+  return { deleted: n > 0, siblings: left };
 }
 const toText = (data) => (Buffer.isBuffer(data) ? data.toString('utf8') : String(data));
 
@@ -119,12 +126,15 @@ const cloudFs = {
   async mkdir() {},
   async unlink(p) {
     const r = rel(p);
-    const [n] = await pipeline([['DEL', `f:${r}`], ['HDEL', 'm', r], ['SREM', `d:${dirOf(r)}`, baseOf(r)]]);
-    if (!n) throw enoent(p);
-    await unlinkEmptyParents(r);
+    const { deleted, siblings } = await dropFile(r);
+    if (!deleted) throw enoent(p);
+    if (!siblings) await unlinkEmptyParents(r, siblings);
   },
   async rm(p, { force = false } = {}) {
     const r = rel(p);
+    // Most calls remove a single file: try that first (one round trip), else treat r as a directory.
+    const one = await dropFile(r);
+    if (one.deleted) { if (!one.siblings) await unlinkEmptyParents(r, one.siblings); return; }
     const { files, dirs } = await walk(r);
     if (!files.length && !dirs.length) { if (force) return; throw enoent(p); }
     await pipeline([
@@ -194,6 +204,29 @@ const readonlyFs = {
 };
 
 export const fs = CLOUD ? cloudFs : READONLY ? readonlyFs : nodeFs;
+
+// ---------------------------------------------------------------- batched helpers (fewer round trips)
+/** Replace a file atomically. A Redis SET already is atomic; on disk use temp file + rename. */
+export async function writeAtomic(file, data) {
+  if (CLOUD || READONLY) return fs.writeFile(file, data);
+  const tmp = `${file}.${Math.random().toString(36).slice(2, 10)}.tmp`;
+  await nodeFs.writeFile(tmp, data);
+  await nodeFs.rename(tmp, file);
+}
+
+/** Read several files at once -> array of text (null when missing). One round trip in the cloud. */
+export async function readMany(paths) {
+  if (!paths.length) return [];
+  if (CLOUD) return pipeline(paths.map((p) => ['GET', `f:${rel(p)}`]));
+  return Promise.all(paths.map((p) => fs.readFile(p, 'utf8').catch((e) => { if (e.code === 'ENOENT') return null; throw e; })));
+}
+
+/** Modification times (ms, null when missing) of several files. One round trip in the cloud. */
+export async function mtimes(paths) {
+  if (!paths.length) return [];
+  if (CLOUD) return (await redis(['HMGET', 'm', ...paths.map(rel)])).map((v) => (v == null ? null : Number(v)));
+  return Promise.all(paths.map((p) => fs.stat(p).then((st) => st.mtimeMs, () => null)));
+}
 
 // ---------------------------------------------------------------- small key-value store with expiry
 // Sessions, login lockouts and preview links. Cloud: Redis keys. Local: memory mirrored to data/kv.json.

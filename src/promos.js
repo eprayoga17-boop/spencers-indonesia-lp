@@ -3,9 +3,8 @@
 //   2. otherwise a REGULAR promo whose date range covers "now" (regular promos have no toggle);
 //   3. otherwise none (promo sections render nothing).
 // Edits go to a draft (data/promos-draft.json); "Publish" copies it to data/promos.json (live).
-import { fs } from './storage.js';
+import { fs, writeAtomic } from './storage.js';
 import path from 'node:path';
-import crypto from 'node:crypto';
 import { ROOT } from './store.js';
 
 const LIVE = path.join(ROOT, 'data', 'promos.json');
@@ -23,10 +22,8 @@ async function readJson(file) {
   }
 }
 async function writeJson(file, data) {
-  const tmp = `${file}.${crypto.randomBytes(6).toString('hex')}.tmp`;
   await fs.mkdir(path.dirname(file), { recursive: true });
-  await fs.writeFile(tmp, JSON.stringify(data, null, 2) + '\n');
-  await fs.rename(tmp, file);
+  await writeAtomic(file, JSON.stringify(data, null, 2) + '\n');
 }
 
 export const getLive = async () => (await readJson(LIVE)) || structuredClone(EMPTY);

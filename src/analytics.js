@@ -3,7 +3,7 @@
 // sha256(daily random salt + IP + user agent); the salt is replaced every day and the old one is
 // thrown away, so visitors cannot be re-identified or followed across days. Referrers are stored
 // without query strings. Raw events are kept for RETENTION_DAYS, then deleted.
-import { fs } from './storage.js';
+import { fs, readMany, mtimes } from './storage.js';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import UAParser from 'ua-parser-js';
@@ -127,23 +127,22 @@ export async function pruneAnalytics() {
 
 // ---------------------------------------------------------------- read + aggregate
 const cache = new Map(); // file -> { mtime, events }
-async function readDay(dir, day) {
-  const file = path.join(dir, `${day}.jsonl`);
-  let st;
-  try {
-    st = await fs.stat(file);
-  } catch {
-    return [];
-  }
-  const hit = cache.get(file);
-  if (hit && hit.mtime === st.mtimeMs) return hit.events;
+function parseLines(text) {
   const events = [];
-  for (const line of (await fs.readFile(file, 'utf8')).split('\n')) {
+  for (const line of text.split('\n')) {
     if (!line) continue;
     try { events.push(JSON.parse(line)); } catch { /* skip broken line */ }
   }
-  cache.set(file, { mtime: st.mtimeMs, events });
   return events;
+}
+// Reads many day files with two storage round trips in total: modification times, then only the
+// files that changed since this server instance last parsed them.
+async function readDays(files) {
+  const times = await mtimes(files);
+  const stale = files.filter((f, i) => times[i] != null && cache.get(f)?.mtime !== times[i]);
+  const texts = await readMany(stale);
+  stale.forEach((f, i) => { if (texts[i] != null) cache.set(f, { mtime: times[files.indexOf(f)], events: parseLines(texts[i]) }); });
+  return files.map((f, i) => (times[i] == null ? [] : cache.get(f)?.events || []));
 }
 
 export const hasSample = async () => (await fs.readdir(SAMPLE_DIR).catch(() => [])).length > 0;
@@ -159,16 +158,12 @@ function daysBetween(from, to) {
 }
 
 async function eventsFor(days, slug) {
-  const sample = await hasSample();
-  // Days are read in parallel batches (each read is a network round trip in cloud storage).
-  const perDay = [];
-  for (let i = 0; i < days.length; i += 16) {
-    perDay.push(...(await Promise.all(days.slice(i, i + 16).map(async (d) => {
-      const evs = [...(await readDay(DIR, d)), ...(sample ? await readDay(SAMPLE_DIR, d) : [])];
-      return { d, evs: slug ? evs.filter((e) => e.p === slug) : evs };
-    }))));
-  }
-  return perDay;
+  // Real and sample files of every day in one batch (missing files simply come back empty).
+  const all = await readDays([...days.map((d) => path.join(DIR, `${d}.jsonl`)), ...days.map((d) => path.join(SAMPLE_DIR, `${d}.jsonl`))]);
+  return days.map((d, i) => {
+    const evs = [...all[i], ...all[days.length + i]];
+    return { d, evs: slug ? evs.filter((e) => e.p === slug) : evs };
+  });
 }
 
 function rank(map, total, limit = 10) {
@@ -182,8 +177,7 @@ export async function report({ from, to, slug = '' }) {
   const len = days.length;
   const prevTo = new Date(Date.parse(from) - 864e5).toISOString().slice(0, 10);
   const prevFrom = new Date(Date.parse(prevTo) - (len - 1) * 864e5).toISOString().slice(0, 10);
-  const cur = await eventsFor(days, slug);
-  const prev = await eventsFor(daysBetween(prevFrom, prevTo), slug);
+  const [cur, prev, sample] = await Promise.all([eventsFor(days, slug), eventsFor(daysBetween(prevFrom, prevTo), slug), hasSample()]);
 
   const pv = (evs) => evs.filter((e) => !e.k);
   const series = (list) => list.map(({ d, evs }) => { const p = pv(evs); return { d, views: p.length, visitors: new Set(p.map((e) => e.v)).size }; });
@@ -223,7 +217,7 @@ export async function report({ from, to, slug = '' }) {
   const landingTotal = [...landings.values()].reduce((a, b) => a + b, 0);
   const refTotal = [...domains.values()].reduce((a, b) => a + b, 0);
   return {
-    from, to, prevFrom, prevTo, slug, sample: await hasSample(),
+    from, to, prevFrom, prevTo, slug, sample,
     series: sCur, prevSeries: sPrev,
     totals: {
       visitors: sum(sCur, 'visitors'), views, prevVisitors: sum(sPrev, 'visitors'), prevViews: sum(sPrev, 'views'),
@@ -241,7 +235,7 @@ export async function report({ from, to, slug = '' }) {
 /** Per-section engagement for one page: reach, time seen, clicks by type and click positions. */
 export async function sectionReport({ from, to, slug }) {
   if (!isDay(from) || !isDay(to) || from > to || !slug) throw Object.assign(new Error('Pilih halaman dan rentang tanggal.'), { status: 400, expose: true });
-  const days = await eventsFor(daysBetween(from, to), slug);
+  const [days, sample] = await Promise.all([eventsFor(daysBetween(from, to), slug), hasSample()]);
   const stats = new Map(); // section -> { reach, ms, timed, clicks: {kind:n}, pts: [] }
   const st = (id) => { if (!stats.has(id)) stats.set(id, { reach: 0, ms: 0, timed: 0, clicks: {}, pts: [] }); return stats.get(id); };
   let visitors = 0; let waClicks = 0; let converters = 0; let depthSum = 0;
@@ -271,7 +265,7 @@ export async function sectionReport({ from, to, slug }) {
     id, reach: x.reach, reachPct: visitors ? Math.min(100, Math.round((x.reach / visitors) * 1000) / 10) : 0,
     avgSec: x.timed ? Math.round(x.ms / x.timed / 100) / 10 : 0, clicks: x.clicks, pts: x.pts,
   }));
-  return { from, to, slug, sample: await hasSample(), visitors, waClicks, converters,
+  return { from, to, slug, sample, visitors, waClicks, converters,
     conversion: visitors ? Math.round((converters / visitors) * 1000) / 10 : 0, sections, depthSum };
 }
 
@@ -310,6 +304,7 @@ export async function generateSample(slugs, days = 30, sectionsBySlug = {}) {
     ['Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:131.0) Gecko/20100101 Firefox/131.0', 2],
   ];
   const uaCache = new Map();
+  const writes = [];
   const today = Date.parse(dayKey());
   for (let i = days - 1; i >= 0; i--) {
     const d = new Date(today - i * 864e5).toISOString().slice(0, 10);
@@ -349,6 +344,7 @@ export async function generateSample(slugs, days = 30, sectionsBySlug = {}) {
         lines.push(JSON.stringify({ k: 'e', t: t + 90000, p: pageOf[0], v: vid, s: sMs, r, ...(c.length ? { c } : {}), x: 1 }));
       }
     }
-    await fs.writeFile(path.join(SAMPLE_DIR, `${d}.jsonl`), lines.join('\n') + '\n');
+    writes.push(fs.writeFile(path.join(SAMPLE_DIR, `${d}.jsonl`), lines.join('\n') + '\n'));
   }
+  await Promise.all(writes); // all days in parallel
 }

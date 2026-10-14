@@ -1,7 +1,6 @@
 // Site-wide defaults ("Global" tab): page width, font, favicon, page categories.
-import { fs } from './storage.js';
+import { fs, writeAtomic } from './storage.js';
 import path from 'node:path';
-import crypto from 'node:crypto';
 import { ROOT } from './store.js';
 
 const FILE = path.join(ROOT, 'data', 'global.json');
@@ -46,8 +45,6 @@ export async function getGlobal() {
 
 export async function saveGlobal(g) {
   const data = JSON.stringify(normalizeGlobal(g), null, 2) + '\n';
-  const tmp = `${FILE}.${crypto.randomBytes(6).toString('hex')}.tmp`;
   await fs.mkdir(path.dirname(FILE), { recursive: true });
-  await fs.writeFile(tmp, data);
-  await fs.rename(tmp, FILE);
+  await writeAtomic(FILE, data);
 }

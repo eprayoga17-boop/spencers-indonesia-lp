@@ -8,11 +8,11 @@ import crypto from 'node:crypto';
 import { fs, saveUpload, uploadExists } from '../storage.js';
 import path from 'node:path';
 import {
-  ROOT, getPage, listPages, savePage, createPage, archivePage, listHistory, readHistory, renamePage, getRedirects,
+  ROOT, getPage, listPages, listSlugs, savePage, createPage, archivePage, listHistory, readHistory, readHistoryMany, renamePage, getRedirects,
   withPageLock, isValidSlug, newSectionId,
 } from '../store.js';
 import { getGlobal, saveGlobal, normalizeGlobal, FONTS, WIDTHS } from '../global.js';
-import { openDraft, pushState, step, markSaved, moveDraft, discardDraft, readMeta, info } from '../drafts.js';
+import { openDraft, pushState, step, markSaved, moveDraft, discardDraft, readMetas, info } from '../drafts.js';
 import {
   authenticate, isLocked, createSession, destroySession, getSession, requireAdmin, requireCsrf, audit, readAudit, pruneAudit,
 } from './security.js';
@@ -307,19 +307,26 @@ export function adminRouter({ assetVersion = '1' } = {}) {
   r.get('/promo', view('promo', 'Promo'));
 
   const initialState = (slug) => async () => {
-    const page = await getPage(slug);
+    const [page, global] = await Promise.all([getPage(slug), getGlobal()]);
     if (!page) throw httpError(404, 'Halaman tidak ditemukan.');
     if (!page.name) page.name = page.title;
-    return { page, global: await getGlobal() };
+    return { page, global };
   };
 
   // Preview shows the current draft (what "Simpan" would publish).
   r.get('/preview/:slug', async (req, res, next) => {
     try {
-      if (!isValidSlug(req.params.slug) || !(await getPage(req.params.slug))) return res.status(404).type('text').send('Halaman tidak ditemukan');
-      const { state } = await withPageLock(req.params.slug, () => openDraft(req.params.slug, initialState(req.params.slug)));
+      const { slug } = req.params;
+      if (!isValidSlug(slug)) return res.status(404).type('text').send('Halaman tidak ditemukan');
+      const [live, draft, promo] = await Promise.all([
+        getPage(slug),
+        withPageLock(slug, () => openDraft(slug, initialState(slug))).catch((e) => e),
+        promos.activePromo(),
+      ]);
+      if (!live) return res.status(404).type('text').send('Halaman tidak ditemukan');
+      if (draft instanceof Error) throw draft;
       res.set('Cache-Control', 'no-store');
-      res.type('html').send(renderPage({ ...state.page, robots: 'noindex, nofollow' }, { assetVersion, global: state.global, showHidden: true, promo: await promos.activePromo() }));
+      res.type('html').send(renderPage({ ...draft.state.page, robots: 'noindex, nofollow' }, { assetVersion, global: draft.state.global, showHidden: true, promo }));
     } catch (e) {
       next(e);
     }
@@ -327,10 +334,10 @@ export function adminRouter({ assetVersion = '1' } = {}) {
 
   r.get('/live/:slug', async (req, res, next) => {
     try {
-      const page = await getPage(req.params.slug);
+      const [page, global, promo] = await Promise.all([getPage(req.params.slug), getGlobal(), promos.activePromo()]);
       if (!page) return res.status(404).type('text').send('Halaman tidak ditemukan');
       res.set('Cache-Control', 'no-store');
-      res.type('html').send(renderPage({ ...page, robots: 'noindex, nofollow' }, { assetVersion, global: { ...(await getGlobal()), ga4Id: '' }, promo: await promos.activePromo() }));
+      res.type('html').send(renderPage({ ...page, robots: 'noindex, nofollow' }, { assetVersion, global: { ...global, ga4Id: '' }, promo }));
     } catch (e) {
       next(e);
     }
@@ -341,23 +348,23 @@ export function adminRouter({ assetVersion = '1' } = {}) {
   r.use('/api', api);
   const wrap = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 
+  const countUnsaved = async (slugs) => (await readMetas(slugs)).filter((m) => m && m.pos !== m.savedPos).length;
+
   api.get('/status', wrap(async (req, res) => {
-    let unsaved = 0;
-    for (const p of await listPages()) {
-      const meta = await readMeta(p.slug).catch(() => null);
-      if (meta && meta.pos !== meta.savedPos) unsaved++;
-    }
-    res.json({ unsavedPages: unsaved, promoDraft: promos.isDirty(await promos.getDraft(), await promos.getLive()) });
+    const [unsavedPages, draft, live] = await Promise.all([listSlugs().then(countUnsaved), promos.getDraft(), promos.getLive()]);
+    res.json({ unsavedPages, promoDraft: promos.isDirty(draft, live) });
   }));
 
   api.get('/pages', wrap(async (req, res) => {
-    const pages = await listPages();
-    for (const p of pages) {
-      const meta = await readMeta(p.slug).catch(() => null);
-      p.unsaved = Boolean(meta && meta.pos !== meta.savedPos);
-      if (!p.thumbnail) { const full = await getPage(p.slug); p.cover = full ? pageImages(full)[0] || null : null; }
-    }
-    res.json({ pages, archived: await listArchived(), categories: (await getGlobal()).categories });
+    const pages = await listPages({ withPage: true });
+    const slugs = pages.map((p) => p.slug);
+    const [metas, archived, global] = await Promise.all([readMetas(slugs), listArchived(new Set(slugs)), getGlobal()]);
+    pages.forEach((p, i) => {
+      p.unsaved = Boolean(metas[i] && metas[i].pos !== metas[i].savedPos);
+      if (!p.thumbnail) p.cover = pageImages(p.page)[0] || null;
+      delete p.page;
+    });
+    res.json({ pages, archived, categories: global.categories });
   }));
 
   api.post('/pages', wrap(async (req, res) => {
@@ -421,19 +428,19 @@ export function adminRouter({ assetVersion = '1' } = {}) {
   api.get('/pages/:slug', wrap(async (req, res) => {
     const { slug } = req.params;
     if (!isValidSlug(slug)) throw httpError(404, 'Halaman tidak ditemukan.');
-    const { meta, state } = await withPageLock(slug, () => openDraft(slug, initialState(slug)));
-    const live = await getPage(slug);
+    const [{ meta, state }, live, clipboard, active] = await Promise.all([
+      withPageLock(slug, () => openDraft(slug, initialState(slug))),
+      getPage(slug),
+      readClipboard(req.admin.email),
+      promos.activePromo(),
+    ]);
     if (!live) throw httpError(404, 'Halaman tidak ditemukan.');
-    const clipboard = await readClipboard(req.admin.email);
     res.json(payload(meta, state, {
       published: { updatedAt: live.updatedAt || null, updatedBy: live.updatedBy || null },
       clipboard: clipboard ? { name: clipboard.section.name, from: clipboard.from } : null,
       options: { fonts: FONTS, widths: WIDTHS },
       images: pageImages(state.page),
-      promo: await (async () => {
-        const a = await promos.activePromo();
-        return a ? { name: a.name, banner: Boolean(a.banner), badge: Boolean(a.badge), bar: Boolean(a.bar && (a.bar.title || a.bar.left || a.bar.right)) } : null;
-      })(),
+      promo: active ? { name: active.name, banner: Boolean(active.banner), badge: Boolean(active.badge), bar: Boolean(active.bar && (active.bar.title || active.bar.left || active.bar.right)) } : null,
     }));
   }));
 
@@ -713,15 +720,20 @@ export function adminRouter({ assetVersion = '1' } = {}) {
   api.get('/pages/:slug/history', wrap(async (req, res) => {
     const { slug } = req.params;
     if (!isValidSlug(slug)) throw httpError(404, 'Halaman tidak ditemukan.');
+    // Versions, redirects and the audit log are independent; all versions are read in one batch.
+    const [list, redirects, entries] = await Promise.all([
+      listHistory(slug).then(async (ts) => ({ ts, pages: await readHistoryMany(slug, ts) })),
+      getRedirects(),
+      readAudit(5000),
+    ]);
     const versions = [];
-    for (const ts of await listHistory(slug)) {
-      const p = await readHistory(slug, ts);
+    list.ts.forEach((ts, i) => {
+      const p = list.pages[i];
       if (p) versions.push({ ts, savedAt: p.updatedAt || null, by: p.updatedBy || null, sections: p.sections?.length || 0 });
-    }
+    });
     // include activity recorded under the page's previous links (URL changes)
-    const redirects = await getRedirects();
     const names = new Set([slug, ...Object.keys(redirects).filter((k) => redirects[k] === slug)]);
-    const activity = (await readAudit(5000)).filter((e) => names.has(e.slug)).slice(0, 300)
+    const activity = entries.filter((e) => names.has(e.slug)).slice(0, 300)
       .map(({ ts, event, actor, section, name, fields, changed, from, version, draft }) => ({ ts, event, actor, section, name, fields, changed, from, version, draft }));
     res.json({ versions, activity });
   }));
@@ -905,9 +917,9 @@ export function adminRouter({ assetVersion = '1' } = {}) {
     res.type('text/csv; charset=utf-8').send(analytics.reportCsv(rep));
   }));
   api.post('/reports/sample', wrap(async (req, res) => {
-    const list = await listPages();
+    const list = await listPages({ withPage: true });
     const sectionsBySlug = {};
-    for (const p of list) { const full = await getPage(p.slug); if (full) sectionsBySlug[p.slug] = full.sections.filter((x) => x.visible !== false).map((x) => ({ id: x.id })); }
+    for (const p of list) sectionsBySlug[p.slug] = p.page.sections.filter((x) => x.visible !== false).map((x) => ({ id: x.id }));
     await analytics.generateSample(list.map((p) => p.slug), 30, sectionsBySlug);
     await audit(req, 'report.sample', {});
     res.json({ ok: true });
@@ -920,28 +932,25 @@ export function adminRouter({ assetVersion = '1' } = {}) {
 
   api.get('/dashboard', wrap(async (req, res) => {
     const today = analytics.dayKey();
-    const [rep7, pages, live, entries] = await Promise.all([
+    const [rep7, slugs, live, draft, entries] = await Promise.all([
       analytics.report({ from: analytics.dayKey(Date.parse(today) - 6 * 864e5), to: today }),
-      listPages(),
+      listSlugs().then(async (list) => ({ list, unsaved: await countUnsaved(list) })),
       promos.getLive(),
+      promos.getDraft(),
       readAudit(400),
     ]);
+    const unsaved = slugs.unsaved;
     const now = Date.now();
     const a = promos.resolveActive(live, now);
     // next promo that will start by schedule (for "Berikutnya")
     const upcoming = live.promos.filter((p) => p.start && Date.parse(p.start) > now).sort((x, y) => Date.parse(x.start) - Date.parse(y.start))[0];
     const img = (im) => (im ? `${im.src}.${im.ext || 'webp'}` : null);
-    let unsaved = 0;
-    for (const p of pages) {
-      const meta = await readMeta(p.slug).catch(() => null);
-      if (meta && meta.pos !== meta.savedPos) unsaved++;
-    }
     res.json({
       report: rep7,
       promo: a.promo ? { name: a.promo.name, kind: a.promo.kind, reason: a.reason, end: a.promo.end || null, banner: img(a.promo.banner), badge: img(a.promo.badge) } : null,
       nextPromo: upcoming ? { name: upcoming.name, start: upcoming.start } : null,
-      promoDraft: promos.isDirty(await promos.getDraft(), live),
-      pages: { total: pages.length, unsaved },
+      promoDraft: promos.isDirty(draft, live),
+      pages: { total: slugs.list.length, unsaved },
       activity: entries.filter((e) => !String(e.event).startsWith('login') && e.event !== 'logout').slice(0, 6),
     });
   }));
@@ -960,20 +969,18 @@ export function adminRouter({ assetVersion = '1' } = {}) {
   return r;
 }
 
-async function listArchived() {
+async function listArchived(liveSlugs) {
   const dir = path.join(ROOT, 'data', 'history');
   let slugs = [];
   try {
-    slugs = await fs.readdir(dir);
+    slugs = (await fs.readdir(dir)).filter((slug) => isValidSlug(slug) && !liveSlugs.has(slug));
   } catch {
     return [];
   }
-  const out = [];
-  for (const slug of slugs) {
-    if (!isValidSlug(slug) || (await getPage(slug))) continue;
+  const out = await Promise.all(slugs.map(async (slug) => {
     const [ts] = await listHistory(slug);
     const p = ts && (await readHistory(slug, ts));
-    if (p) out.push({ slug, title: p.name || p.title || slug, archivedAt: new Date(ts).toISOString() });
-  }
-  return out;
+    return p ? { slug, title: p.name || p.title || slug, archivedAt: new Date(ts).toISOString() } : null;
+  }));
+  return out.filter(Boolean);
 }

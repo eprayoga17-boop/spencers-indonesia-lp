@@ -1,8 +1,7 @@
 // Page storage: one JSON file per page in data/pages, atomic writes, and a history
 // snapshot of the previous version on every save (change management / rollback).
-import { fs } from './storage.js';
+import { fs, writeAtomic as writeFileAtomic, readMany } from './storage.js';
 import path from 'node:path';
-import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -30,23 +29,30 @@ export async function getPage(slug) {
   }
 }
 
-export async function listPages() {
+/** Slugs of all live pages (one directory listing, no page reads). */
+export async function listSlugs() {
   await fs.mkdir(PAGES_DIR, { recursive: true });
-  const files = (await fs.readdir(PAGES_DIR)).filter((f) => f.endsWith('.json'));
+  return (await fs.readdir(PAGES_DIR)).filter((f) => f.endsWith('.json')).map((f) => f.slice(0, -5)).filter(isValidSlug);
+}
+
+/** All live pages, read in one batch. withPage adds the full page object as `page` (not for JSON output). */
+export async function listPages({ withPage = false } = {}) {
+  const slugs = await listSlugs();
+  const texts = await readMany(slugs.map(pageFile));
   const out = [];
-  for (const f of files) {
-    const slug = f.slice(0, -5);
-    if (!isValidSlug(slug)) continue;
-    const [page, st] = await Promise.all([getPage(slug), fs.stat(pageFile(slug))]);
-    if (!page) continue;
+  for (const [i, slug] of slugs.entries()) {
+    if (texts[i] == null) continue;
+    const page = JSON.parse(texts[i]);
+    const st = page.updatedAt ? null : await fs.stat(pageFile(slug)).catch(() => null);
     out.push({
+      ...(withPage ? { page } : {}),
       slug,
       name: page.name || page.title || slug,
       title: page.title || slug,
       category: page.category || '',
       thumbnail: page.thumbnail || null,
       sections: page.sections.length,
-      updatedAt: page.updatedAt || st.mtime.toISOString(),
+      updatedAt: page.updatedAt || (st ? st.mtime.toISOString() : new Date(0).toISOString()),
       updatedBy: page.updatedBy || null,
       duplicatedFrom: page.duplicatedFrom || null,
     });
@@ -54,11 +60,7 @@ export async function listPages() {
   return out.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }
 
-async function writeAtomic(file, data) {
-  const tmp = `${file}.${crypto.randomBytes(6).toString('hex')}.tmp`;
-  await fs.writeFile(tmp, data);
-  await fs.rename(tmp, file);
-}
+const writeAtomic = (file, data) => writeFileAtomic(file, data);
 
 async function snapshot(slug) {
   try {
@@ -67,7 +69,7 @@ async function snapshot(slug) {
     await fs.mkdir(dir, { recursive: true });
     await fs.writeFile(path.join(dir, `${Date.now()}.json`), prev);
     const files = (await fs.readdir(dir)).sort();
-    for (const old of files.slice(0, Math.max(0, files.length - HISTORY_KEEP))) await fs.unlink(path.join(dir, old));
+    await Promise.all(files.slice(0, Math.max(0, files.length - HISTORY_KEEP)).map((old) => fs.unlink(path.join(dir, old))));
   } catch (e) {
     if (e.code !== 'ENOENT') throw e;
   }
@@ -121,6 +123,13 @@ export async function readHistory(slug, ts) {
   } catch {
     return null;
   }
+}
+
+/** Several history versions in one batch -> array of pages (null where unreadable). */
+export async function readHistoryMany(slug, list) {
+  if (!isValidSlug(slug)) return list.map(() => null);
+  const texts = await readMany(list.map((ts) => path.join(HISTORY_DIR, slug, `${ts}.json`)));
+  return texts.map((t) => { try { return t == null ? null : JSON.parse(t); } catch { return null; } });
 }
 
 export function newSectionId(page, base = 'section') {
