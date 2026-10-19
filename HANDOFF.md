@@ -20,6 +20,16 @@
   `docs/flowchart-website/` (non-technical flowcharts for the team: 5-page PDF/PNG + single-page `Alur-Keseluruhan`;
   rebuild with `node scripts/build-flowchart.mjs` / `node scripts/build-flowchart-overall.mjs`).
 
+- **Deployed 2026-10-19 (commit 0fe278d)**: templates/editor v3, homepage at `/`, elements, distributors, pixels and the
+  whole shop (Produk, Order, Diskon, `/produk/<slug>`) are live. On Vercel both migrations ran (`homepage-v1`:
+  distributors + homepage; `templates-v1`: MealBlend LP split into templates). NOT on live (local data only): BurnX page
+  `/burnxmatchawomen` + its templates, the FAQ/footer template split, shop data (products, discounts, settings, orders).
+  To fill the live shop: Produk → Import (Berdu product JSON) then Diskon → Import (Berdu discount JSON), and enter real
+  bank accounts / WA / shipping rates in Order → Pengaturan Toko.
+- ⚠ Before importing the 3,867 discounts on live: every checkout quote reads the whole `data/shop/discounts.json`
+  (≈2.9 MB) and `products.json` (≈0.5 MB) from Redis — add a per-instance cache (or split keys) first, or the Upstash
+  free bandwidth (10 GB/month) runs out fast.
+
 ## How to work with this user
 - Indonesian speaker (reply in Bahasa Indonesia), product/marketing person for Spencer's Indonesia (brand: Spencer's MealBlend).
 - **Since 2026-10-15: build new features on localhost first, push to GitHub only when the user says the feature is
