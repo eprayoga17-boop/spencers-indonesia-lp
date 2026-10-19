@@ -22,8 +22,10 @@
 
 ## How to work with this user
 - Indonesian speaker (reply in Bahasa Indonesia), product/marketing person for Spencer's Indonesia (brand: Spencer's MealBlend).
-- **Work in the GitHub repo and verify on the live site** (user's instruction 2026-10-14: "kerjakan langsung di Repo GitHub,
-  jangan lokal"). Commit + push to `main`, check the Vercel deployment and logs. Do not rely on the local dev server/data.
+- **Since 2026-10-15: build new features on localhost first, push to GitHub only when the user says the feature is
+  finished** ("kerjakan localhost dulu, nanti baru dipush"). Pushing `main` deploys to Vercel. Local test data in `data/`
+  (pages, promos, templates) is not committed. Port 3000 may be used by another chat's dev server; `.claude/launch.json`
+  also has `mealblend-lp-3001`.
 - **Confirm before significant changes** (the user regularly asks "konfirmasi dulu"); for small fixes just do them.
 - Do not log in to the live admin with credentials yourself; ask the user to try flows that need a login.
 - Prioritise progress over reports; short reports; few screenshots. Wants `ui-ux-pro-max` for UI work; QA skills from
@@ -33,8 +35,176 @@
 - 2FA (TOTP) and a real admin account (the dummy admin is reachable on the internet); admin roles (who sees security logs).
 - Vercel Hobby is non-commercial by Vercel's terms — company use needs Pro.
 - Landing page speed: subset the woff2 fonts to Latin and add responsive `srcset` for images (see the Lighthouse section).
-- Scheduled backup/export of Redis; consent notice before enabling GA4; delete sample analytics once real data exists.
+- Scheduled backup/export of Redis; GA4 still loads without the cookie notice (pixels.js has one; reuse it for GA4);
+  delete sample analytics once real data exists.
 - `data/promos.json` / `data/promos-draft.json` changes on the user's PC are local tests — do not commit them.
+
+## Template + Page + editor v3 — DONE on localhost (2026-10-15, not pushed yet)
+- User's model: **Homepage** (clone of www.spencers.id at `/`, NEXT step, not started) · **Page** (landing page with a link,
+  composed of Templates + standalone Sections) · **Template** (ordered group of sections). Templates are **linked**: saving a
+  template changes every page that uses it; "Lepas jadi section biasa" copies it into one page only.
+- Data: `src/templates.js` (`data/templates/<id>.json`, id `t-xxxxxxxx`, history `data/template-history/`, drafts
+  `data/template-drafts/` via `makeDrafts()` in `src/drafts.js`). A page section `{ type:'template', template:<id> }` is a
+  reference; `expandPage/resolvePage/resolvePages` replace it with the template's sections (same section ids → per-section
+  reports continue; duplicates get `-2`; admin preview adds `data-ref=<ref id>`; template badges are merged). Templates
+  cannot contain templates. Rendering calls `resolvePage` in server.js (`/:slug`, `/p/:token`) and admin preview/live/reports.
+- API: one editor router (`ed` in routes.js) mounted at `/admin/api/pages/:key` and `/admin/api/templates/:key` with doc
+  adapters (`DOCS.page|template`); template list/create/duplicate/import/delete at `/admin/api/templates` (delete refused
+  while used). New: `POST …/sections` `{type:'template', template}`, `POST …/sections/:id/detach`. Views `/admin/templates`,
+  `/admin/templates/:id` (body `data-kind="template"`), preview `/admin/preview-template/:id`.
+- Migration `src/migrate-templates.js` (runs once per storage, kv claim `migration:templates-v1`, idempotent; also on Vercel at
+  first request after deploy): LP `slimmealsolutionmintidn2` → Template 1 (promo-bar…promo-banner, 32 sections, owns the
+  14-day badge) + cta-1 + pembayaran-distributor-1 + Template 2 (offline-judul…promo-banner-2) + cta-2 +
+  pembayaran-distributor-2 + Template 3 (video-distributor…footer). Verified: public HTML byte-identical before/after.
+  It discards an existing draft of that page.
+- Editor v3 (admin.js `viewEditor`, CSS "Editor v3" block): narrow left panel + preview canvas; Desktop | Tablet | HP toggle
+  in the bar (remembered in localStorage `mb-device`; HP = iPhone 11 frame, Tablet = iPad Air 820×1180 frame, Desktop =
+  full width); template rows expand to show their sections; "+ Tambah" menu (Muat Template… / Section / [PROMO] / Tempel);
+  template block selected as one in the preview with a "Template · name" tag. Halaman menu has tabs **Page | Template**.
+- Tests (scratchpad, not in repo): template e2e 29/29 and the old regression suite pass locally and against mock Redis.
+
+## Homepage (clone of www.spencers.id) — DONE on localhost (2026-10-15, not pushed yet)
+- The homepage is the page with slug `home`, served at `/` (`/home` → 301 `/`; if it is missing `/` still redirects to the
+  MealBlend Women LP). Slug `home` is reserved: it cannot be renamed, archived, created again or taken by another page.
+- Admin: Halaman has tabs **Homepage | Page | Template** (`/admin/homepage`); the Page list hides `home`; the editor shows a
+  "Homepage" chip, a locked URL field and "Lihat live" → `/`.
+- Content built by `scripts/clone-homepage.mjs` (one-off; `--force` rebuilds): header logo bar, 7-banner slider, the
+  banner image blocks with their links (other Berdu pages still link to www.spencers.id; "Chat Admin" uses Berdu's CS
+  rotate link until our CS Rotator has numbers), Paper.id, media awards, the distributor list (element "Daftar
+  Distributor", data from the Distributor menu) and a black contact footer (phone links improved to tel:/wa.me).
+  Images were re-encoded into `public/uploads/sections/home-*/` (commit them with the page).
+- `scripts/home-banners.mjs` (step 2, after the clone): the product cards + "Customer Care" became **Banner + Teks**
+  elements — the baked-in headline/button pixels were removed from the images ("ink" between background and black only)
+  and replaced by a real `<h2>` + real buttons in Montserrat, positioned/sized from measurements. Re-running needs a fresh
+  clone (`clone-homepage.mjs --force`) because it deletes the source slices. Headline copy kept as on the live site
+  ("FOR WOMAN").
+- Vercel: `src/migrate-home.js` copies the bundled `data/pages/home.json` and `data/distributors.json` into Redis once
+  (kv claim `migration:homepage-v1`) when the storage was seeded before they existed (tested against mock Redis).
+
+## Figma → website: skill `figma-lp-to-sections` + first LP BurnX Matcha — DONE on localhost (2026-10-15, not pushed)
+- Skill: `.claude/skills/figma-lp-to-sections/` (SKILL.md + reference/conversion-rules.md, fx-html.md, spec-format.md).
+  Input = a Figma link to the LP frame (`node-id=`), not a .fig. `FIGMA_TOKEN` (read-only) is in the user's `.env`.
+  Scripts: `scripts/figma/figma.mjs` (fetch tree/renders/fills, export layers), `build.mjs` (spec → fx HTML with real
+  text + assets + manifest), `push.mjs` (manifest → local admin drafts: templates, page, sections; `--compare`).
+  Figma exports live in `design-src/figma/` (git-ignored). New fonts: Bebas Neue, DM Sans (+ classes ff-bebas, ff-dmsans);
+  FAQ "Kotak" got header colours (`headBg`, `headColor`).
+- BurnX Matcha (Figma `i8iKtYHyaQoO69Jq2WZBG7`, node 1:30) → draft page **/burnxmatchawomen** = Template "BurnX Matcha 1 ·
+  Testi s/d Resep Brand" (19 HTML + Video + [PROMO] Banner) → CTA (HTML + Tombol Chat Admin → CS Rotator
+  `cs-burnx-matcha`, still EMPTY by the user's choice; Tombol Info Peluang Distributor → spencers.id/agentslimdistributorretail1)
+  → Template "BurnX Matcha 2 · Testi s/d Award" → Template "FAQ Spencer's BurnX Matcha" → Template "Disclaimer Medis &
+  Legal". User rule: FAQ = one template per PRODUCT (not men/women). Nothing published yet.
+- /burnxmatchawomen was then aligned with the LIVE Wix page (spencerscalifornia.com/slimmealsolutionburnxidn2), which
+  differs from the Figma file: [PROMO] Bar on top; promo badge on both heroes; live-only images 200.000++ Customer,
+  12 Years Journey/National Award, Offline Experiences, Telah Teruji, "12 years of Success Stories" + MealBlend's media
+  slider; [PROMO] Banner after "Resep Brand"; CTA + Pembayaran Paper.id + Info Peluang Distributor
+  (agentslimdistributorretail3) twice; FAQ; shared template **"Footer Spencer's"** (t-7w224czk, also on MealBlend; the
+  MealBlend one is now "MealBlend · Disclaimer" + Footer). No award block / disclaimer at the end (as live). Template
+  "Disclaimer Medis & Legal" is now unused. Live Chat Admin goes to WA 0853-8553-9053; our button uses the empty CS
+  Rotator `cs-burnx-matcha`. Published locally.
+- MealBlend Women (local, published 2026-10-15): Template 3 split → "MealBlend Women 3 · Kisah Distributor s/d Tips
+  Dokter" + **"FAQ Spencer's MealBlend"** (t-79rs4nay) + "MealBlend · Disclaimer & Footer" (t-brzmg3j5); page refs
+  `tpl-ref-faq`, `tpl-ref-footer`. Public HTML byte-identical before/after.
+- ⚠ Vercel/Redis: the live Redis was seeded long ago, so the BurnX templates/page and this FAQ split exist only in the
+  local data files. Before/at deploy: recreate them on live (push.mjs can't target live — it is localhost-only), or add
+  a one-time migration like `migrate-home.js` that copies these templates/pages from the bundle when missing.
+
+## UX round 3 — DONE on localhost (2026-10-15, not pushed yet). User approved review items 1–7 and 9 (not 8 = move all
+## LPs here, not 10 = admin security: still testing/pitching, many people need access)
+1. "Simpan" → **Publikasikan**; status "Draft tersimpan · belum live" / "Live · <tanggal>" (`role=status`); leaving with
+   a draft offers "Publikasikan & keluar" or "Keluar, simpan sebagai draft".
+2. **Gambar & HTML are edited in the left panel** (old popup `sectionDialog` removed): image list with alt/link,
+   replace/reorder/delete, stack ↔ slider, drop zone; HTML code with live preview (1.2 s idle or Ctrl+Enter), .html upload,
+   supporting images, sanitiser notes. New Gambar/HTML create nothing until there is content. `?render=` now re-renders any
+   section type.
+3. **Templates are edited in place** from the page editor (row edit / click in preview): panel with a "tersambung ke N
+   halaman" warning, its sections, add elements, "Publikasikan template" / "Buang". The page preview shows template
+   drafts (`/admin/preview/:slug` uses `templateDrafts.peek`). Publishing the page asks "Halaman saja / Halaman +
+   template" when a used template has a draft. Template calls send their own draft revision: `api(…, { rev })`.
+   The full template editor is still in the row menu ("Buka editor template penuh").
+4. Homepage headlines/buttons are real text (see Homepage). New element **Banner + Teks**; button size "Sangat kecil",
+   icon left/right, arrow icon; font **Montserrat** (OFL, `public/assets/fonts/montserrat-latin-var.woff2`).
+5. **Distributor menu** (`/admin/distributors`, `src/distributors.js`, `data/distributors.json`, audit
+   `distributor.*`): province / city / area / TOP SELLER / links (type guessed from URL, https only). Element **Daftar
+   Distributor**: grouped per province, search box ("Cari kota atau provinsi…", opens matches when ≤3), help link when
+   nothing matches. Changes are live at once (15 s cache per instance). Medan Barat merged into Sumatera Utara › Medan.
+6. Number fields show real size: "≈16px HP" (+ desktop in the tooltip), because sizes are 1/320 of the page width.
+7. **Laporan → CS Rotator**: chats per number (today, 7 days per day, total), counted in `/go/wa/:id`
+   (`rotstat:<id>:<number>[:<day>]`, day keys expire after 40 days); link from Global → CS Rotator.
+9. Picker: hover/focus a card shows a live example (`/admin/block-preview/:kind`); element cards can be dragged into the
+   preview (drop line "Lepas di sini"); clicking still works (WCAG drag alternative).
+- Tests (scratchpad): `round2-e2e.mjs` 35/35 local (29/30 on mock Redis without Blob: the only miss was clicks left by an
+  aborted run), blocks e2e 39/39, templates 29/29, cloud regression and homepage guards pass; migration on pre-seeded
+  storage verified.
+
+## Elements (blocks) for Page + Template — DONE on localhost (2026-10-15, not pushed yet)
+- User asked for Berdu's addable section features, adapted (not a 1:1 clone); Gambar + HTML stay the main types. Chosen:
+  groups A–D, settings edited **in the left panel with live preview**.
+- 16 kinds: Teks, Tombol, Ruang Kosong, Garis, Quote · Video YouTube, Galeri, Gambar + Teks · FAQ, Testimoni, Countdown
+  (own date or "ikut promo aktif"), Daftar Fitur, Copy Teks, Daftar Rekening · Tombol WA Melayang, Popup Promo.
+- Data: section `{ type:'block', kind, props }`. One schema (`src/admin/block-props.js`) drives server normalisation
+  (`normalizeBlock`) and the generated admin forms (`GET /admin/api/blocks` → schema, icons, fonts, pages, rotators).
+  Rich text goes through `sanitizeBlockText` (sanitize.js). Renderers in `src/blocks.js`; CSS appended to `lp.css`
+  (block FAQ uses `.lp-bq*`, NOT `.lp-faq*` which belongs to the LP's own FAQ); JS in `lp.js` (`LP.init(scope)`).
+- Smart links: WhatsApp, **CS Rotator** (Global tab: groups of numbers, `/go/wa/<id>` round-robin via `kv.incr`), page,
+  section scroll, URL, tel, email, PDF (`POST …/files`, `/uploads/files/`). Images: `POST …/assets`.
+- Live preview: props PATCH is debounced (`PATCH …/sections/:id?render=:id`), the response carries the re-rendered
+  section HTML which replaces the element in the preview iframe (no reload). `edit()`, Simpan and Kembali flush pending
+  props first. Clicking a block in the preview opens its settings; Esc / back arrow returns to the list.
+- "+ Tambah" opens a picker in the left panel (search; Utama = Gambar/HTML/Template; then categories; Lainnya = [PROMO]/Tempel).
+- Ad pixels (Global tab): Meta Pixel, TikTok Pixel, Google Ads ID + label. `public/assets/js/pixels.js` shows a cookie notice
+  and loads nothing until the visitor accepts (UU PDP; also skipped with Global Privacy Control). Buttons with an
+  "Event iklan" send it (`data-track`). Laporan click type `copy` added.
+- Tests (scratchpad `blocks-e2e.mjs`): 39/39 locally and against mock Redis; template e2e and cloud regression still pass.
+
+## Produk module (Berdu clone) — IN PROGRESS on localhost (2026-10-15, not pushed yet)
+- Goal (user): duplicate Berdu + Wix features, starting with Berdu "Produk". Scope chosen: products + stock + categories +
+  catalogs + bundles, then Order/Checkout (manual bank transfer; shipping = manual rates per province/city), public product
+  page `/produk/<slug>`. **Work on localhost first, push only when the user says the feature is finished.**
+- Files: `src/shop.js` (data model, `data/shop/*.json`, stock log `data/shop/stock-log/YYYY-MM.jsonl`),
+  `src/shop-import.js` (Berdu import), `src/admin/shop-routes.js` (API `/admin/api/shop/*`), `public/admin/shop.js` + `shop.css`
+  (views; admin.js exposes helpers on `window.MBA`). Admin URLs: `/admin/products`, `/products/:id/edit`, `/products/:id`
+  (Laporan/Riwayat Stok/Order), `/stock`, `/categories`, `/catalogs`, `/bundles`.
+- Variants work like Berdu: up to 3 option groups with values; a value may override price/compare price/weight (later group
+  wins). Stock is shared per product unless one group is the "stock group" (`variants.stockAxis`): then each value has its own
+  SKU + stock; units have vid `<groupId>:<valueId>`. All stock changes go through `applyStock` and are logged.
+- Berdu data: no CSV export for this account. Data was read (read-only) from the Berdu admin GraphQL `/_/graph` on
+  www.spencers.id (camp id `bsob0d3ebsogk72t2x_2`) via Claude in Chrome with the user's logged-in session and saved as
+  `data/import/berdu-products-2026-10-15.json` (453 products, 14 categories; gitignored). Field meaning: `stockManagement`
+  0 = not tracked, 1 = tracked + can buy when empty, 2 = tracked; `publishTime` in year 2200 = Tersembunyi; `unlisted` = link
+  only; prices/weights `variationID` "" = base, "<group>:<option>" = per value, "$minCount:N" = harga grosir; `salePrice` =
+  harga coret; descriptions are Draft.js JSON; `cdn://img/...` = https://bdsingapore.com/img/...
+- Import: Produk → "Import" (upload that JSON) runs 8 products per request (downloads images). Duplicate Berdu SKUs
+  (e.g. MTR0000432 x13) get new SKUs. Catalogs/bundles were not exported (3 catalogs, 2 bundles — recreate by hand or export later).
+- Order & checkout (2026-10-15, localhost): `src/orders.js` (orders `data/shop/orders/<no>.json` + `orders-index.json`,
+  settings `data/shop/settings.json`), `src/storefront.js` (public `/produk/<slug>` = product page with one-product
+  checkout, `/pesanan/<no>?t=<token>` = order page with bank accounts + "Konfirmasi via WhatsApp", API `/api/shop/ongkir`,
+  `/api/shop/checkout` rate-limited + honeypot + same-origin), `public/assets/{css,js}/shop.*`. Admin: sidebar **Order**
+  (`/admin/orders`, `/admin/orders/<no>`, `/admin/shop-settings` = WhatsApp admin, rekening, tarif ongkir per provinsi/kota,
+  teks persetujuan PDP). User choices: one-product checkout (no cart), order page + WA button, NO unique transfer code.
+  Order no. like Berdu `SP` + YYMMDD (WIB) + 6-digit daily counter. Stock is reserved at checkout ("Checkout (SP…)" in
+  Riwayat Stok) and returned on Batalkan. Statuses: Belum Bayar → Terbayar → Diproses → Dikirim (resi) → Selesai; Dibatalkan.
+  Product Laporan/Order tabs read the order index (paid statuses by default). Region data `public/assets/wilayah/`
+  (cahyadsn/wilayah, Kepmendagri 2025, MIT; built from its wilayah.sql). Local settings hold PLACEHOLDER bank/WA values.
+- Diskon (2026-10-15, localhost): `src/discounts.js` (`data/shop/discounts.json`), admin sidebar **Diskon**
+  (`/admin/discounts`, editor + Laporan tab). Types like Berdu: Potongan Harga, % Diskon Produk, Potongan per Produk,
+  Dapat produk gratis (gift item price 0, stock reserved), Gratis Ongkir (optional cap), Potongan Ongkir, % Diskon Ongkir.
+  Conditions: total pembelian min/max, pelanggan terpilih (WA numbers), produk/kategori terpilih, metode pembayaran,
+  kuantitas min/max; schedule (WIB), coupon code (case/#/space-insensitive), max uses + per customer (counted from the
+  order index, cancelled orders excluded). ONE discount per order: a valid code wins, else the best automatic one; an
+  invalid code keeps the automatic discount and shows why. Checkout uses `POST /api/shop/quote` (server computes subtotal,
+  shipping, discount, gift, total) so preview and order always match.
+- Berdu discounts imported locally (2026-10-15): read-only from GraphQL `camp.discounts(search:"",viewer:staff,first:100)`
+  fields `id name notes couponCode trigger oneTimeUse type useLimit useDateFrom useDateTo discountPrice discountPercent
+  conditions tags` → `data/import/berdu-discounts-2026-10-15.json` (3,922; categories merged in). Importer
+  `src/discount-import.js` + Diskon → "Import" (mapping documented in the file header). Result: 3,867 active imported,
+  52 ended skipped, 3 VIP discounts (Berdu customer ids) imported disabled, 3 with value 0 skipped. Berdu "Dapat produk
+  gratis" = gift `pid: "same"` (buy X get N of the same product). New condition "Lokasi Pengiriman" (province/city codes).
+  Usage counters start at 0 here (Berdu's used counts are not available). Combos that mix several products only work once
+  a cart exists (checkout is one product line).
+- Berdu admin menus for this account: Home, Produk, Diskon, Laporan, Blog, Tampilan, Apps, Pengaturan (no Order menu
+  for this staff role).
+- Local quirk: OneDrive locks files briefly → `writeAtomic` retries rename on EPERM; `.claude/launch.json` watches only
+  `src/` + `server.js` (node --watch restarted constantly on node_modules changes).
 
 ## The user's original brief (6 points)
 1. Mobile-only landing page (no desktop version) identical to the live Wix page

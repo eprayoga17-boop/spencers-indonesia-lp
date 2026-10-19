@@ -80,7 +80,7 @@ export function statusOf(p, active, now = Date.now()) {
 /** The public shape used by the renderer. */
 export function renderable(p) {
   if (!p) return null;
-  return { id: p.id, name: p.name, banner: p.banner || null, badge: p.badge || null, bar: p.bar || null };
+  return { id: p.id, name: p.name, banner: p.banner || null, badge: p.badge || null, bar: p.bar || null, end: p.end || null };
 }
 
 export async function activePromo(now = Date.now()) {

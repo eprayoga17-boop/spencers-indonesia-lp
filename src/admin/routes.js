@@ -5,25 +5,32 @@ import multer from 'multer';
 import rateLimit from 'express-rate-limit';
 import sharp from 'sharp';
 import crypto from 'node:crypto';
-import { fs, saveUpload, uploadExists } from '../storage.js';
+import { fs, saveUpload, uploadExists, kv } from '../storage.js';
 import path from 'node:path';
 import {
   ROOT, getPage, listPages, listSlugs, savePage, createPage, archivePage, listHistory, readHistory, readHistoryMany, renamePage, getRedirects,
   withPageLock, isValidSlug, newSectionId,
 } from '../store.js';
 import { getGlobal, saveGlobal, normalizeGlobal, FONTS, WIDTHS } from '../global.js';
-import { openDraft, pushState, step, markSaved, moveDraft, discardDraft, readMetas, info } from '../drafts.js';
+import { openDraft, pushState, step, markSaved, moveDraft, discardDraft, readMetas, info, templateDrafts } from '../drafts.js';
+import {
+  isTemplateId, getTemplate, getTemplates, listTemplates, listTemplateIds, createTemplate, saveTemplate, deleteTemplate,
+  listTemplateHistory, readTemplateHistory, readTemplateHistoryMany, templateRefs, expandPage, resolvePage, resolvePages, templateUsage,
+} from '../templates.js';
 import {
   authenticate, isLocked, createSession, destroySession, getSession, requireAdmin, requireCsrf, audit, readAudit, pruneAudit,
 } from './security.js';
 import { sanitizeSection } from './sanitize.js';
 import { processImage, UserError } from './media.js';
 import { exportCode, importCode } from './transfer.js';
-import { renderPage } from '../render.js';
+import { renderPage, renderSectionPreview } from '../render.js';
+import { BLOCKS, blockDefaults, normalizeBlock, blockSchema, blockMeta } from './block-props.js';
+import { getDistributors, updateDistributors, normalizeDistributor, attachBlockData, PROVINCES, LINK_KINDS } from '../distributors.js';
 import * as promos from '../promos.js';
 import * as analytics from '../analytics.js';
 import { createLink, phoneBase } from '../preview-links.js';
 import QRCode from 'qrcode';
+import { shopApi } from './shop-routes.js';
 
 const MAX_HTML_BYTES = 1024 * 1024;
 const ASSET_V = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 10) || Date.now().toString(36); // cache-busting for admin assets per server start
@@ -31,6 +38,7 @@ const esc = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<
 const httpError = (status, message, extra) => Object.assign(new Error(message), { status, expose: true, ...extra });
 const clip = (v, n) => String(v ?? '').trim().slice(0, n);
 const toNum = (v, min, max, d = 0) => (Number.isFinite(Number(v)) && v !== '' && v != null ? Math.min(max, Math.max(min, Number(v))) : d);
+const HOME = 'home'; // the homepage is the page with this slug, served at "/"
 const safeHref = (v) => {
   const h = clip(v, 1000);
   return /^(https?:\/\/|\/(?!\/)|#|mailto:|tel:)/i.test(h) ? h : '';
@@ -38,6 +46,7 @@ const safeHref = (v) => {
 const uploadUrl = (v) => (typeof v === 'string' && /^\/uploads\/[\w./-]+$/.test(v) && !v.includes('..') ? v : '');
 const scopeSelector = (key) => `.lp-sec[data-s="${key}"]`;
 const newScope = () => crypto.randomBytes(5).toString('hex');
+const slugifyName = (v) => String(v || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
 const SLUG_HELP = 'Link hanya boleh huruf kecil, angka dan tanda minus (contoh: promo-ramadan). Beberapa kata dicadangkan.';
 
 const upload = multer({
@@ -46,10 +55,12 @@ const upload = multer({
   fileFilter(req, file, cb) {
     const okImage = /^image\//.test(file.mimetype) && file.mimetype !== 'image/svg+xml';
     const okHtml = file.fieldname === 'htmlFile' && /\.html?$/i.test(file.originalname);
-    if ((file.fieldname === 'htmlFile' && okHtml) || (file.fieldname !== 'htmlFile' && okImage)) return cb(null, true);
+    const okPdf = file.fieldname === 'pdfFile' && /\.pdf$/i.test(file.originalname);
+    if (okPdf || (file.fieldname === 'htmlFile' && okHtml) || (!['htmlFile', 'pdfFile'].includes(file.fieldname) && okImage)) return cb(null, true);
+    if (file.fieldname === 'pdfFile') return cb(new UserError('File harus PDF.'));
     cb(new UserError(file.fieldname === 'htmlFile' ? 'File HTML harus berekstensi .html' : `File "${file.originalname}" bukan gambar (SVG tidak diizinkan).`));
   },
-}).fields([{ name: 'images', maxCount: 30 }, { name: 'htmlFile', maxCount: 1 }, { name: 'assets', maxCount: 30 }]);
+}).fields([{ name: 'images', maxCount: 30 }, { name: 'htmlFile', maxCount: 1 }, { name: 'assets', maxCount: 30 }, { name: 'pdfFile', maxCount: 1 }]);
 
 const withUpload = (req, res, next) =>
   upload(req, res, (err) => {
@@ -162,7 +173,8 @@ function summary(page) {
     settings: { maxWidth: st.maxWidth ?? null, background: st.background || '#ffffff', font: st.font ?? null },
     sections: page.sections.map((s) => ({
       id: s.id, name: s.name, type: s.type, visible: s.visible !== false, mt: s.mt || 0, layout: s.layout || 'stack',
-      wrap: Boolean(s.wrap), part: s.part,
+      wrap: Boolean(s.wrap), part: s.part, template: s.type === 'template' ? s.template : undefined,
+      kind: s.type === 'block' ? s.kind : undefined, props: s.type === 'block' ? s.props : undefined,
       items: s.type === 'image' ? s.items.map((it) => ({ src: it.src, ext: it.ext || null, alt: it.alt || '', href: it.href || '' })) : undefined,
       source: s.type === 'html' ? s.source ?? s.html : undefined,
     })),
@@ -171,7 +183,7 @@ function summary(page) {
 }
 
 // ---------------------------------------------------------------- pages (HTML shells)
-function shell({ title, body, csrf = '', view = '', slug = '', email = '' }) {
+function shell({ title, body, csrf = '', view = '', slug = '', email = '', shop = false, kind = '' }) {
   return `<!doctype html>
 <html lang="id">
 <head>
@@ -183,9 +195,10 @@ function shell({ title, body, csrf = '', view = '', slug = '', email = '' }) {
 <script src="/admin/static/theme.js"></script>
 <link rel="stylesheet" href="/admin/static/admin.css?v=${ASSET_V}">
 </head>
-<body data-view="${esc(view)}" data-slug="${esc(slug)}" data-email="${esc(email)}">
+<body data-view="${esc(view)}" data-slug="${esc(slug)}" data-email="${esc(email)}"${kind ? ` data-kind="${esc(kind)}"` : ''}>
 ${body}
 ${view ? `<script src="/admin/static/admin.js?v=${ASSET_V}" defer></script>` : ''}
+${shop ? `<link rel="stylesheet" href="/admin/static/shop.css?v=${ASSET_V}"><script src="/admin/static/shop.js?v=${ASSET_V}" defer></script>` : ''}
 </body>
 </html>`;
 }
@@ -301,32 +314,115 @@ export function adminRouter({ assetVersion = '1' } = {}) {
   };
   r.get('/', view('dashboard', 'Dashboard'));
   r.get('/pages', view('pages', 'Halaman'));
+  r.get('/homepage', view('homepage', 'Homepage'));
+  // Example of one element with its default settings (picker preview).
+  r.get('/block-preview/:kind', async (req, res, next) => {
+    try {
+      const { kind } = req.params;
+      if (!Object.hasOwn(BLOCKS, kind)) return res.status(404).type('text').send('Elemen tidak dikenal');
+      const sec = { id: 'contoh', name: BLOCKS[kind].label, type: 'block', kind, props: normalizeBlock(kind, blockDefaults(kind)) };
+      const page = await attachBlockData({ title: BLOCKS[kind].label, sections: [sec], settings: { maxWidth: 375 }, robots: 'noindex, nofollow' });
+      res.set('Cache-Control', 'private, max-age=300');
+      res.type('html').send(renderPage(page, { assetVersion, global: { maxWidth: 375 }, showHidden: ['floatwa', 'popup'].includes(kind), promo: await promos.activePromo() }));
+    } catch (e) {
+      next(e);
+    }
+  });
+  r.get('/distributors', view('distributors', 'Distributor'));
   r.get('/reports', view('reports', 'Laporan'));
   r.get('/pages/:slug', view('editor', 'Editor'));
+  r.get('/templates', view('templates', 'Template'));
+  r.get('/templates/:key', (req, res) => {
+    if (!isTemplateId(req.params.key)) return res.status(404).type('text').send('Template tidak ditemukan');
+    res.type('html').send(shell({ title: 'Edit template', view: 'editor', kind: 'template', slug: req.params.key, csrf: req.admin.csrf, email: req.admin.email, body: '<div id="app" class="app" aria-live="polite"></div>' }));
+  });
   r.get('/audit', (req, res) => res.redirect(301, '/admin/reports?tab=log'));
   r.get('/promo', view('promo', 'Promo'));
-
-  const initialState = (slug) => async () => {
-    const [page, global] = await Promise.all([getPage(slug), getGlobal()]);
-    if (!page) throw httpError(404, 'Halaman tidak ditemukan.');
-    if (!page.name) page.name = page.title;
-    return { page, global };
+  // Produk (shop) views — rendered by public/admin/shop.js
+  const shopView = (v, title) => (req, res) => {
+    const id = req.params.id || '';
+    if (id && !/^[a-z]_[a-f0-9]{10}$/.test(id)) return res.status(404).type('text').send('Tidak ditemukan');
+    res.type('html').send(shell({ title, view: v, slug: id, csrf: req.admin.csrf, email: req.admin.email, shop: true, body: '<div id="app" class="app" aria-live="polite"></div>' }));
   };
+  r.get('/products', shopView('shop-products', 'Produk'));
+  r.get('/products/new', shopView('shop-product-edit', 'Produk baru'));
+  r.get('/products/:id', shopView('shop-product', 'Produk'));
+  r.get('/products/:id/edit', shopView('shop-product-edit', 'Edit produk'));
+  r.get('/stock', shopView('shop-stock', 'Kelola Stok'));
+  r.get('/categories', shopView('shop-categories', 'Kategori'));
+  r.get('/catalogs', shopView('shop-catalogs', 'Katalog'));
+  r.get('/catalogs/:id', shopView('shop-catalog', 'Katalog'));
+  r.get('/bundles', shopView('shop-bundles', 'Bundle'));
+  r.get('/bundles/new', shopView('shop-bundle-edit', 'Bundle baru'));
+  r.get('/bundles/:id', shopView('shop-bundle-edit', 'Edit bundle'));
+  r.get('/orders', shopView('shop-orders', 'Order'));
+  r.get('/orders/:no', (req, res) => {
+    if (!/^SP\d{12}$/.test(req.params.no)) return res.status(404).type('text').send('Tidak ditemukan');
+    res.type('html').send(shell({ title: `Order ${req.params.no}`, view: 'shop-order', slug: req.params.no, csrf: req.admin.csrf, email: req.admin.email, shop: true, body: '<div id="app" class="app" aria-live="polite"></div>' }));
+  });
+  r.get('/shop-settings', shopView('shop-settings', 'Pengaturan Toko'));
+  r.get('/discounts', shopView('shop-discounts', 'Diskon'));
+  r.get('/discounts/new', shopView('shop-discount-edit', 'Diskon baru'));
+  r.get('/discounts/:id', shopView('shop-discount-edit', 'Edit diskon'));
 
-  // Preview shows the current draft (what "Simpan" would publish).
+  // ---- documents edited with the page editor: pages and templates (same editor, same draft rules)
+  const pageDrafts = { openDraft, pushState, step, markSaved, moveDraft, discardDraft, readMetas };
+  const DOCS = {
+    page: {
+      kind: 'page', label: 'Halaman', notFound: 'Halaman tidak ditemukan.', drafts: pageDrafts, valid: isValidSlug, get: getPage,
+      lock: (key, fn) => withPageLock(key, fn), audit: (key) => ({ slug: key }),
+      async initial(key) {
+        const [page, global] = await Promise.all([getPage(key), getGlobal()]);
+        if (!page) throw httpError(404, 'Halaman tidak ditemukan.');
+        if (!page.name) page.name = page.title;
+        return { page, global };
+      },
+      listHistory, readHistory, readHistoryMany,
+    },
+    template: {
+      kind: 'template', label: 'Template', notFound: 'Template tidak ditemukan.', drafts: templateDrafts, valid: isTemplateId, get: getTemplate,
+      lock: (key, fn) => withPageLock(`tpl:${key}`, fn), audit: (key) => ({ template: key }),
+      async initial(key) {
+        const [tpl, global] = await Promise.all([getTemplate(key), getGlobal()]);
+        if (!tpl) throw httpError(404, 'Template tidak ditemukan.');
+        return { page: tpl, global };
+      },
+      listHistory: listTemplateHistory, readHistory: readTemplateHistory, readHistoryMany: readTemplateHistoryMany,
+    },
+  };
+  const openDoc = (doc, key) => doc.lock(key, () => doc.drafts.openDraft(key, () => doc.initial(key)));
+  const onlyPage = (req) => { if (req.doc.kind !== 'page') throw httpError(400, 'Hanya untuk halaman.'); };
+
+  // Preview shows the current draft (what "Publikasikan" would publish). Templates inside the page show their draft too,
+  // because they can be edited in place from the page editor.
   r.get('/preview/:slug', async (req, res, next) => {
     try {
       const { slug } = req.params;
       if (!isValidSlug(slug)) return res.status(404).type('text').send('Halaman tidak ditemukan');
-      const [live, draft, promo] = await Promise.all([
-        getPage(slug),
-        withPageLock(slug, () => openDraft(slug, initialState(slug))).catch((e) => e),
-        promos.activePromo(),
-      ]);
+      const [live, draft, promo] = await Promise.all([getPage(slug), openDoc(DOCS.page, slug).catch((e) => e), promos.activePromo()]);
       if (!live) return res.status(404).type('text').send('Halaman tidak ditemukan');
       if (draft instanceof Error) throw draft;
+      const ids = templateRefs(draft.state.page);
+      const map = await getTemplates(ids);
+      for (const id of ids) {
+        const d = map.has(id) && (await templateDrafts.peek(id));
+        if (d && d.meta.pos !== d.meta.savedPos) map.set(id, { ...map.get(id), ...d.state.page, id });
+      }
+      const page = await attachBlockData(expandPage(draft.state.page, map, { admin: true }));
       res.set('Cache-Control', 'no-store');
-      res.type('html').send(renderPage({ ...draft.state.page, robots: 'noindex, nofollow' }, { assetVersion, global: draft.state.global, showHidden: true, promo }));
+      res.type('html').send(renderPage({ ...page, robots: 'noindex, nofollow' }, { assetVersion, global: draft.state.global, showHidden: true, promo }));
+    } catch (e) {
+      next(e);
+    }
+  });
+  r.get('/preview-template/:key', async (req, res, next) => {
+    try {
+      const { key } = req.params;
+      if (!isTemplateId(key) || !(await getTemplate(key))) return res.status(404).type('text').send('Template tidak ditemukan');
+      const [draft, global, promo] = await Promise.all([openDoc(DOCS.template, key), getGlobal(), promos.activePromo()]);
+      const tpl = draft.state.page;
+      res.set('Cache-Control', 'no-store');
+      res.type('html').send(renderPage(await attachBlockData({ title: tpl.name, sections: tpl.sections, badges: tpl.badges, settings: {}, robots: 'noindex, nofollow' }), { assetVersion, global, showHidden: true, promo }));
     } catch (e) {
       next(e);
     }
@@ -334,8 +430,9 @@ export function adminRouter({ assetVersion = '1' } = {}) {
 
   r.get('/live/:slug', async (req, res, next) => {
     try {
-      const [page, global, promo] = await Promise.all([getPage(req.params.slug), getGlobal(), promos.activePromo()]);
-      if (!page) return res.status(404).type('text').send('Halaman tidak ditemukan');
+      const [raw, global, promo] = await Promise.all([getPage(req.params.slug), getGlobal(), promos.activePromo()]);
+      if (!raw) return res.status(404).type('text').send('Halaman tidak ditemukan');
+      const page = await resolvePage(raw);
       res.set('Cache-Control', 'no-store');
       res.type('html').send(renderPage({ ...page, robots: 'noindex, nofollow' }, { assetVersion, global: { ...global, ga4Id: '' }, promo, fullLayout: true }));
     } catch (e) {
@@ -349,19 +446,26 @@ export function adminRouter({ assetVersion = '1' } = {}) {
   const wrap = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 
   const countUnsaved = async (slugs) => (await readMetas(slugs)).filter((m) => m && m.pos !== m.savedPos).length;
+  const countUnsavedTemplates = async (ids) => (await templateDrafts.readMetas(ids)).filter((m) => m && m.pos !== m.savedPos).length;
 
   api.get('/status', wrap(async (req, res) => {
-    const [unsavedPages, draft, live] = await Promise.all([listSlugs().then(countUnsaved), promos.getDraft(), promos.getLive()]);
-    res.json({ unsavedPages, promoDraft: promos.isDirty(draft, live) });
+    const [unsavedPages, unsavedTemplates, draft, live] = await Promise.all([
+      listSlugs().then(countUnsaved), listTemplateIds().then(countUnsavedTemplates), promos.getDraft(), promos.getLive(),
+    ]);
+    res.json({ unsavedPages: unsavedPages + unsavedTemplates, unsavedTemplates, promoDraft: promos.isDirty(draft, live) });
   }));
 
   api.get('/pages', wrap(async (req, res) => {
     const pages = await listPages({ withPage: true });
     const slugs = pages.map((p) => p.slug);
-    const [metas, archived, global] = await Promise.all([readMetas(slugs), listArchived(new Set(slugs)), getGlobal()]);
+    const [metas, archived, global, expanded] = await Promise.all([
+      readMetas(slugs), listArchived(new Set(slugs)), getGlobal(), resolvePages(pages.map((p) => p.page)),
+    ]);
     pages.forEach((p, i) => {
       p.unsaved = Boolean(metas[i] && metas[i].pos !== metas[i].savedPos);
-      if (!p.thumbnail) p.cover = pageImages(p.page)[0] || null;
+      p.templates = templateRefs(p.page).length;
+      p.sections = expanded[i].sections.length;
+      if (!p.thumbnail) p.cover = pageImages(expanded[i])[0] || null;
       delete p.page;
     });
     res.json({ pages, archived, categories: global.categories });
@@ -372,6 +476,7 @@ export function adminRouter({ assetVersion = '1' } = {}) {
     const title = clip(req.body?.title, 160) || slug;
     const from = clip(req.body?.from, 80);
     if (!isValidSlug(slug)) throw httpError(400, SLUG_HELP);
+    if (slug === HOME) throw httpError(400, 'Link "home" dipakai Homepage. Pilih link lain.');
     let page;
     if (from) {
       const src = await getPage(from);
@@ -397,6 +502,7 @@ export function adminRouter({ assetVersion = '1' } = {}) {
 
   api.post('/pages/:slug/archive', wrap(async (req, res) => {
     const { slug } = req.params;
+    if (slug === HOME) throw httpError(400, 'Homepage tidak bisa diarsipkan.');
     await withPageLock(slug, async () => {
       if (!(await getPage(slug))) throw httpError(404, 'Halaman tidak ditemukan.');
       await archivePage(slug);
@@ -422,44 +528,170 @@ export function adminRouter({ assetVersion = '1' } = {}) {
     res.json({ ok: true });
   }));
 
-  // ---- editor (draft)
-  const payload = (meta, state, extra = {}) => ({ ok: true, page: summary(state.page), global: state.global, draft: info(meta), ...extra });
+  // ---- Distributor menu: one list used by every "Daftar Distributor" element (changes are live at once)
+  api.get('/distributors', wrap(async (req, res) => {
+    res.json({ items: await getDistributors({ fresh: true }), provinces: PROVINCES, kinds: LINK_KINDS });
+  }));
+  api.post('/distributors', wrap(async (req, res) => {
+    const d = normalizeDistributor(req.body || {});
+    if (!d.city || !d.name) throw new UserError('Isi kota dan nama area.');
+    if (!d.links.length) throw new UserError('Tambahkan minimal satu link (Shopee, Tokopedia, …). Link harus diawali https://');
+    await updateDistributors((items) => [...items, d]);
+    await audit(req, 'distributor.create', { name: d.name, city: d.city });
+    res.status(201).json({ ok: true, item: d });
+  }));
+  api.put('/distributors/:id', wrap(async (req, res) => {
+    const d = normalizeDistributor(req.body || {}, req.params.id);
+    if (!d.city || !d.name) throw new UserError('Isi kota dan nama area.');
+    if (!d.links.length) throw new UserError('Tambahkan minimal satu link (Shopee, Tokopedia, …). Link harus diawali https://');
+    let found = false;
+    await updateDistributors((items) => items.map((x) => (x.id === req.params.id ? ((found = true), d) : x)));
+    if (!found) throw httpError(404, 'Distributor tidak ditemukan.');
+    await audit(req, 'distributor.update', { name: d.name, city: d.city });
+    res.json({ ok: true, item: d });
+  }));
+  api.delete('/distributors/:id', wrap(async (req, res) => {
+    let gone = null;
+    await updateDistributors((items) => items.filter((x) => (x.id === req.params.id ? ((gone = x), false) : true)));
+    if (!gone) throw httpError(404, 'Distributor tidak ditemukan.');
+    await audit(req, 'distributor.delete', { name: gone.name, city: gone.city });
+    res.json({ ok: true });
+  }));
 
-  api.get('/pages/:slug', wrap(async (req, res) => {
-    const { slug } = req.params;
-    if (!isValidSlug(slug)) throw httpError(404, 'Halaman tidak ditemukan.');
-    const [{ meta, state }, live, clipboard, active] = await Promise.all([
-      withPageLock(slug, () => openDraft(slug, initialState(slug))),
-      getPage(slug),
-      readClipboard(req.admin.email),
-      promos.activePromo(),
+  // ---- CS Rotator: chats sent to each number (counted by /go/wa/:id)
+  api.get('/rotators/stats', wrap(async (req, res) => {
+    const g = await getGlobal();
+    const days = Array.from({ length: 7 }, (_, i) => new Date(Date.now() + 7 * 36e5 - i * 864e5).toISOString().slice(0, 10));
+    const keys = [];
+    for (const r of g.rotators) for (const n of r.numbers) keys.push(`rotstat:${r.id}:${n}`, ...days.map((d) => `rotstat:${r.id}:${n}:${d}`));
+    const vals = await kv.getMany(keys);
+    let i = 0;
+    res.json({ days, rotators: g.rotators.map((r) => ({ id: r.id, name: r.name, numbers: r.numbers.map((number) => {
+      const total = Number(vals[i++] || 0);
+      const perDay = days.map(() => Number(vals[i++] || 0));
+      return { number, total, today: perDay[0], week: perDay.reduce((a, b) => a + b, 0), perDay };
+    }) })) });
+  }));
+
+  // ---- element blocks: schema for the admin forms, pages for the link picker
+  api.get('/blocks', wrap(async (req, res) => {
+    const [pages, global] = await Promise.all([listPages(), getGlobal()]);
+    res.json({ blocks: blockSchema(), meta: blockMeta, pages: pages.map((p) => ({ slug: p.slug, name: p.name })), rotators: global.rotators.map((r) => ({ id: r.id, name: r.name })) });
+  }));
+
+  // ---- templates list
+  const coverOf = (doc) => pageImages(doc)[0] || null;
+  api.get('/templates', wrap(async (req, res) => {
+    const [list, usage] = await Promise.all([listTemplates(), templateUsage()]);
+    const metas = await templateDrafts.readMetas(list.map((t) => t.id));
+    res.json({
+      templates: list.map((t, i) => ({
+        id: t.id, name: t.name, sections: t.sections.length, cover: coverOf(t), updatedAt: t.updatedAt || null, updatedBy: t.updatedBy || null,
+        usedIn: usage.get(t.id) || [], unsaved: Boolean(metas[i] && metas[i].pos !== metas[i].savedPos), duplicatedFrom: t.duplicatedFrom || null,
+      })),
+    });
+  }));
+  api.post('/templates', wrap(async (req, res) => {
+    const name = clip(req.body?.name, 160);
+    if (!name) throw new UserError('Nama template wajib diisi.');
+    const from = clip(req.body?.from, 20);
+    let sections = [];
+    let badges = [];
+    if (from) {
+      const src = await getTemplate(from);
+      if (!src) throw httpError(404, 'Template sumber tidak ditemukan.');
+      sections = structuredClone(src.sections);
+      badges = structuredClone(src.badges || []);
+    }
+    const tpl = await createTemplate({ name, sections, badges, from: from || undefined }, req.admin.email);
+    await audit(req, from ? 'template.duplicate' : 'template.create', { template: tpl.id, name, from: from || undefined });
+    res.status(201).json({ ok: true, id: tpl.id });
+  }));
+  api.post('/templates/import', wrap(async (req, res) => {
+    const { page: imported, source } = importCode(req.body?.code);
+    const name = clip(req.body?.name, 160) || clip(imported.name || imported.title, 160) || 'Template impor';
+    const tpl = await createTemplate({ name, sections: imported.sections.filter((s) => s.type !== 'template'), badges: imported.badges || [] }, req.admin.email);
+    await audit(req, 'template.import', { template: tpl.id, name, from: source });
+    res.status(201).json({ ok: true, id: tpl.id });
+  }));
+  api.delete('/templates/:key', wrap(async (req, res) => {
+    const { key } = req.params;
+    const tpl = await getTemplate(key);
+    if (!tpl) throw httpError(404, 'Template tidak ditemukan.');
+    const used = (await templateUsage()).get(key) || [];
+    if (used.length) throw new UserError(`Template masih dipakai di: ${used.map((p) => p.name).join(', ')}. Hapus dari halaman itu dulu.`);
+    await withPageLock(`tpl:${key}`, async () => { await deleteTemplate(key); await templateDrafts.discardDraft(key); });
+    await audit(req, 'template.delete', { template: key, name: tpl.name });
+    res.json({ ok: true });
+  }));
+
+  // ---- editor (draft) — mounted for /pages/:key and /templates/:key
+  const ed = express.Router({ mergeParams: true });
+  const mountDoc = (doc) => (req, res, next) => {
+    req.doc = doc;
+    req.key = req.params.key;
+    if (!doc.valid(req.key)) return next(httpError(404, doc.notFound));
+    next();
+  };
+  api.use('/pages/:key', mountDoc(DOCS.page), ed);
+  api.use('/templates/:key', mountDoc(DOCS.template), ed);
+
+  /** Templates referenced by a page draft, for the editor list (name + their sections). */
+  async function templateInfo(state) {
+    const map = await getTemplates(templateRefs(state.page));
+    const metas = await templateDrafts.readMetas([...map.keys()]);
+    const out = {};
+    let i = 0;
+    for (const [id, t] of map) {
+      const m = metas[i++];
+      out[id] = { name: t.name, updatedAt: t.updatedAt || null, badges: (t.badges || []).length, dirty: Boolean(m && m.pos !== m.savedPos),
+        sections: t.sections.map((s) => ({ id: s.id, name: s.name, type: s.type, part: s.part, visible: s.visible !== false })) };
+    }
+    return out;
+  }
+  const payload = async (req, meta, state, extra = {}) => ({
+    ok: true, kind: req.doc.kind, page: summary(state.page), global: state.global, draft: info(meta),
+    templates: req.doc.kind === 'page' ? await templateInfo(state) : {}, ...extra,
+  });
+
+  ed.get('/', wrap(async (req, res) => {
+    const { doc, key } = req;
+    const [{ meta, state }, live, clipboard, active, usage] = await Promise.all([
+      openDoc(doc, key), doc.get(key), readClipboard(req.admin.email), promos.activePromo(),
+      doc.kind === 'template' ? templateUsage() : null,
     ]);
-    if (!live) throw httpError(404, 'Halaman tidak ditemukan.');
-    res.json(payload(meta, state, {
+    if (!live) throw httpError(404, doc.notFound);
+    const flat = doc.kind === 'page' ? await resolvePage(state.page) : state.page;
+    res.json(await payload(req, meta, state, {
       published: { updatedAt: live.updatedAt || null, updatedBy: live.updatedBy || null },
-      clipboard: clipboard ? { name: clipboard.section.name, from: clipboard.from } : null,
+      clipboard: clipboard ? { name: clipboard.section.name, from: clipboard.from, template: clipboard.section.type === 'template' } : null,
       options: { fonts: FONTS, widths: WIDTHS },
-      images: pageImages(state.page),
+      images: pageImages(flat),
+      usedIn: usage ? usage.get(key) || [] : undefined,
       promo: active ? { name: active.name, banner: Boolean(active.banner), badge: Boolean(active.badge), bar: Boolean(active.bar && (active.bar.title || active.bar.left || active.bar.right)) } : null,
     }));
   }));
 
   // Every draft edit: lock, revision check (other tab), apply on a copy, push an undo step, audit.
   const edit = (event, fn) => wrap(async (req, res) => {
-    const { slug } = req.params;
-    if (!isValidSlug(slug)) throw httpError(404, 'Halaman tidak ditemukan.');
+    const { doc, key } = req;
     let detail = {};
-    const out = await withPageLock(slug, async () => {
-      const { meta, state } = await openDraft(slug, initialState(slug));
+    const out = await doc.lock(key, async () => {
+      const { meta, state } = await doc.drafts.openDraft(key, () => doc.initial(key));
       const rev = req.get('x-draft-rev');
       if (rev && Number(rev) !== meta.rev) throw httpError(409, 'Draft ini baru saja diubah di tab atau oleh admin lain. Muat ulang untuk melihat versi terbaru.');
       const next = structuredClone(state);
       detail = (await fn(next.page, req, next)) || {};
       if (detail.noChange) return { meta, state };
-      return { meta: await pushState(slug, meta, next), state: next };
+      return { meta: await doc.drafts.pushState(key, meta, next), state: next };
     });
-    if (event && !detail.noChange) await audit(req, event, { slug, draft: true, ...detail, notes: undefined, noChange: undefined, clipboard: undefined });
-    res.json(payload(out.meta, out.state, { notes: detail.notes || [], clipboard: detail.clipboard, images: detail.images }));
+    const ev = event && doc.kind === 'template' ? event.replace(/^page\./, 'template.') : event;
+    if (ev && !detail.noChange) await audit(req, ev, { ...doc.audit(key), draft: true, ...detail, notes: undefined, noChange: undefined, clipboard: undefined });
+    let html;
+    const rid = typeof req.query.render === 'string' ? req.query.render : '';
+    const rsec = rid && out.state.page.sections.find((x) => x.id === rid);
+    if (rsec && rsec.type !== 'template') html = renderSectionPreview(rsec, { promo: await promos.activePromo(), badges: out.state.page.badges || [], data: (await attachBlockData({ sections: [rsec] }))._data });
+    res.json(await payload(req, out.meta, out.state, { notes: detail.notes || [], clipboard: detail.clipboard, images: detail.images, html }));
   });
 
   const findSection = (page, id) => {
@@ -468,12 +700,13 @@ export function adminRouter({ assetVersion = '1' } = {}) {
     return i;
   };
 
-  // Konten / Desain / SEO fields
-  api.patch('/pages/:slug', edit('page.update', async (page, req) => {
+  // Konten / Desain / SEO fields (templates only have a name)
+  ed.patch('/', edit('page.update', async (page, req) => {
     const b = req.body || {};
     const changed = [];
     const set = (k, v) => { if (JSON.stringify(page[k]) !== JSON.stringify(v)) { page[k] = v; changed.push(k); } };
     if (b.name != null) set('name', clip(b.name, 160) || page.name);
+    if (req.doc.kind === 'template') return changed.length ? { fields: changed } : { noChange: true };
     if (b.title != null) set('title', clip(b.title, 160) || page.title);
     if (b.description != null) set('description', clip(b.description, 500));
     if (b.robots != null) set('robots', b.robots === 'noindex, nofollow' ? 'noindex, nofollow' : '');
@@ -483,7 +716,8 @@ export function adminRouter({ assetVersion = '1' } = {}) {
     if (b.slug != null) {
       const slug = clip(b.slug, 80).toLowerCase();
       if (!isValidSlug(slug)) throw httpError(400, SLUG_HELP);
-      if (slug !== req.params.slug && (await getPage(slug))) throw httpError(409, 'Link sudah dipakai halaman lain.');
+      if ((slug === HOME) !== (req.key === HOME)) throw httpError(400, req.key === HOME ? 'Link Homepage selalu "/" dan tidak bisa diubah.' : 'Link "home" dipakai Homepage. Pilih link lain.');
+      if (slug !== req.key && (await getPage(slug))) throw httpError(409, 'Link sudah dipakai halaman lain.');
       set('slug', slug);
     }
     if (b.settings) {
@@ -496,13 +730,15 @@ export function adminRouter({ assetVersion = '1' } = {}) {
     return changed.length ? { fields: changed } : { noChange: true };
   }));
 
-  api.patch('/pages/:slug/global', edit('global.update', (page, req, state) => {
+  ed.patch('/global', edit('global.update', (page, req, state) => {
+    onlyPage(req);
     const before = JSON.stringify(state.global);
     state.global = normalizeGlobal({ ...state.global, ...req.body });
     return before === JSON.stringify(state.global) ? { noChange: true } : { fields: Object.keys(req.body || {}) };
   }));
 
-  api.post('/pages/:slug/thumbnail', withUpload, edit('page.update', async (page, req) => {
+  ed.post('/thumbnail', withUpload, edit('page.update', async (page, req) => {
+    onlyPage(req);
     const f = req.files?.images?.[0];
     if (!f) throw new UserError('Pilih gambar thumbnail.');
     const img = await processImage(f.buffer, 'thumbnails');
@@ -510,7 +746,8 @@ export function adminRouter({ assetVersion = '1' } = {}) {
     return { fields: ['thumbnail'] };
   }));
 
-  api.post('/pages/:slug/favicon', withUpload, edit('global.update', async (page, req, state) => {
+  ed.post('/favicon', withUpload, edit('global.update', async (page, req, state) => {
+    onlyPage(req);
     const f = req.files?.images?.[0];
     if (!f) throw new UserError('Pilih gambar favicon.');
     let buf;
@@ -525,7 +762,7 @@ export function adminRouter({ assetVersion = '1' } = {}) {
     return { fields: ['favicon'] };
   }));
 
-  api.put('/pages/:slug/order', edit('section.reorder', (page, req) => {
+  ed.put('/order', edit('section.reorder', (page, req) => {
     const ids = req.body?.ids;
     if (!Array.isArray(ids) || ids.length !== page.sections.length || new Set(ids).size !== ids.length) throw httpError(400, 'Urutan tidak valid. Muat ulang halaman.');
     const byId = new Map(page.sections.map((s) => [s.id, s]));
@@ -535,14 +772,35 @@ export function adminRouter({ assetVersion = '1' } = {}) {
     return {};
   }));
 
-  api.post('/pages/:slug/sections', withUpload, edit('section.create', async (page, req) => {
+  const refId = (page) => {
+    let id;
+    do id = `tpl-${crypto.randomBytes(3).toString('hex')}`; while (page.sections.some((s) => s.id === id));
+    return id;
+  };
+
+  ed.post('/sections', withUpload, edit('section.create', async (page, req) => {
     const b = req.body || {};
+    const pos = () => toNum(b.position, 0, page.sections.length, page.sections.length);
+    if (b.type === 'template') {
+      if (req.doc.kind !== 'page') throw new UserError('Template tidak bisa dimasukkan ke template lain.');
+      const tpl = await getTemplate(clip(b.template, 20));
+      if (!tpl) throw httpError(404, 'Template tidak ditemukan.');
+      const sec = { id: refId(page), name: tpl.name, type: 'template', template: tpl.id };
+      page.sections.splice(pos(), 0, sec);
+      return { section: sec.id, name: tpl.name, type: 'template', template: tpl.id };
+    }
+    if (b.type === 'block') {
+      const kind = clip(b.kind, 20);
+      if (!Object.hasOwn(BLOCKS, kind)) throw httpError(400, 'Jenis elemen tidak dikenal.');
+      const sec = { id: newSectionId(page, BLOCKS[kind].label), name: BLOCKS[kind].label, type: 'block', kind, props: normalizeBlock(kind, blockDefaults(kind)) };
+      page.sections.splice(pos(), 0, sec);
+      return { section: sec.id, name: sec.name, type: 'block', kind };
+    }
     if (b.type === 'promo') {
       const part = b.part === 'bar' ? 'bar' : 'banner';
       const name = part === 'bar' ? '[PROMO] Bar' : '[PROMO] Banner';
       const sec = { id: newSectionId(page, `promo-${part}`), name, type: 'promo', part };
-      const pos = toNum(b.position, 0, page.sections.length, page.sections.length);
-      page.sections.splice(pos, 0, sec);
+      page.sections.splice(pos(), 0, sec);
       return { section: sec.id, name, type: 'promo' };
     }
     const name = clip(b.name, 120) || (b.type === 'html' ? 'Section HTML' : 'Section Gambar');
@@ -558,12 +816,11 @@ export function adminRouter({ assetVersion = '1' } = {}) {
       sec.wrap = true;
       notes = await buildHtml(sec, { code: b.code, htmlFile: req.files?.htmlFile?.[0], assets: req.files?.assets });
     }
-    const pos = toNum(b.position, 0, page.sections.length, page.sections.length);
-    page.sections.splice(pos, 0, sec);
+    page.sections.splice(pos(), 0, sec);
     return { section: sec.id, name: sec.name, type: sec.type, notes };
   }));
 
-  api.patch('/pages/:slug/sections/:id', withUpload, edit('section.update', async (page, req) => {
+  ed.patch('/sections/:id', withUpload, edit('section.update', async (page, req) => {
     const i = findSection(page, req.params.id);
     const sec = page.sections[i];
     const b = req.body || {};
@@ -572,6 +829,15 @@ export function adminRouter({ assetVersion = '1' } = {}) {
     if (b.visible != null) {
       const v = !(b.visible === false || b.visible === 'false');
       if (v !== (sec.visible !== false)) { if (v) delete sec.visible; else sec.visible = false; changed.push('visible'); }
+    }
+    if (sec.type === 'template') return changed.length ? { section: sec.id, name: sec.name, changed } : { noChange: true };
+    if (sec.type === 'block') {
+      if (b.mt != null) { const mt = toNum(b.mt, -200, 400, 0); if (mt !== (sec.mt || 0)) { if (mt) sec.mt = mt; else delete sec.mt; changed.push('spacing'); } }
+      if (b.props != null) {
+        const next = normalizeBlock(sec.kind, typeof b.props === 'string' ? parseJsonField(b.props, {}) : b.props);
+        if (JSON.stringify(next) !== JSON.stringify(sec.props)) { sec.props = next; changed.push('props'); }
+      }
+      return changed.length ? { section: sec.id, name: sec.name, changed } : { noChange: true };
     }
     if (b.mt != null) { const mt = toNum(b.mt, -200, 400, 0); if (mt !== (sec.mt || 0)) { if (mt) sec.mt = mt; else delete sec.mt; changed.push('spacing'); } }
     let notes = [];
@@ -595,38 +861,81 @@ export function adminRouter({ assetVersion = '1' } = {}) {
     return { section: sec.id, name: sec.name, changed, notes };
   }));
 
-  api.post('/pages/:slug/sections/:id/duplicate', edit('section.duplicate', (page, req) => {
+  ed.post('/sections/:id/duplicate', edit('section.duplicate', (page, req) => {
     const i = findSection(page, req.params.id);
-    const copy = cloneSection(page, page.sections[i], ' (salinan)');
+    const src = page.sections[i];
+    const copy = src.type === 'template' ? { ...src, id: refId(page) } : cloneSection(page, src, ' (salinan)');
     page.sections.splice(i + 1, 0, copy);
     copyBadges(page, badgesOf(page, req.params.id), copy.id);
     return { section: copy.id, name: copy.name, from: req.params.id };
   }));
 
-  api.delete('/pages/:slug/sections/:id', edit('section.delete', (page, req) => {
+  // "Lepas template": the template block becomes normal sections of this page only.
+  ed.post('/sections/:id/detach', edit('template.detach', async (page, req) => {
+    onlyPage(req);
+    const i = findSection(page, req.params.id);
+    const ref = page.sections[i];
+    if (ref.type !== 'template') throw httpError(400, 'Bukan template.');
+    const tpl = await getTemplate(ref.template);
+    if (!tpl) throw httpError(404, 'Template tidak ditemukan.');
+    const rest = page.sections.filter((s) => s !== ref);
+    const copies = [];
+    const rename = new Map();
+    for (const s of tpl.sections) {
+      const holder = { sections: [...rest, ...copies] };
+      const copy = cloneSection(holder, s);
+      if (!holder.sections.some((x) => x.id === s.id)) copy.id = s.id; // keep ids so per-section reports continue
+      rename.set(s.id, copy.id);
+      copies.push(copy);
+    }
+    page.sections.splice(i, 1, ...copies);
+    for (const b of tpl.badges || []) if (rename.has(b.section)) copyBadges(page, [b], rename.get(b.section));
+    return { section: ref.id, name: ref.name, from: ref.template };
+  }));
+
+  ed.post('/assets', withUpload, wrap(async (req, res) => {
+    const files = req.files?.images || [];
+    if (!files.length) throw new UserError('Pilih gambar.');
+    const out = [];
+    for (const f of files.slice(0, 20)) out.push({ ...(await processImage(f.buffer, 'blocks')), alt: '' });
+    res.json({ images: out });
+  }));
+  ed.post('/files', withUpload, wrap(async (req, res) => {
+    const f = req.files?.pdfFile?.[0];
+    if (!f) throw new UserError('Pilih file PDF.');
+    if (f.size > 10 * 1024 * 1024) throw new UserError('PDF maksimal 10 MB.');
+    if (f.buffer.subarray(0, 5).toString('latin1') !== '%PDF-') throw new UserError('File bukan PDF yang valid.');
+    const name = `${slugifyName(f.originalname.replace(/\.pdf$/i, '')).slice(0, 40) || 'file'}-${crypto.randomBytes(4).toString('hex')}.pdf`;
+    await saveUpload(`/uploads/files/${name}`, f.buffer);
+    await audit(req, 'file.upload', { ...req.doc.audit(req.key), name });
+    res.json({ file: `/uploads/files/${name}`, name: f.originalname.slice(0, 120) });
+  }));
+
+  ed.delete('/sections/:id', edit('section.delete', (page, req) => {
     const i = findSection(page, req.params.id);
     const [sec] = page.sections.splice(i, 1);
     dropBadges(page, sec.id);
     return { section: sec.id, name: sec.name };
   }));
 
-  // Copy / cut put the full section on the admin's clipboard; paste works on any page.
-  api.post('/pages/:slug/clipboard', edit('section.cut', async (page, req) => {
+  // Copy / cut put the full section on the admin's clipboard; paste works on any page or template.
+  ed.post('/clipboard', edit('section.cut', async (page, req) => {
     const i = findSection(page, clip(req.body?.id, 64));
     const sec = page.sections[i];
     const cut = req.body?.mode === 'cut';
-    await writeClipboard(req.admin.email, { section: sec, badges: badgesOf(page, sec.id), from: req.params.slug, at: Date.now() });
-    const clipboard = { name: sec.name, from: req.params.slug };
+    await writeClipboard(req.admin.email, { section: sec, badges: badgesOf(page, sec.id), from: req.key, at: Date.now() });
+    const clipboard = { name: sec.name, from: req.key, template: sec.type === 'template' };
     if (!cut) return { noChange: true, clipboard };
     page.sections.splice(i, 1);
     dropBadges(page, sec.id);
     return { section: sec.id, name: sec.name, clipboard };
   }));
 
-  api.post('/pages/:slug/sections/paste', edit('section.paste', async (page, req) => {
+  ed.post('/sections/paste', edit('section.paste', async (page, req) => {
     const cb = await readClipboard(req.admin.email);
     if (!cb) throw new UserError('Belum ada section yang di-copy atau di-cut.');
-    const copy = cloneSection(page, cb.section);
+    if (cb.section.type === 'template' && req.doc.kind !== 'page') throw new UserError('Template tidak bisa ditempel di dalam template lain.');
+    const copy = cb.section.type === 'template' ? { ...cb.section, id: refId(page) } : cloneSection(page, cb.section);
     const pos = toNum(req.body?.position, 0, page.sections.length, page.sections.length);
     page.sections.splice(pos, 0, copy);
     copyBadges(page, cb.badges, copy.id);
@@ -635,30 +944,32 @@ export function adminRouter({ assetVersion = '1' } = {}) {
 
   // ---- promo badges (float over a section; image comes from the active promo)
   const badgeNum = (v, min, max, d) => Math.round(toNum(v, min, max, d) * 10) / 10;
-  api.post('/pages/:slug/badges', edit('badge.create', (page, req) => {
+  ed.post('/badges', edit('badge.create', (page, req) => {
     const sec = page.sections[findSection(page, clip(req.body?.section, 64))];
+    if (sec.type === 'template') throw new UserError('Badge untuk template diatur di editor template itu.');
     page.badges = page.badges || [];
     const badge = { id: `badge-${crypto.randomBytes(4).toString('hex')}`, section: sec.id, cx: 240, cy: 50, w: 110 };
     page.badges.push(badge);
     return { section: sec.id, name: sec.name, badge: badge.id };
   }));
-  api.patch('/pages/:slug/badges/:id', edit('badge.move', (page, req) => {
+  ed.patch('/badges/:id', edit('badge.move', (page, req) => {
     const b = (page.badges || []).find((x) => x.id === req.params.id);
-    if (!b) throw httpError(404, 'Badge tidak ditemukan.');
+    if (!b) throw httpError(404, 'Badge ini milik template. Atur posisinya di editor template.');
     const next = { cx: badgeNum(req.body?.cx, -160, 480, b.cx), cy: badgeNum(req.body?.cy, -400, 4000, b.cy), w: badgeNum(req.body?.w, 20, 320, b.w) };
     if (next.cx === b.cx && next.cy === b.cy && next.w === b.w) return { noChange: true };
     Object.assign(b, next);
     return { section: b.section, badge: b.id };
   }));
-  api.delete('/pages/:slug/badges/:id', edit('badge.delete', (page, req) => {
+  ed.delete('/badges/:id', edit('badge.delete', (page, req) => {
     const before = (page.badges || []).length;
     page.badges = (page.badges || []).filter((x) => x.id !== req.params.id);
     if (page.badges.length === before) throw httpError(404, 'Badge tidak ditemukan.');
     return { badge: req.params.id };
   }));
 
-  api.post('/pages/:slug/phone-link', wrap(async (req, res) => {
-    const { slug } = req.params;
+  ed.post('/phone-link', wrap(async (req, res) => {
+    onlyPage(req);
+    const slug = req.key;
     if (!(await getPage(slug))) throw httpError(404, 'Halaman tidak ditemukan.');
     const { token, expiresAt } = await createLink(slug);
     const url = `${phoneBase(req)}/p/${token}`;
@@ -669,61 +980,68 @@ export function adminRouter({ assetVersion = '1' } = {}) {
 
   // ---- undo / redo / publish / discard
   const stepRoute = (delta) => wrap(async (req, res) => {
-    const { slug } = req.params;
-    const out = await withPageLock(slug, async () => {
-      const { meta, state } = await openDraft(slug, initialState(slug));
-      const next = await step(slug, meta, delta);
+    const { doc, key } = req;
+    const out = await doc.lock(key, async () => {
+      const { meta, state } = await doc.drafts.openDraft(key, () => doc.initial(key));
+      const next = await doc.drafts.step(key, meta, delta);
       return { meta, state: next || state };
     });
-    res.json(payload(out.meta, out.state));
+    res.json(await payload(req, out.meta, out.state));
   });
-  api.post('/pages/:slug/undo', stepRoute(-1));
-  api.post('/pages/:slug/redo', stepRoute(1));
+  ed.post('/undo', stepRoute(-1));
+  ed.post('/redo', stepRoute(1));
 
-  api.post('/pages/:slug/publish', wrap(async (req, res) => {
-    const { slug } = req.params;
-    let target = slug;
-    const out = await withPageLock(slug, async () => {
-      const { meta, state } = await openDraft(slug, initialState(slug));
-      const live = await getPage(slug);
-      if (!live) throw httpError(404, 'Halaman tidak ditemukan.');
+  ed.post('/publish', wrap(async (req, res) => {
+    const { doc, key } = req;
+    let target = key;
+    const out = await doc.lock(key, async () => {
+      const { meta, state } = await doc.drafts.openDraft(key, () => doc.initial(key));
+      const live = await doc.get(key);
+      if (!live) throw httpError(404, doc.notFound);
       if (!req.body?.force && meta.baseVersion && live.updatedAt && live.updatedAt !== meta.baseVersion) {
-        throw httpError(409, 'Halaman live sudah diubah sejak draft ini dibuat (mungkin oleh admin lain).', { code: 'LIVE_CHANGED' });
+        throw httpError(409, `${doc.label} live sudah diubah sejak draft ini dibuat (mungkin oleh admin lain).`, { code: 'LIVE_CHANGED' });
       }
       const page = structuredClone(state.page);
-      target = page.slug && page.slug !== slug ? page.slug : slug;
-      if (target !== slug) {
+      if (doc.kind === 'template') {
+        const saved = await saveTemplate(key, page, req.admin.email);
+        return { meta: await doc.drafts.markSaved(key, meta, saved.updatedAt), state };
+      }
+      target = page.slug && page.slug !== key ? page.slug : key;
+      if (target !== key) {
         if (!isValidSlug(target)) throw httpError(400, SLUG_HELP);
         if (await getPage(target)) throw httpError(409, 'Link baru sudah dipakai halaman lain.');
-        await renamePage(slug, target, page, req.admin.email);
-        await moveDraft(slug, target);
+        await renamePage(key, target, page, req.admin.email);
+        await moveDraft(key, target);
       } else {
-        await savePage(slug, page, req.admin.email);
+        await savePage(key, page, req.admin.email);
       }
       const globalChanged = JSON.stringify(await getGlobal()) !== JSON.stringify(normalizeGlobal(state.global));
       if (globalChanged) await saveGlobal(state.global);
       return { meta: await markSaved(target, meta, page.updatedAt), state, globalChanged };
     });
-    await audit(req, 'page.publish', { slug: target, from: target !== slug ? slug : undefined, global: out.globalChanged || undefined });
-    res.json(payload(out.meta, out.state, { slug: target, published: { updatedAt: out.meta.baseVersion, updatedBy: req.admin.email } }));
+    if (doc.kind === 'template') {
+      const usedIn = (await templateUsage()).get(key) || [];
+      await audit(req, 'template.publish', { template: key, name: out.state.page.name, pages: usedIn.length });
+      return res.json(await payload(req, out.meta, out.state, { usedIn, published: { updatedAt: out.meta.baseVersion, updatedBy: req.admin.email } }));
+    }
+    await audit(req, 'page.publish', { slug: target, from: target !== key ? key : undefined, global: out.globalChanged || undefined });
+    res.json(await payload(req, out.meta, out.state, { slug: target, published: { updatedAt: out.meta.baseVersion, updatedBy: req.admin.email } }));
   }));
 
-  api.post('/pages/:slug/discard', wrap(async (req, res) => {
-    const { slug } = req.params;
-    if (!isValidSlug(slug)) throw httpError(404, 'Halaman tidak ditemukan.');
-    await withPageLock(slug, () => discardDraft(slug));
-    await audit(req, 'draft.discard', { slug });
+  ed.post('/discard', wrap(async (req, res) => {
+    const { doc, key } = req;
+    await doc.lock(key, () => doc.drafts.discardDraft(key));
+    await audit(req, 'draft.discard', doc.audit(key));
     res.json({ ok: true });
   }));
 
-  // ---- history (published versions) + this page's activity
-  api.get('/pages/:slug/history', wrap(async (req, res) => {
-    const { slug } = req.params;
-    if (!isValidSlug(slug)) throw httpError(404, 'Halaman tidak ditemukan.');
+  // ---- history (published versions) + this document's activity
+  ed.get('/history', wrap(async (req, res) => {
+    const { doc, key } = req;
     // Versions, redirects and the audit log are independent; all versions are read in one batch.
     const [list, redirects, entries] = await Promise.all([
-      listHistory(slug).then(async (ts) => ({ ts, pages: await readHistoryMany(slug, ts) })),
-      getRedirects(),
+      doc.listHistory(key).then(async (ts) => ({ ts, pages: await doc.readHistoryMany(key, ts) })),
+      doc.kind === 'page' ? getRedirects() : {},
       readAudit(5000),
     ]);
     const versions = [];
@@ -731,42 +1049,49 @@ export function adminRouter({ assetVersion = '1' } = {}) {
       const p = list.pages[i];
       if (p) versions.push({ ts, savedAt: p.updatedAt || null, by: p.updatedBy || null, sections: p.sections?.length || 0 });
     });
-    // include activity recorded under the page's previous links (URL changes)
-    const names = new Set([slug, ...Object.keys(redirects).filter((k) => redirects[k] === slug)]);
-    const activity = entries.filter((e) => names.has(e.slug)).slice(0, 300)
+    // pages: include activity recorded under the page's previous links (URL changes)
+    const names = new Set([key, ...Object.keys(redirects).filter((k) => redirects[k] === key)]);
+    const mine = doc.kind === 'page' ? (e) => names.has(e.slug) : (e) => e.template === key;
+    const activity = entries.filter(mine).slice(0, 300)
       .map(({ ts, event, actor, section, name, fields, changed, from, version, draft }) => ({ ts, event, actor, section, name, fields, changed, from, version, draft }));
     res.json({ versions, activity });
   }));
 
   // Restoring loads the old version into the draft; "Simpan" publishes it.
-  api.post('/pages/:slug/history/:ts/restore', edit('page.restore', async (page, req) => {
-    const old = await readHistory(req.params.slug, req.params.ts);
+  ed.post('/history/:ts/restore', edit('page.restore', async (page, req) => {
+    const old = await req.doc.readHistory(req.key, req.params.ts);
     if (!old) throw httpError(404, 'Versi tidak ditemukan.');
-    const slug = page.slug;
+    const keep = req.doc.kind === 'page' ? { slug: page.slug } : { id: page.id };
     for (const k of Object.keys(page)) delete page[k];
-    Object.assign(page, old, { slug });
+    Object.assign(page, old, keep);
     if (!page.name) page.name = page.title;
     return { version: req.params.ts };
   }));
 
   // ---- export / import (signed code, readable only by this system)
-  api.get('/pages/:slug/export', wrap(async (req, res) => {
-    const { slug } = req.params;
-    const { state } = await withPageLock(slug, () => openDraft(slug, initialState(slug)));
-    const code = exportCode(state.page, slug);
-    await audit(req, 'page.export', { slug });
-    res.json({ code, filename: `${slug}-${new Date().toISOString().slice(0, 10)}.mbpage` });
+  ed.get('/export', wrap(async (req, res) => {
+    const { doc, key } = req;
+    const { state } = await openDoc(doc, key);
+    const code = exportCode(state.page, key);
+    await audit(req, `${doc.kind}.export`, doc.audit(key));
+    const base = doc.kind === 'page' ? key : slugifyName(state.page.name) || key;
+    res.json({ code, filename: `${base}-${new Date().toISOString().slice(0, 10)}.mbpage` });
   }));
 
-  api.post('/pages/:slug/import', edit('page.import', async (page, req) => {
+  ed.post('/import', edit('page.import', async (page, req) => {
     const { page: imported, source } = importCode(req.body?.code);
-    const slug = page.slug;
-    for (const k of Object.keys(page)) delete page[k];
-    Object.assign(page, imported, { slug });
-    delete page.updatedAt;
-    delete page.updatedBy;
+    if (req.doc.kind === 'template') {
+      page.sections = imported.sections.filter((s) => s.type !== 'template');
+      page.badges = imported.badges || [];
+    } else {
+      const slug = page.slug;
+      for (const k of Object.keys(page)) delete page[k];
+      Object.assign(page, imported, { slug });
+      delete page.updatedAt;
+      delete page.updatedBy;
+    }
     const missing = [];
-    for (const u of pageImages(page).slice(0, 200)) {
+    for (const u of pageImages(await resolvePage(page)).slice(0, 200)) {
       if (!(await uploadExists(decodeURIComponent(u), `${req.protocol}://${req.get('host')}`))) missing.push(u);
     }
     return { from: source, notes: missing.length ? [`${missing.length} gambar tidak ditemukan di server`] : [] };
@@ -898,7 +1223,7 @@ export function adminRouter({ assetVersion = '1' } = {}) {
   }));
   api.get('/reports/sections', wrap(async (req, res) => {
     const slug = clip(req.query.slug, 80);
-    const page = isValidSlug(slug) ? await getPage(slug) : null;
+    const page = isValidSlug(slug) ? await resolvePage(await getPage(slug)) : null;
     if (!page) throw httpError(404, 'Halaman tidak ditemukan.');
     const rep = await analytics.sectionReport({ from: clip(req.query.from, 10), to: clip(req.query.to, 10), slug });
     const byId = new Map(rep.sections.map((x) => [x.id, x]));
@@ -918,8 +1243,9 @@ export function adminRouter({ assetVersion = '1' } = {}) {
   }));
   api.post('/reports/sample', wrap(async (req, res) => {
     const list = await listPages({ withPage: true });
+    const flat = await resolvePages(list.map((p) => p.page));
     const sectionsBySlug = {};
-    for (const p of list) sectionsBySlug[p.slug] = p.page.sections.filter((x) => x.visible !== false).map((x) => ({ id: x.id }));
+    for (const [i, p] of list.entries()) sectionsBySlug[p.slug] = flat[i].sections.filter((x) => x.visible !== false).map((x) => ({ id: x.id }));
     await analytics.generateSample(list.map((p) => p.slug), 30, sectionsBySlug);
     await audit(req, 'report.sample', {});
     res.json({ ok: true });
@@ -956,6 +1282,8 @@ export function adminRouter({ assetVersion = '1' } = {}) {
   }));
 
   api.get('/audit', wrap(async (req, res) => res.json({ entries: await readAudit(toNum(req.query.limit, 1, 1000, 300)) })));
+
+  api.use('/shop', shopApi());
 
   api.use((req, res) => res.status(404).json({ error: 'Tidak ditemukan.' }));
   // eslint-disable-next-line no-unused-vars

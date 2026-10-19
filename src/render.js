@@ -5,6 +5,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { renderBlock, OVERLAY_KINDS } from './blocks.js';
 
 // The page CSS (about 5 KB compressed) is inlined so the first paint does not wait for a separate
 // stylesheet request. Font URLs become absolute; comments and indentation are stripped.
@@ -138,6 +139,8 @@ function estimateHeight(sec) {
 // the section's top edge; content-visibility contains it, so it is moved onto the section instead.
 // undefined = the first child is not a known box (its margins cannot be moved safely).
 function firstBoxMargin(sec) {
+  // element blocks have no outer margin; floating ones (WA button, popup) must never be contained
+  if (sec.type === 'block') return OVERLAY_KINDS.has(sec.kind) ? undefined : 0;
   if (sec.type === 'image') return sec.layout === 'slider' ? num(sec.box && sec.box.mt) : num(sec.items[0] && sec.items[0].mt);
   if (sec.type === 'html' && !sec.wrap) {
     const html = String(sec.html || '').replace(/^\s*(<style[\s\S]*?<\/style>\s*)*/i, '');
@@ -155,11 +158,14 @@ const collapse = (a, b) => (a >= 0 && b >= 0 ? Math.max(a, b) : a < 0 && b < 0 ?
 const LAZY_FROM = 4;
 
 function section(sec, index, ctx = {}) {
-  const { showHidden, promo, badgesBySection, lazyLayout } = ctx;
+  const { showHidden, promo, badgesBySection, lazyLayout, data } = ctx;
   if (sec.visible === false && !showHidden) return '';
   let body = '';
   if (sec.type === 'image') {
     body = sec.layout === 'slider' ? imageSlider(sec) : sec.items.map((it) => imageItem(it, it.eager || index < 2)).join('');
+  } else if (sec.type === 'block') {
+    body = renderBlock(sec, { admin: showHidden, promo, data });
+    if (!body) return '';
   } else if (sec.type === 'html') {
     body = sec.html; // stored already sanitized (sanitizer runs on save in the admin)
     if (sec.wrap) body = `<div class="lp-html">${body}</div>`; // uploaded HTML: clipped to the page width
@@ -177,7 +183,13 @@ function section(sec, index, ctx = {}) {
   const styles = [smt ? `--smt:${smt}` : '', lazy ? `--ih:${Math.round(ih || 300)}` : ''].filter(Boolean).join(';');
   const style = styles ? ` style="${styles}"` : '';
   const scope = sec.scope ? ` data-s="${esc(sec.scope)}"` : '';
-  return `<section class="lp-sec lp-sec--${sec.type}${sec.visible === false ? ' lp-sec--hidden' : ''}${lazy ? ' lp-cv' : ''}" id="${esc(sec.id)}" data-name="${esc(sec.name)}"${scope}${style}>${body}</section>`;
+  return `<section class="lp-sec lp-sec--${sec.type}${sec.visible === false ? ' lp-sec--hidden' : ''}${lazy ? ' lp-cv' : ''}" id="${esc(sec.id)}" data-name="${esc(sec.name)}"${showHidden && sec._ref ? ` data-ref="${esc(sec._ref)}"` : ''}${scope}${style}>${body}</section>`;
+}
+
+/** One section as the admin preview shows it (used to update an edited element without reloading). */
+export function renderSectionPreview(sec, { promo = null, badges = [], data } = {}) {
+  const badgesBySection = new Map([[sec.id, badges.filter((b) => b.section === sec.id)]]);
+  return section(sec, 0, { showHidden: true, promo, badgesBySection, lazyLayout: false, data });
 }
 
 // fullLayout: lay out every section up front (admin preview and heatmap measure section positions).
@@ -194,7 +206,7 @@ export function renderPage(page, { assetVersion = '1', global = {}, showHidden =
     badgesBySection.get(b.section).push(b);
   }
   const lazyLayout = !showHidden && !fullLayout;
-  const sections = page.sections.map((sec, i) => section(sec, i, { showHidden, promo, badgesBySection, lazyLayout })).join('\n');
+  const sections = page.sections.map((sec, i) => section(sec, i, { showHidden, promo, badgesBySection, lazyLayout, data: page._data })).join('\n');
   return `<!doctype html>
 <html lang="id">
 <head>
@@ -220,6 +232,7 @@ ${sections}
 </div>
 </main>
 <script src="/assets/js/lp.js?v=${esc(assetVersion)}" defer></script>
+${!showHidden && (global.fbPixelId || global.tiktokPixelId || global.gadsId) ? `<script src="/assets/js/pixels.js?v=${esc(assetVersion)}" data-fb="${esc(global.fbPixelId || '')}" data-tt="${esc(global.tiktokPixelId || '')}" data-gads="${esc(global.gadsId || '')}" data-gads-label="${esc(global.gadsLabel || '')}" defer></script>` : ''}
 ${global.ga4Id && !showHidden ? `<script async src="https://www.googletagmanager.com/gtag/js?id=${esc(global.ga4Id)}"></script>
 <script src="/assets/js/ga.js?v=${esc(assetVersion)}" data-ga="${esc(global.ga4Id)}"></script>` : ''}
 </body>

@@ -11,7 +11,7 @@ const HISTORY_KEEP = 50;
 
 export const SLUG = /^[a-z0-9][a-z0-9-]{0,79}$/;
 export const SECTION_ID = /^[a-z0-9][a-z0-9-]{0,63}$/;
-const RESERVED = new Set(['admin', 'assets', 'uploads', 'api', 'login', 'logout', 'favicon-ico', 'robots-txt']);
+const RESERVED = new Set(['admin', 'assets', 'uploads', 'api', 'login', 'logout', 'favicon-ico', 'robots-txt', 'produk', 'pesanan', 'checkout', 'katalog']);
 
 export function isValidSlug(slug) {
   return typeof slug === 'string' && SLUG.test(slug) && !RESERVED.has(slug);

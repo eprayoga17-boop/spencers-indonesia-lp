@@ -11,6 +11,9 @@ data/sessions.json
 data/analytics/
 data/analytics-sample/
 data/preview-links.json
+data/shop/
+data/import/
+public/uploads/sections/products/
 data/kv.json
 src/seed-data.js
 .vercel/
@@ -22,3 +25,5 @@ perbandingan-5-section.jpg
 .env*
 !.env.example
 src/vendor/
+data/template-history/
+data/template-drafts/

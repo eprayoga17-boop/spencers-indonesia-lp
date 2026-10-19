@@ -53,7 +53,7 @@ export function importCode(code) {
   const page = body && body.page;
   if (body.kind !== 'mealblend-page' || body.v !== 1 || !page || !Array.isArray(page.sections)) throw new UserError('Isi kode bukan halaman yang valid.');
   for (const s of page.sections) {
-    if (!s || typeof s.id !== 'string' || !['image', 'html', 'promo'].includes(s.type)) throw new UserError('Isi kode bukan halaman yang valid.');
+    if (!s || typeof s.id !== 'string' || !['image', 'html', 'promo', 'template'].includes(s.type)) throw new UserError('Isi kode bukan halaman yang valid.');
   }
   return { page, source: body.source, exportedAt: body.exportedAt };
 }

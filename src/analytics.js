@@ -93,7 +93,7 @@ export async function track(req, body, { pageExists }) {
 }
 
 const SEC = /^[a-z0-9][a-z0-9-]{0,63}$/;
-const KINDS = new Set(['wa', 'link', 'video', 'slider', 'faq', 'other']);
+const KINDS = new Set(['wa', 'link', 'video', 'slider', 'faq', 'copy', 'other']);
 const clampN = (v, a, b) => Math.min(b, Math.max(a, Math.round(Number(v) * 10) / 10 || 0));
 const visitorOf = async (req) => crypto.createHash('sha256').update(`${await dailySalt()}|${req.ip}|${String(req.get('user-agent') || '')}`).digest('base64url').slice(0, 16);
 

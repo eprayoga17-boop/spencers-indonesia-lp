@@ -154,9 +154,163 @@
     root.classList.add('is-ready');
   }
 
+  // ---------- Element blocks: gallery zoom, countdown, copy buttons, floating WA button, popups ----------
+  const ADMIN = /^\/admin\//.test(location.pathname);
+
+  function initGallery(root) {
+    if (root.dataset.ready) return;
+    root.dataset.ready = '1';
+    const items = [...root.querySelectorAll('.lp-gal-open')];
+    items.forEach((btn, start) => btn.addEventListener('click', () => {
+      if (ADMIN) return;
+      let i = start;
+      const box = document.createElement('div');
+      box.className = 'lp-lightbox';
+      box.setAttribute('role', 'dialog');
+      box.setAttribute('aria-modal', 'true');
+      box.setAttribute('aria-label', 'Gambar');
+      const img = document.createElement('img');
+      const show = () => { img.src = items[i].dataset.full; img.alt = items[i].querySelector('img')?.alt || ''; };
+      const mk = (cls, label, text, fn) => { const b = document.createElement('button'); b.type = 'button'; b.className = cls; b.setAttribute('aria-label', label); b.textContent = text; b.addEventListener('click', (e) => { e.stopPropagation(); fn(); }); return b; };
+      const close = () => { box.remove(); document.removeEventListener('keydown', key); btn.focus(); };
+      const step = (d) => { i = (i + d + items.length) % items.length; show(); };
+      const key = (e) => { if (e.key === 'Escape') close(); if (e.key === 'ArrowRight') step(1); if (e.key === 'ArrowLeft') step(-1); };
+      box.append(img, mk('lp-lb-x', 'Tutup', '×', close));
+      if (items.length > 1) box.append(mk('lp-lb-prev', 'Sebelumnya', '‹', () => step(-1)), mk('lp-lb-next', 'Berikutnya', '›', () => step(1)));
+      box.addEventListener('click', (e) => { if (e.target === box) close(); });
+      document.addEventListener('keydown', key);
+      show();
+      document.body.append(box);
+      box.querySelector('.lp-lb-x').focus();
+    }));
+  }
+
+  function initCountdown(root) {
+    if (root.dataset.ready) return;
+    root.dataset.ready = '1';
+    const end = Date.parse(root.dataset.end);
+    const cells = Object.fromEntries([...root.querySelectorAll('[data-u]')].map((b) => [b.dataset.u, b]));
+    const pad = (n) => String(n).padStart(2, '0');
+    const tick = () => {
+      const left = Math.max(0, end - Date.now());
+      const s = Math.floor(left / 1000);
+      cells.d.textContent = pad(Math.floor(s / 86400));
+      cells.h.textContent = pad(Math.floor((s % 86400) / 3600));
+      cells.m.textContent = pad(Math.floor((s % 3600) / 60));
+      cells.s.textContent = pad(s % 60);
+      if (left > 0) return;
+      clearInterval(timer);
+      if (ADMIN) return;
+      if (root.dataset.expired === 'text') { root.querySelector('.lp-cd').hidden = true; root.querySelector('.lp-cd-done').hidden = false; }
+      else root.closest('.lp-sec')?.setAttribute('hidden', '');
+    };
+    const timer = setInterval(tick, 1000);
+    tick();
+  }
+
+  async function copyText(btn) {
+    const text = btn.dataset.copy || '';
+    try { await navigator.clipboard.writeText(text); } catch {
+      const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.append(ta); ta.select(); document.execCommand('copy'); ta.remove();
+    }
+    const label = btn.querySelector('span');
+    if (!label) return;
+    const before = label.textContent;
+    label.textContent = btn.dataset.done || 'Tersalin!';
+    setTimeout(() => { label.textContent = before; }, 1800);
+  }
+
+  function initFloat(el) {
+    if (el.dataset.ready) return;
+    el.dataset.ready = '1';
+    const after = Number(el.dataset.after) || 0;
+    if (!after || ADMIN) return;
+    const sync = () => el.classList.toggle('is-off', scrollY < after);
+    sync();
+    addEventListener('scroll', sync, { passive: true });
+  }
+
+  function initPopup(el) {
+    if (el.dataset.ready || ADMIN) return;
+    el.dataset.ready = '1';
+    const key = `lp-pop:${location.pathname}:${el.closest('.lp-sec')?.id || ''}`;
+    const freq = el.dataset.freq;
+    try {
+      if (freq === 'session' && sessionStorage.getItem(key)) return;
+      if (freq === 'day' && localStorage.getItem(key) === new Date().toDateString()) return;
+    } catch { /* storage blocked: show anyway */ }
+    let shown = false;
+    const close = () => { el.hidden = true; document.removeEventListener('keydown', esc); };
+    const esc = (e) => { if (e.key === 'Escape') close(); };
+    const open = () => {
+      if (shown) return;
+      shown = true;
+      try { if (freq === 'session') sessionStorage.setItem(key, '1'); if (freq === 'day') localStorage.setItem(key, new Date().toDateString()); } catch { /* ignore */ }
+      el.hidden = false;
+      document.addEventListener('keydown', esc);
+      el.querySelector('.lp-pop-x')?.focus();
+    };
+    el.querySelector('.lp-pop-x')?.addEventListener('click', close);
+    el.addEventListener('click', (e) => { if (e.target === el) close(); });
+    const trig = el.dataset.trigger;
+    if (trig === 'scroll') {
+      const pct = Number(el.dataset.scroll) || 50;
+      const check = () => { if ((scrollY + innerHeight) / document.documentElement.scrollHeight * 100 >= pct) { open(); removeEventListener('scroll', check); } };
+      addEventListener('scroll', check, { passive: true });
+    } else if (trig === 'exit') {
+      document.addEventListener('mouseout', (e) => { if (!e.relatedTarget && e.clientY <= 0) open(); });
+    } else {
+      setTimeout(open, (Number(el.dataset.delay) || 0) * 1000);
+    }
+  }
+
+  // copy buttons + smooth scroll to sections (#id links)
+  document.addEventListener('click', (e) => {
+    const c = e.target.closest && e.target.closest('[data-copy]');
+    if (c) { e.preventDefault(); copyText(c); return; }
+    const a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a || ADMIN) return;
+    const target = document.getElementById(decodeURIComponent(a.getAttribute('href').slice(1)));
+    if (!target) return;
+    e.preventDefault();
+    target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+  });
+
+  // Daftar Distributor: filter cities while typing; open the matches when only a few are left.
+  function initDistributors(root) {
+    const input = root.querySelector('[data-dist-search]');
+    if (!input || input.dataset.ready) return;
+    input.dataset.ready = '1';
+    const fold = (t) => t.toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
+    const cities = [...root.querySelectorAll('.lp-dist-city')];
+    const provs = [...root.querySelectorAll('.lp-dist-prov')];
+    const empty = root.querySelector('.lp-dist-empty');
+    const auto = new Set();
+    let timer;
+    const apply = () => {
+      const words = fold(input.value.trim()).split(/\s+/).filter(Boolean);
+      const hits = cities.filter((c) => {
+        const ok = words.every((w) => c.dataset.q.includes(w));
+        c.hidden = !ok;
+        return ok;
+      });
+      for (const c of auto) if (!words.length || !hits.includes(c)) { c.open = false; auto.delete(c); }
+      if (words.length && hits.length <= 3) for (const c of hits) if (!c.open) { c.open = true; auto.add(c); }
+      for (const p of provs) p.hidden = !p.querySelector('.lp-dist-city:not([hidden])');
+      if (empty) empty.hidden = !words.length || hits.length > 0;
+    };
+    input.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(apply, 120); });
+  }
+
   function init(scope = document) {
     scope.querySelectorAll('.lp-yt').forEach(initYouTube);
     scope.querySelectorAll('.lp-slider').forEach(initSlider);
+    scope.querySelectorAll('.lp-gal').forEach(initGallery);
+    scope.querySelectorAll('.lp-b-countdown[data-end]').forEach(initCountdown);
+    scope.querySelectorAll('.lp-float').forEach(initFloat);
+    scope.querySelectorAll('.lp-pop').forEach(initPopup);
+    scope.querySelectorAll('.lp-b-dist').forEach(initDistributors);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => init());
@@ -222,7 +376,8 @@
       if (!sec || clicks.length >= 60) return;
       const a = e.target.closest('a[href]');
       const href = a ? a.getAttribute('href') : '';
-      const kind = a ? (/wa\.me|whatsapp/i.test(href) ? 'wa' : 'link')
+      const kind = a ? (a.dataset.kind === 'wa' || /wa\.me|whatsapp|\/go\/wa\//i.test(href) ? 'wa' : 'link')
+        : e.target.closest('[data-copy]') ? 'copy'
         : e.target.closest('.lp-yt') ? 'video'
           : e.target.closest('.lp-slider') ? 'slider'
             : e.target.closest('summary') ? 'faq' : 'other';

@@ -211,7 +211,19 @@ export async function writeAtomic(file, data) {
   if (CLOUD || READONLY) return fs.writeFile(file, data);
   const tmp = `${file}.${Math.random().toString(36).slice(2, 10)}.tmp`;
   await nodeFs.writeFile(tmp, data);
-  await nodeFs.rename(tmp, file);
+  // Windows: sync tools (OneDrive) and virus scanners briefly lock files, so rename can fail with EPERM/EBUSY.
+  for (let attempt = 0; ; attempt++) {
+    try {
+      await nodeFs.rename(tmp, file);
+      return;
+    } catch (e) {
+      if (!['EPERM', 'EBUSY', 'EACCES'].includes(e.code) || attempt >= 8) {
+        await nodeFs.rm(tmp, { force: true });
+        throw e;
+      }
+      await new Promise((r) => setTimeout(r, 50 * (attempt + 1)));
+    }
+  }
 }
 
 /** Read several files at once -> array of text (null when missing). One round trip in the cloud. */
@@ -279,12 +291,37 @@ export const kv = {
     localMap().delete(key);
     saveLocal();
   },
+  /** Atomic counter (round-robin, rate counting) -> new value. */
+  async incr(key, ttlMs) {
+    if (CLOUD) {
+      if (!ttlMs) return Number(await redis(['INCR', `kv:${key}`]));
+      const [n] = await pipeline([['INCR', `kv:${key}`], ['PEXPIRE', `kv:${key}`, String(Math.round(ttlMs))]]);
+      return Number(n);
+    }
+    const n = Number((await kv.get(key)) || 0) + 1;
+    await kv.set(key, n, ttlMs || 10 * 365 * 864e5);
+    return n;
+  },
+  /** Several keys in one round trip (missing -> null). */
+  async getMany(keys) {
+    if (!keys.length) return [];
+    if (CLOUD) return (await pipeline(keys.map((k) => ['GET', `kv:${k}`]))).map((v) => (v == null ? null : JSON.parse(v)));
+    return Promise.all(keys.map((k) => kv.get(k)));
+  },
+  /** Sets key only if it does not exist yet -> true for the caller that got it (one-time jobs, shared locks). */
+  async claim(key, value, ttlMs) {
+    const ttl = Math.max(1000, Math.round(ttlMs));
+    if (CLOUD) return (await redis(['SET', `kv:${key}`, JSON.stringify(value), 'NX', 'PX', String(ttl)])) === 'OK';
+    if ((await kv.get(key)) != null) return false;
+    await kv.set(key, value, ttl);
+    return true;
+  },
 };
 
 // ---------------------------------------------------------------- uploaded images
 // urlPath is the public URL, e.g. /uploads/sections/<id>/<name>.webp
-const UPLOAD_URL = /^\/uploads\/[a-z0-9/_-]+\.(webp|avif|png|jpe?g|gif|ico)$/i;
-const TYPES = { webp: 'image/webp', avif: 'image/avif', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', ico: 'image/x-icon' };
+const UPLOAD_URL = /^\/uploads\/[a-z0-9/_-]+\.(webp|avif|png|jpe?g|gif|ico|pdf)$/i;
+const TYPES = { webp: 'image/webp', avif: 'image/avif', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', ico: 'image/x-icon', pdf: 'application/pdf' };
 
 export async function saveUpload(urlPath, buffer) {
   if (!UPLOAD_URL.test(urlPath)) throw new Error('invalid upload path');

@@ -1,0 +1,571 @@
+{
+  "name": "Homepage",
+  "title": "Spencer's Premium Grocery",
+  "description": "Dapatkan ratusan produk Healthy Daily Needs dalam 1 klik",
+  "robots": "",
+  "settings": {
+    "maxWidth": null,
+    "designWidth": 320,
+    "background": "#ffffff",
+    "outerBackground": "#f2f2f2"
+  },
+  "thumbnail": "/uploads/sections/home-banner-slider/607d112f773f4f70.webp",
+  "sections": [
+    {
+      "id": "home-header-logo",
+      "name": "Header Logo",
+      "type": "image",
+      "items": [
+        {
+          "src": "/uploads/sections/home-header-logo/4983d465e0cc1109",
+          "iw": 1200,
+          "ih": 128,
+          "alt": "Spencer’s",
+          "href": "/"
+        }
+      ]
+    },
+    {
+      "id": "home-banner-slider",
+      "name": "Banner Slider",
+      "type": "image",
+      "layout": "slider",
+      "items": [
+        {
+          "src": "/uploads/sections/home-banner-slider/607d112f773f4f70",
+          "iw": 1400,
+          "ih": 1549,
+          "alt": "Promo Spencer’s"
+        },
+        {
+          "src": "/uploads/sections/home-banner-slider/9f12f788314b9f88",
+          "iw": 1400,
+          "ih": 1549,
+          "alt": "Promo Spencer’s"
+        },
+        {
+          "src": "/uploads/sections/home-banner-slider/bfcc13e537fb4e74",
+          "iw": 1440,
+          "ih": 1593,
+          "alt": "Promo Spencer’s"
+        },
+        {
+          "src": "/uploads/sections/home-banner-slider/3f86784fd4c96a63",
+          "iw": 1400,
+          "ih": 1549,
+          "alt": "Promo Spencer’s"
+        },
+        {
+          "src": "/uploads/sections/home-banner-slider/54fc723b088807c8",
+          "iw": 1440,
+          "ih": 1593,
+          "alt": "Promo Spencer’s"
+        },
+        {
+          "src": "/uploads/sections/home-banner-slider/e08a998814244cc4",
+          "iw": 1400,
+          "ih": 1548,
+          "alt": "Promo Spencer’s"
+        },
+        {
+          "src": "/uploads/sections/home-banner-slider/e3193b8df6a9a28e",
+          "iw": 1440,
+          "ih": 1593,
+          "alt": "Promo Spencer’s"
+        }
+      ],
+      "slider": {
+        "transition": "slide",
+        "interval": 4000,
+        "dots": "square-dark",
+        "arrows": false
+      },
+      "box": {
+        "w": 320,
+        "h": 354,
+        "mt": 0
+      }
+    },
+    {
+      "id": "home-mealblend-women",
+      "name": "MealBlend Women",
+      "type": "block",
+      "kind": "banner",
+      "props": {
+        "image": {
+          "src": "/uploads/sections/home-mealblend-women/d49acf99fa1818cd",
+          "iw": 1440,
+          "ih": 817,
+          "alt": ""
+        },
+        "eyebrow": "SPENCER’S MEALBLEND",
+        "title": "SLIMMING PROGRAM\nFOR WOMAN",
+        "text": "",
+        "descBold": false,
+        "font": "Montserrat",
+        "color": "#111111",
+        "titleSize": 13.3,
+        "eyebrowSize": 9,
+        "titleLh": 1.2,
+        "gap": 0.1,
+        "align": "left",
+        "button": {
+          "label": "ORDER NOW",
+          "link": {
+            "type": "page",
+            "page": "slimmealsolutionmintidn2"
+          },
+          "style": "outline",
+          "size": "xs",
+          "color": "#111111",
+          "textColor": "#ffffff",
+          "radius": 4.5,
+          "icon": "arrow",
+          "iconPos": "right",
+          "track": "ViewContent"
+        },
+        "x": 5.8,
+        "y": 30.1,
+        "w": 56.8,
+        "bx": 5.6,
+        "by": 85.9,
+        "bg": "",
+        "pt": 0,
+        "pb": 0,
+        "px": 0
+      },
+      "mt": 28.3
+    },
+    {
+      "id": "home-mealblend-men",
+      "name": "MealBlend Men",
+      "type": "block",
+      "kind": "banner",
+      "props": {
+        "image": {
+          "src": "/uploads/sections/home-mealblend-men/9682eb1dd2ce3395",
+          "iw": 1440,
+          "ih": 885,
+          "alt": ""
+        },
+        "eyebrow": "SPENCER’S MEALBLEND",
+        "title": "1st WEIGHT LOSS\nPROGRAM FOR MEN",
+        "text": "",
+        "descBold": false,
+        "font": "Montserrat",
+        "color": "#111111",
+        "titleSize": 13.3,
+        "eyebrowSize": 9,
+        "titleLh": 1.2,
+        "gap": 0,
+        "align": "left",
+        "button": {
+          "label": "ORDER NOW",
+          "link": {
+            "type": "url",
+            "url": "https://www.spencers.id/slimmealsolutionmanidn2"
+          },
+          "style": "outline",
+          "size": "xs",
+          "color": "#111111",
+          "textColor": "#ffffff",
+          "radius": 4.5,
+          "icon": "arrow",
+          "iconPos": "right",
+          "track": "ViewContent"
+        },
+        "x": 5.8,
+        "y": 37.8,
+        "w": 54.7,
+        "bx": 5.6,
+        "by": 86.8,
+        "bg": "",
+        "pt": 0,
+        "pb": 0,
+        "px": 0
+      },
+      "mt": 7.5
+    },
+    {
+      "id": "home-distributor",
+      "name": "Distributor MealBlend",
+      "type": "block",
+      "kind": "banner",
+      "props": {
+        "image": {
+          "src": "/uploads/sections/home-distributor/69462e6053ecd948",
+          "iw": 1440,
+          "ih": 1048,
+          "alt": ""
+        },
+        "eyebrow": "DISTRIBUTOR",
+        "title": "MEALBLEND",
+        "text": "",
+        "descBold": false,
+        "font": "Montserrat",
+        "color": "#111111",
+        "titleSize": 12.6,
+        "eyebrowSize": 9,
+        "titleLh": 1.2,
+        "gap": 0.3,
+        "align": "left",
+        "button": {
+          "label": "MORE INFO",
+          "link": {
+            "type": "url",
+            "url": "https://www.spencers.id/agentslimdistributorretail1"
+          },
+          "style": "outline",
+          "size": "xs",
+          "color": "#111111",
+          "textColor": "#ffffff",
+          "radius": 4.5,
+          "icon": "arrow",
+          "iconPos": "right",
+          "track": "ViewContent"
+        },
+        "x": 5.9,
+        "y": 17.5,
+        "w": 37.6,
+        "bx": 5.6,
+        "by": 86.5,
+        "bg": "",
+        "pt": 0,
+        "pb": 0,
+        "px": 0
+      }
+    },
+    {
+      "id": "home-mealblend-mix",
+      "name": "MealBlend",
+      "type": "block",
+      "kind": "banner",
+      "props": {
+        "image": {
+          "src": "/uploads/sections/home-mealblend-mix/31028c491549cc03",
+          "iw": 1440,
+          "ih": 784,
+          "alt": ""
+        },
+        "eyebrow": "SPENCER’S MEALBLEND",
+        "title": "FOR MEAL\nREPLACEMENT\n& SUPPORT",
+        "text": "",
+        "descBold": false,
+        "font": "Montserrat",
+        "color": "#111111",
+        "titleSize": 13.3,
+        "eyebrowSize": 9,
+        "titleLh": 1.2,
+        "gap": 6.8,
+        "align": "left",
+        "button": {
+          "label": "ORDER NOW",
+          "link": {
+            "type": "url",
+            "url": "https://www.spencers.id/slimmealsolutionmidn2"
+          },
+          "style": "outline",
+          "size": "xs",
+          "color": "#111111",
+          "textColor": "#ffffff",
+          "radius": 4.5,
+          "icon": "arrow",
+          "iconPos": "right",
+          "track": "ViewContent"
+        },
+        "x": 5.8,
+        "y": 31.2,
+        "w": 47,
+        "bx": 5.6,
+        "by": 84.6,
+        "bg": "",
+        "pt": 0,
+        "pb": 0,
+        "px": 0
+      }
+    },
+    {
+      "id": "home-burnx-fiber",
+      "name": "BurnX Fiber",
+      "type": "block",
+      "kind": "banner",
+      "props": {
+        "image": {
+          "src": "/uploads/sections/home-burnx-fiber/ec6819ae6a247fb9",
+          "iw": 1440,
+          "ih": 812,
+          "alt": ""
+        },
+        "eyebrow": "SPENCER’S BURNX FIBER",
+        "title": "NATURAL DETOX",
+        "text": "(PELANCAR PENCERNAAN)",
+        "descBold": true,
+        "font": "Montserrat",
+        "color": "#111111",
+        "titleSize": 12.6,
+        "eyebrowSize": 9,
+        "titleLh": 1.2,
+        "gap": 2.3,
+        "align": "left",
+        "button": {
+          "label": "ORDER NOW",
+          "link": {
+            "type": "url",
+            "url": "https://www.spencers.id/spencersburnxfiberbfidn"
+          },
+          "style": "outline",
+          "size": "xs",
+          "color": "#111111",
+          "textColor": "#ffffff",
+          "radius": 4.5,
+          "icon": "arrow",
+          "iconPos": "right",
+          "track": "ViewContent"
+        },
+        "x": 6.5,
+        "y": 42.5,
+        "w": 56.2,
+        "bx": 6.7,
+        "by": 84.2,
+        "bg": "",
+        "pt": 0,
+        "pb": 0,
+        "px": 0
+      }
+    },
+    {
+      "id": "home-burnx",
+      "name": "BurnX",
+      "type": "block",
+      "kind": "banner",
+      "props": {
+        "image": {
+          "src": "/uploads/sections/home-burnx/67fd0d3f00f3e76e",
+          "iw": 1440,
+          "ih": 913,
+          "alt": ""
+        },
+        "eyebrow": "SPENCER’S BURNX MATCHA",
+        "title": "LAGI CARI\nNATURAL FAT\nBURNER?",
+        "text": "",
+        "descBold": false,
+        "font": "Montserrat",
+        "color": "#111111",
+        "titleSize": 12.6,
+        "eyebrowSize": 9,
+        "titleLh": 1.2,
+        "gap": 6.1,
+        "align": "left",
+        "button": {
+          "label": "ORDER NOW",
+          "link": {
+            "type": "url",
+            "url": "https://www.spencers.id/slimmealsolutionburnxidn2"
+          },
+          "style": "outline",
+          "size": "xs",
+          "color": "#111111",
+          "textColor": "#ffffff",
+          "radius": 4.5,
+          "icon": "arrow",
+          "iconPos": "right",
+          "track": "ViewContent"
+        },
+        "x": 6.7,
+        "y": 35.8,
+        "w": 52.5,
+        "bx": 6.8,
+        "by": 86.5,
+        "bg": "",
+        "pt": 0,
+        "pb": 0,
+        "px": 0
+      }
+    },
+    {
+      "id": "home-contact-us",
+      "name": "Contact Us",
+      "type": "image",
+      "items": [
+        {
+          "src": "/uploads/sections/home-contact-us/ca7b7577e20d3347",
+          "iw": 1440,
+          "ih": 64,
+          "alt": ""
+        },
+        {
+          "src": "/uploads/sections/home-contact-us/b3312bad49885e59",
+          "iw": 1440,
+          "ih": 113,
+          "alt": "Need help? Contact us"
+        },
+        {
+          "src": "/uploads/sections/home-contact-us/c881344cd8ce7871",
+          "iw": 1440,
+          "ih": 374,
+          "alt": "Our customer care"
+        }
+      ]
+    },
+    {
+      "id": "home-customer-care",
+      "name": "Customer Care",
+      "type": "block",
+      "kind": "banner",
+      "props": {
+        "image": {
+          "src": "/uploads/sections/home-contact-us/d3c8d195fa217120",
+          "iw": 1440,
+          "ih": 171,
+          "alt": ""
+        },
+        "eyebrow": "OUR",
+        "title": "CUSTOMER CARE",
+        "text": "",
+        "descBold": false,
+        "font": "Montserrat",
+        "color": "#111111",
+        "titleSize": 14,
+        "eyebrowSize": 9.5,
+        "titleLh": 1.2,
+        "gap": 0,
+        "align": "left",
+        "button": {
+          "label": "CHAT ADMIN",
+          "link": {
+            "type": "url",
+            "url": "https://www.spencers.id/_/cs/rotate?group=1718091609609&text=Hi%20Admin%2C%20Saya%20mau%20tanya%20ya."
+          },
+          "style": "fill",
+          "size": "s",
+          "color": "#518c58",
+          "textColor": "#ffffff",
+          "radius": 1.8,
+          "icon": "wa",
+          "iconPos": "right",
+          "track": "Contact"
+        },
+        "x": 6.9,
+        "y": 13.4,
+        "w": 48,
+        "bx": 56.7,
+        "by": 7,
+        "bg": "",
+        "pt": 0,
+        "pb": 0,
+        "px": 0
+      }
+    },
+    {
+      "id": "home-pembayaran-paper",
+      "name": "Pembayaran Paper.id",
+      "type": "image",
+      "items": [
+        {
+          "src": "/uploads/sections/home-pembayaran-paper/d8bd551c11c58171",
+          "iw": 1440,
+          "ih": 90,
+          "alt": ""
+        },
+        {
+          "src": "/uploads/sections/home-pembayaran-paper/150ea1488949ea14",
+          "iw": 1200,
+          "ih": 166,
+          "alt": "Pembayaran official hanya melalui Paper.id"
+        },
+        {
+          "src": "/uploads/sections/home-pembayaran-paper/59e9406b5a14491e",
+          "iw": 1200,
+          "ih": 322,
+          "alt": "Pastikan rekening atas nama PAPER.ID"
+        },
+        {
+          "src": "/uploads/sections/home-pembayaran-paper/fcdbd9937d27f3c7",
+          "iw": 1200,
+          "ih": 300,
+          "alt": "Cara pembayaran Paper.id"
+        }
+      ]
+    },
+    {
+      "id": "home-diliput-media",
+      "name": "Diliput Media",
+      "type": "image",
+      "items": [
+        {
+          "src": "/uploads/sections/home-diliput-media/479ac9541e5bebb4",
+          "iw": 1000,
+          "ih": 2173,
+          "alt": "Spencer’s diliput berbagai media nasional",
+          "mt": 12.3
+        }
+      ]
+    },
+    {
+      "id": "home-distributor-info",
+      "name": "List Official Distributor",
+      "type": "block",
+      "kind": "text",
+      "props": {
+        "html": "<h3>LIST OFFICIAL DISTRIBUTOR MEALBLEND</h3><p><strong>Free Delivery with Fast &amp; Safe Service :</strong></p><p>1. Pilih dan cari Official Distributor MealBlend di kota terdekat Anda<br />2. Klik link order untuk memesan melalui Distributor Spencer's MealBlend</p>",
+        "size": 11,
+        "align": "left",
+        "color": "#333333",
+        "font": "",
+        "lineHeight": 1.5,
+        "bg": "",
+        "pt": 18,
+        "pb": 6,
+        "px": 10
+      }
+    },
+    {
+      "id": "home-distributor-kota",
+      "name": "Daftar Distributor",
+      "type": "block",
+      "kind": "distributors",
+      "props": {
+        "title": "",
+        "search": true,
+        "placeholder": "Cari kota atau provinsi…",
+        "group": "province",
+        "emptyText": "Belum ada distributor di daerah itu.",
+        "emptyLabel": "Tanya admin",
+        "emptyLink": {
+          "type": "url",
+          "url": "https://www.spencers.id/_/cs/rotate?group=1718091609609&text=Hi%20Admin%2C%20Saya%20mau%20tanya%20ya."
+        },
+        "size": 10,
+        "accent": "#000000",
+        "color": "#424242",
+        "bg": "",
+        "pt": 4,
+        "pb": 20,
+        "px": 10
+      }
+    },
+    {
+      "id": "home-footer-contact",
+      "name": "Footer Kontak",
+      "type": "block",
+      "kind": "text",
+      "props": {
+        "html": "<p><strong>Our Contact</strong></p><p><a href=\"https://www.sfsgroupid.com/\" target=\"_blank\" rel=\"noopener noreferrer\"><span style=\"color:#ffffff\">About Us</span></a><br /><a href=\"https://www.spencers.id/\" target=\"_blank\" rel=\"noopener noreferrer\"><span style=\"color:#ffffff\">spencers.id</span></a><br /><a href=\"https://www.instagram.com/spencersindonesia/\" target=\"_blank\" rel=\"noopener noreferrer\"><span style=\"color:#ffffff\">Instagram @spencersindonesia</span></a><br /><a href=\"tel:+623160010626\"><span style=\"color:#ffffff\">031 - 600 106 26</span></a><br /><a href=\"https://wa.me/628132524235\" target=\"_blank\" rel=\"noopener noreferrer\"><span style=\"color:#ffffff\">+62 813-2524-235</span></a></p><p><small>© 2026 Spencer's Indonesia Inc.</small></p>",
+        "size": 10,
+        "align": "left",
+        "color": "#ffffff",
+        "font": "",
+        "lineHeight": 1.7,
+        "bg": "#000000",
+        "pt": 16,
+        "pb": 18,
+        "px": 12
+      }
+    }
+  ],
+  "badges": [],
+  "category": "",
+  "slug": "home",
+  "updatedAt": "2026-10-15T08:08:01.297Z",
+  "updatedBy": "home-banners"
+}

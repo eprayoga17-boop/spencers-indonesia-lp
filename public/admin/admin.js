@@ -6,6 +6,7 @@
   const VIEW = document.body.dataset.view;
   const SLUG = document.body.dataset.slug;
   const EMAIL = document.body.dataset.email;
+  const KIND = document.body.dataset.kind || 'page'; // editor: page | template
   const app = document.getElementById('app');
 
   // ------------------------------------------------------------ helpers
@@ -84,10 +85,24 @@
     logout: 'Logout', 'page.create': 'Buat halaman', 'page.duplicate': 'Duplikat halaman', 'page.archive': 'Arsipkan halaman', 'page.unarchive': 'Pulihkan arsip',
     'page.update': 'Ubah pengaturan halaman', 'page.restore': 'Muat versi lama ke draft', 'page.publish': 'Simpan (publikasi)', 'draft.discard': 'Buang draft',
     'page.export': 'Ekspor halaman', 'page.import': 'Impor halaman', 'global.update': 'Ubah pengaturan global',
+    'template.create': 'Buat template', 'template.duplicate': 'Duplikat template', 'template.import': 'Impor template', 'template.delete': 'Hapus template',
+    'template.publish': 'Simpan template', 'template.update': 'Ubah nama template', 'template.restore': 'Muat versi lama template', 'template.export': 'Ekspor template',
+    'template.detach': 'Lepas template jadi section',
+    'distributor.create': 'Tambah distributor', 'distributor.update': 'Ubah distributor', 'distributor.delete': 'Hapus distributor',
     'section.create': 'Tambah section', 'section.update': 'Ubah section', 'section.delete': 'Hapus section', 'section.duplicate': 'Duplikat section',
     'section.reorder': 'Ubah urutan section', 'section.cut': 'Cut section', 'section.paste': 'Tempel section',
     'badge.create': 'Tambah badge promo', 'badge.move': 'Geser badge promo', 'badge.delete': 'Hapus badge promo',
     'promo.create': 'Buat promo', 'promo.update': 'Ubah promo', 'promo.delete': 'Hapus promo', 'promo.publish': 'Publish promo', 'promo.discard': 'Buang draft promo',
+    'product.create': 'Buat produk', 'product.update': 'Ubah produk', 'product.duplicate': 'Duplikat produk', 'product.delete': 'Hapus produk',
+    'product.sku': 'Ubah SKU', 'stock.update': 'Ubah stok', 'category.create': 'Buat kategori', 'category.update': 'Ubah kategori',
+    'category.delete': 'Hapus kategori', 'category.reorder': 'Urutkan kategori', 'catalog.create': 'Buat katalog', 'catalog.update': 'Ubah katalog',
+    'catalog.delete': 'Hapus katalog', 'bundle.create': 'Buat bundle', 'bundle.update': 'Ubah bundle', 'bundle.duplicate': 'Duplikat bundle',
+    'bundle.delete': 'Hapus bundle', 'product.bulk.delete': 'Hapus produk (massal)', 'product.bulk.public': 'Publikasikan produk (massal)',
+    'product.bulk.hidden': 'Sembunyikan produk (massal)', 'product.bulk.link': 'Produk jadi link akses (massal)',
+    'product.bulk.addCategory': 'Tambah kategori (massal)', 'product.bulk.removeCategory': 'Lepas kategori (massal)',
+    'product.import.start': 'Mulai import produk', 'product.import.done': 'Import produk selesai', 'order.create': 'Order baru (checkout)',
+    'order.status': 'Ubah status order', 'order.update': 'Ubah catatan/resi order', 'shop.settings': 'Ubah pengaturan toko',
+    'discount.create': 'Buat diskon', 'discount.update': 'Ubah diskon', 'discount.duplicate': 'Duplikat diskon', 'discount.delete': 'Hapus diskon',
   };
   const FIELD_LABELS = { name: 'nama', title: 'judul', description: 'deskripsi', robots: 'indeks mesin pencari', keywords: 'keywords', category: 'kategori',
     thumbnail: 'thumbnail', slug: 'URL', settings: 'desain', maxWidth: 'lebar', font: 'font', favicon: 'favicon', categories: 'kategori',
@@ -134,9 +149,12 @@
       onclose: () => { clearInterval(timer); idleBox = null; },
     });
   }, 15000);
-  async function api(method, url, body) {
+  // opt.rev: draft revision of another document (a template edited inside the page editor); it does not touch draftRev.
+  async function api(method, url, body, opt = {}) {
+    const own = 'rev' in opt;
+    const rev = own ? opt.rev : draftRev;
     const opts = { method, headers: { 'x-csrf-token': CSRF, accept: 'application/json' }, credentials: 'same-origin' };
-    if (draftRev && method !== 'GET') opts.headers['x-draft-rev'] = String(draftRev);
+    if (rev && method !== 'GET') opts.headers['x-draft-rev'] = String(rev);
     if (body instanceof FormData) opts.body = body;
     else if (body !== undefined) { opts.headers['content-type'] = 'application/json'; opts.body = JSON.stringify(body); }
     let res;
@@ -149,7 +167,7 @@
     lastActive = Date.now();
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw Object.assign(new Error(data.error || `Gagal (${res.status})`), { status: res.status, code: data.code });
-    if (data.draft) draftRev = data.draft.rev;
+    if (data.draft && !own) draftRev = data.draft.rev;
     return data;
   }
   async function run(fn, okMsg) {
@@ -265,6 +283,44 @@
     wa: 'M3 21l1.6-4.8A8.5 8.5 0 1 1 7.9 19.6zM8.5 9.5c.3 2.4 2.6 4.8 5 5.2l1.2-1.2 2.1 1-.3 1.6c-3.8.6-9.2-4.4-8.8-8.6l1.6-.4 1 2.1z',
     trendUp: 'M23 6l-9.5 9.5-5-5L1 18M17 6h6v6',
     trendDown: 'M23 18l-9.5-9.5-5 5L1 6M17 18h6v-6',
+    cartNav: 'M3 3h2l2.4 12.2a2 2 0 0 0 2 1.8h8.2a2 2 0 0 0 2-1.6L21 8H6M9 21h.01M18 21h.01',
+    percent: 'M19 5L5 19M6.5 9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM17.5 20a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z',
+    layers: 'M12 2 2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5',
+    monitor: 'M3 4h18v12H3zM8 20h8M12 16v4',
+    tablet: 'M6 2h12a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zM11 18h2',
+    unlink: 'M18.8 13.2l1.6-1.6a4.5 4.5 0 0 0-6.4-6.4l-1.6 1.6M5.2 10.8l-1.6 1.6a4.5 4.5 0 0 0 6.4 6.4l1.6-1.6M8 16l-3 3M16 8l3-3',
+    chevD: 'M6 9l6 6 6-6',
+    chevR: 'M9 18l6-6-6-6',
+    home: 'M3 11l9-8 9 8M5 10v10h14V10M10 20v-6h4v6',
+    banner: 'M3 4h18v16H3zM7 9h7M7 12h5M7 16h4',
+    pin: 'M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12zM12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z',
+    more: 'M12 5h.01M12 12h.01M12 19h.01',
+    type: 'M4 7V4h16v3M9 20h6M12 4v16',
+    button: 'M5 7h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2zM8 12h8',
+    spacer: 'M4 3h16M4 21h16M12 7v10M9 10l3-3 3 3M9 14l3 3 3-3',
+    divider: 'M3 12h4M10 12h4M17 12h4',
+    quote: 'M7 7H4v6h3l-2 4M17 7h-3v6h3l-2 4',
+    video: 'M3 5h18v14H3zM10 9l5 3-5 3z',
+    gallery: 'M7 3h14v14H7zM3 7v14h14M11 13l3-3 4 4',
+    imagetext: 'M3 5h8v8H3zM14 6h7M14 10h7M3 17h18M3 21h12',
+    faq: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01',
+    testi: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2zM8 9h8M8 13h5',
+    timer: 'M12 22a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM12 10v4l2 2M9 2h6',
+    list: 'M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01',
+    copytext: 'M9 9h11v11H9zM5 15H4V4h11v1M12 13h5M12 16h3',
+    bank: 'M3 10h18M5 10v8M9 10v8M15 10v8M19 10v8M3 21h18M12 3l9 5H3z',
+    popup: 'M3 5h18v14H3zM7 9h10v6H7z',
+    bold: 'M6 4h7a4 4 0 0 1 0 8H6zM6 12h8a4 4 0 0 1 0 8H6z',
+    italic: 'M19 4h-9M14 20H5M15 4 9 20',
+    underline: 'M6 3v7a6 6 0 0 0 12 0V3M4 21h16',
+    textColor: 'M4 21h16M7 17l5-13 5 13M8.6 13h6.8',
+    marker: 'M9 11l-6 6v3h9l3-3M22 12l-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4',
+    alignL: 'M3 6h18M3 12h12M3 18h16',
+    alignC: 'M3 6h18M6 12h12M4 18h16',
+    alignR: 'M3 6h18M9 12h12M5 18h16',
+    listOl: 'M10 6h11M10 12h11M10 18h11M4 4h1v4M4 8h2M6 20H4c0-1 2-2 2-3s-1-1.5-2-1',
+    link: 'M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7',
+    eraser: 'M4 7V4h13M10 4 6 20M4 20h5M15 15l5 5M20 15l-5 5',
   });
   const nf = (n) => Number(n || 0).toLocaleString('id-ID');
   const dLabel = (d) => new Date(`${d}T00:00:00`).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
@@ -316,7 +372,11 @@
         link('dashboard', '/admin', 'grid', 'Dashboard'),
         link('laporan', '/admin/reports', 'chart', 'Laporan'),
         link('halaman', '/admin/pages', 'file', 'Halaman'),
-        link('promo', '/admin/promo', 'megaphone', 'Promo')),
+        link('distributor', '/admin/distributors', 'pin', 'Distributor'),
+        link('promo', '/admin/promo', 'megaphone', 'Promo'),
+        link('produk', '/admin/products', 'tag', 'Produk'),
+        link('order', '/admin/orders', 'cartNav', 'Order'),
+        link('diskon', '/admin/discounts', 'percent', 'Diskon')),
       h('div', { class: 'side-foot' },
         h('div', { class: 'side-user', title: EMAIL }, h('span', { class: 'avatar', 'aria-hidden': 'true', text: initials(EMAIL) }),
           h('span', { class: 'who2' }, h('b', { text: EMAIL }), h('span', { text: 'Admin' }))),
@@ -333,7 +393,8 @@
       const dot = (el, title) => { if (el && !el.querySelector('.ndot')) el.append(h('span', { class: 'ndot', title, 'aria-label': title })); };
       if (st.unsavedPages) dot(root.querySelector('.side-link[href="/admin/pages"]'), 'Ada draft halaman yang belum disimpan');
       if (st.promoDraft) dot(root.querySelector('.side-link[href="/admin/promo"]'), 'Draft promo belum dipublish');
-      if (st.unsavedPages) dot(root.querySelector('.subtab[href="/admin/pages"]'), 'Ada draft halaman belum disimpan');
+      if (st.unsavedPages - (st.unsavedTemplates || 0) > 0) dot(root.querySelector('.subtab[href="/admin/pages"]'), 'Ada draft halaman belum disimpan');
+      if (st.unsavedTemplates) dot(root.querySelector('.subtab[href="/admin/templates"]'), 'Ada draft template belum disimpan');
     }).catch(() => {});
     return { root, content, appbar };
   }
@@ -543,9 +604,35 @@
   }
 
   // ============================================================ LAPORAN
+  async function renderRotators(body) {
+    body.append(h('div', { class: 'card skeleton', style: 'height:220px' }));
+    const d = await run(() => api('GET', '/admin/api/rotators/stats'));
+    if (!d) return;
+    const dayLabel = (iso) => new Date(`${iso}T00:00:00`).toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric' });
+    if (!d.rotators.length) {
+      body.replaceChildren(h('div', { class: 'empty' }, icon('wa'), h('strong', { text: 'Belum ada CS Rotator' }),
+        h('span', { text: 'Buat grup nomor WhatsApp di editor halaman → tab Global → CS Rotator, lalu pakai di Tombol (Tujuan: CS Rotator).' })));
+      return;
+    }
+    body.replaceChildren(...d.rotators.map((r) => {
+      const max = Math.max(1, ...r.numbers.map((n) => n.week));
+      const sum = r.numbers.reduce((a, n) => a + n.week, 0);
+      return h('section', { class: 'panel rot-rep' },
+        h('div', { class: 'panel-head' }, h('h2', { text: r.name }), h('span', { class: 'fine', text: `${sum} chat dalam 7 hari · link /go/wa/${r.id}` })),
+        r.numbers.length ? h('table', { class: 'tbl' },
+          h('thead', {}, h('tr', {}, h('th', { text: 'Nomor' }), h('th', { text: '7 hari terakhir' }), ...d.days.slice().reverse().map((x) => h('th', { class: 'num', text: dayLabel(x) })), h('th', { class: 'num', text: 'Total' }))),
+          h('tbody', {}, r.numbers.map((n) => h('tr', {},
+            h('td', {}, h('a', { href: `https://wa.me/${n.number}`, target: '_blank', rel: 'noopener', text: `+${n.number}` })),
+            h('td', {}, h('div', { class: 'rot-bar', title: `${n.week} chat` }, h('span', { style: `width:${(n.week / max) * 100}%` }), h('b', { text: String(n.week) }))),
+            ...n.perDay.slice().reverse().map((v) => h('td', { class: 'num', text: v ? String(v) : '·' })),
+            h('td', { class: 'num', text: nf(n.total) })))))
+          : h('p', { class: 'empty', text: 'Grup ini belum punya nomor.' }));
+    }), h('p', { class: 'fine', text: 'Dihitung setiap kali pengunjung menekan tombol CS Rotator (sebelum diarahkan ke WhatsApp). Nomor diberi giliran merata.' }));
+  }
+
   async function viewReports() {
     const params = new URLSearchParams(location.search);
-    const tab = ['log', 'bagian'].includes(params.get('tab')) ? params.get('tab') : 'ringkasan';
+    const tab = ['log', 'bagian', 'cs'].includes(params.get('tab')) ? params.get('tab') : 'ringkasan';
     const today = new Date(Date.now() + 7 * 3600e3).toISOString().slice(0, 10);
     const back = (n) => new Date(Date.parse(today) - n * 864e5).toISOString().slice(0, 10);
     let st = { preset: '7', from: back(6), to: today, slug: '' };
@@ -563,11 +650,12 @@
     }, 'btn-sm', 'download');
     csvBtn.title = 'Unduh laporan (CSV untuk Excel / Google Sheets)';
     const filters = h('div', { class: 'filters' }, icon('filter'), preset, custom, pageSel, tab === 'ringkasan' ? csvBtn : null);
-    const { content } = layout({ active: 'laporan', title: 'Laporan', subtitle: tab === 'log' ? 'Catatan login dan setiap perubahan.' : tab === 'bagian' ? 'Bagian mana yang dilihat dan diklik pengunjung.' : 'Statistik kunjungan landing page.' });
-    content.append(h('div', { class: 'tabbar' }, subtabs([['ringkasan', '/admin/reports', 'chart', 'Page View'], ['bagian', '/admin/reports?tab=bagian', 'grid', 'Per Bagian'], ['log', '/admin/reports?tab=log', 'clock', 'Log Aktivitas']], tab), tab === 'log' ? null : filters));
+    const { content } = layout({ active: 'laporan', title: 'Laporan', subtitle: tab === 'cs' ? 'Berapa chat WhatsApp yang dikirim ke tiap nomor CS Rotator.' : tab === 'log' ? 'Catatan login dan setiap perubahan.' : tab === 'bagian' ? 'Bagian mana yang dilihat dan diklik pengunjung.' : 'Statistik kunjungan landing page.' });
+    content.append(h('div', { class: 'tabbar' }, subtabs([['ringkasan', '/admin/reports', 'chart', 'Page View'], ['bagian', '/admin/reports?tab=bagian', 'grid', 'Per Bagian'], ['cs', '/admin/reports?tab=cs', 'wa', 'CS Rotator'], ['log', '/admin/reports?tab=log', 'clock', 'Log Aktivitas']], tab), tab === 'log' || tab === 'cs' ? null : filters));
     const body = h('div');
     content.append(body);
     if (tab === 'log') return renderLog(body);
+    if (tab === 'cs') return renderRotators(body);
 
     const pagesReady = api('GET', '/admin/api/pages').then((d) => {
       for (const p of d.pages) pageSel.append(h('option', { value: p.slug, text: p.name, selected: p.slug === st.slug }));
@@ -644,7 +732,7 @@
       const live = secs.filter((x) => !x.removed);
       const avgDepth = r.visitors ? Math.round((r.depthSum / r.visitors) * 10) / 10 : 0;
       const longest = [...live].sort((a, b) => b.avgSec - a.avgSec)[0];
-      const KIND = { wa: 'WhatsApp', video: 'Video', slider: 'Slider', faq: 'FAQ', link: 'Link', other: 'Lainnya' };
+      const KIND = { wa: 'WhatsApp', video: 'Video', slider: 'Slider', faq: 'FAQ', link: 'Link', copy: 'Salin teks', other: 'Lainnya' };
       const sec1 = (v) => `${String(v).replace('.', ',')} dtk`;
       let mode = 'perhatian';
       const frame = h('iframe', { class: 'hm-frame', title: 'Heatmap halaman', src: `/admin/live/${st.slug}`, loading: 'lazy' });
@@ -752,8 +840,9 @@
 
   // ============================================================ PAGES LIST
   async function viewPages() {
-    const { content } = layout({ active: 'halaman', title: 'Halaman', subtitle: 'Semua landing page. Duplikat untuk dijadikan template.',
-      tools: [btn('Halaman baru', () => pageDialog(), 'btn-primary', 'plus')] });
+    const { content } = layout({ active: 'halaman', title: 'Halaman', subtitle: 'Page = landing page dengan link sendiri, disusun dari Template dan Section.',
+      tools: [btn('Page baru', () => pageDialog(), 'btn-primary', 'plus')] });
+    content.append(halamanTabs('pages'));
     const main = h('div');
     content.append(main);
     main.append(h('div', { class: 'cards' }, [0, 1, 2].map(() => h('div', { class: 'card skeleton', style: 'height:330px' }))));
@@ -766,8 +855,8 @@
     async function load() {
       const data = await run(() => api('GET', '/admin/api/pages'));
       if (!data) return;
-      pages = data.pages;
-      const cats = data.categories.filter((c) => data.pages.some((p) => p.category === c));
+      pages = data.pages.filter((p) => p.slug !== 'home'); // the homepage has its own tab
+      const cats = data.categories.filter((c) => pages.some((p) => p.category === c));
       if (filter && !cats.includes(filter)) filter = '';
       main.replaceChildren(...[
         h('div', { class: 'list-tools' }, search,
@@ -797,10 +886,10 @@
           coverOf(p) ? h('img', { src: coverOf(p), alt: '', loading: 'lazy' }) : icon('image')),
         h('div', {}, h('h2', { text: p.name }), h('a', { class: 'slug', href: `/${p.slug}`, target: '_blank', rel: 'noopener', text: `${location.host}/${p.slug}` })),
         h('div', { class: 'meta' },
-          h('span', { text: `${p.sections} section${p.category ? ` · ${p.category}` : ''}` }),
+          h('span', { text: `${p.templates ? `${p.templates} template · ` : ''}${p.sections} section${p.category ? ` · ${p.category}` : ''}` }),
           h('span', { text: `Disimpan ${fmtDate(p.updatedAt)}${p.updatedBy ? ` oleh ${p.updatedBy}` : ''}` }),
           h('span', { class: 'badges' },
-            p.unsaved ? h('span', { class: 'badge warn', text: 'Ada draft belum disimpan' }) : null,
+            p.unsaved ? h('span', { class: 'badge warn', text: 'Ada draft belum dipublikasikan' }) : null,
             p.duplicatedFrom ? h('span', { class: 'badge', text: `Duplikat dari /${p.duplicatedFrom}` }) : null)),
         h('div', { class: 'actions' },
           h('a', { class: 'btn btn-primary btn-sm', href: `/admin/pages/${p.slug}` }, icon('edit'), 'Edit'),
@@ -841,7 +930,7 @@
               option('', 'Halaman kosong', null, 'Tambah section sendiri'),
               pages.map((p) => option(p.slug, p.name, coverOf(p), `${p.sections} section`)))),
           h('div', { class: 'row' }, field('Nama halaman', title), h('label', { class: 'field' }, h('span', { text: 'Link (slug)' }), slug, url)),
-          h('p', { class: 'fine', text: 'Template disalin persis (section, desain, SEO). Halaman baru bisa diubah tanpa memengaruhi halaman asal.' }),
+          h('p', { class: 'fine', text: 'Isi halaman disalin persis (section, desain, SEO). Template yang dipakai tetap tersambung: mengubah template mengubah semua halaman yang memakainya.' }),
           h('button', { type: 'submit', hidden: true })),
         foot: [btn('Batal', () => d.close()), btn('Buat halaman', submit, 'btn-primary')],
       });
@@ -850,7 +939,251 @@
     load();
   }
 
-  // ============================================================ EDITOR
+  // ============================================================ TEMPLATES LIST
+  const halamanTabs = (current) => subtabs([['homepage', '/admin/homepage', 'home', 'Homepage'], ['pages', '/admin/pages', 'file', 'Page'], ['templates', '/admin/templates', 'layers', 'Template']], current);
+
+  // ============================================================ DISTRIBUTOR (one list for every "Daftar Distributor" element)
+  async function viewDistributors() {
+    const { content } = layout({ active: 'distributor', title: 'Distributor', subtitle: 'Distributor resmi per kota. Tampil di website lewat elemen "Daftar Distributor" (mis. di Homepage). Perubahan langsung live.',
+      tools: [btn('Tambah distributor', () => form(null), 'btn-primary', 'plus')] });
+    const main = h('div', {}, h('div', { class: 'card skeleton', style: 'height:300px' }));
+    content.append(main);
+    let data = { items: [], provinces: [], kinds: {} };
+    let q = '';
+    let prov = sessionStorage.getItem('dist-prov') || '';
+    const coll = new Intl.Collator('id', { numeric: true, sensitivity: 'base' });
+    const fold = (t) => String(t || '').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '');
+    const guess = (url) => (/shopee|shp\.ee/i.test(url) ? 'shopee' : /tokopedia/i.test(url) ? 'tokopedia' : /tiktok/i.test(url) ? 'tiktok'
+      : /lazada/i.test(url) ? 'lazada' : /wa\.me|whatsapp/i.test(url) ? 'wa' : /maps\.app|goo\.gl\/maps|google\.[a-z.]+\/maps/i.test(url) ? 'maps' : 'web');
+    const SHORT = { shopee: 'Shopee', tokopedia: 'Tokopedia', tiktok: 'TikTok', lazada: 'Lazada', wa: 'WhatsApp', maps: 'Maps', web: 'Web' };
+
+    async function load() {
+      const d = await run(() => api('GET', '/admin/api/distributors'));
+      if (!d) return;
+      data = d;
+      draw();
+    }
+    const listBox = h('div', { class: 'dist-list' });
+    const countEl = h('span', { class: 'fine' });
+    const search = h('input', { type: 'search', placeholder: 'Cari kota, area atau provinsi…', 'aria-label': 'Cari distributor', oninput: (e) => { q = fold(e.target.value.trim()); drawList(); } });
+    const provSel = h('select', { 'aria-label': 'Filter provinsi', onchange: (e) => { prov = e.target.value; sessionStorage.setItem('dist-prov', prov); drawList(); } });
+    function draw() {
+      const used = [...new Set(data.items.map((d) => d.province))].sort(coll.compare);
+      if (prov && !used.includes(prov)) prov = '';
+      provSel.replaceChildren(h('option', { value: '', text: 'Semua provinsi' }), used.map((p) => h('option', { value: p, text: p, selected: p === prov })));
+      main.replaceChildren(
+        h('div', { class: 'list-tools' }, h('label', { class: 'search' }, icon('search'), search), provSel, countEl),
+        listBox);
+      drawList();
+    }
+    function drawList() {
+      const shown = data.items.filter((d) => (!prov || d.province === prov) && (!q || fold(`${d.province} ${d.city} ${d.name}`).includes(q)));
+      countEl.textContent = `${shown.length} dari ${data.items.length} distributor`;
+      if (!data.items.length) {
+        listBox.replaceChildren(h('div', { class: 'empty' }, icon('pin'), h('strong', { text: 'Belum ada distributor' }), h('span', { text: 'Tambahkan distributor pertama. Daftarnya otomatis tampil di elemen "Daftar Distributor".' }),
+          btn('Tambah distributor', () => form(null), 'btn-primary btn-sm', 'plus')));
+        return;
+      }
+      if (!shown.length) {
+        listBox.replaceChildren(h('div', { class: 'empty' }, icon('search'), h('strong', { text: 'Tidak ada yang cocok' }), h('span', { text: 'Coba nama kota lain, atau pilih "Semua provinsi".' })));
+        return;
+      }
+      const byProv = new Map();
+      for (const d of shown) {
+        if (!byProv.has(d.province)) byProv.set(d.province, new Map());
+        const c = byProv.get(d.province);
+        if (!c.has(d.city)) c.set(d.city, []);
+        c.get(d.city).push(d);
+      }
+      listBox.replaceChildren(...[...byProv].sort((a, b) => coll.compare(a[0], b[0])).map(([p, cities]) => h('section', { class: 'dist-prov' },
+        h('h2', {}, p || 'Tanpa provinsi', h('span', { class: 'badge', text: String([...cities.values()].reduce((n, l) => n + l.length, 0)) })),
+        [...cities].sort((a, b) => coll.compare(a[0], b[0])).map(([city, list]) => h('div', { class: 'dist-city' },
+          h('h3', { text: city }),
+          h('ul', {}, list.sort((a, b) => b.top - a.top).map((d) => h('li', { class: 'dist-row' },
+            h('div', { class: 'dist-main' },
+              h('b', { text: d.name }), d.top ? h('span', { class: 'badge warn', text: 'TOP SELLER' }) : null,
+              h('div', { class: 'dist-links' }, d.links.map((l) => h('a', { class: `dist-chip k-${l.type}`, href: l.url, target: '_blank', rel: 'noopener', title: l.url, text: SHORT[l.type] || l.label })))),
+            h('div', { class: 'dist-act' },
+              iconBtn('edit', `Edit ${d.name}`, () => form(d)),
+              iconBtn('trash', `Hapus ${d.name}`, async () => {
+                if (!(await confirmBox(`Hapus "${d.name}" (${d.city})? Langsung hilang dari website.`, { ok: 'Hapus', danger: true }))) return;
+                if (await run(() => api('DELETE', `/admin/api/distributors/${d.id}`), 'Distributor dihapus.')) load();
+              }, { class: 'danger' }))))))))));
+    }
+
+    function form(d) {
+      if (anyDialogOpen()) return;
+      const cur = d ? structuredClone(d) : { province: prov || '', city: '', name: '', top: false, links: [{ type: 'shopee', url: '' }] };
+      const cities = (p) => [...new Set(data.items.filter((x) => x.province === p).map((x) => x.city))].sort(coll.compare);
+      const dl = h('datalist', { id: 'dist-cities' });
+      const fillCities = () => dl.replaceChildren(...cities(provIn.value).map((c) => h('option', { value: c })));
+      const provIn = h('select', { required: true, onchange: fillCities },
+        h('option', { value: '', text: 'Pilih provinsi…', disabled: true, selected: !cur.province }),
+        [...new Set([...data.provinces, cur.province].filter(Boolean))].map((p) => h('option', { value: p, text: p, selected: p === cur.province })));
+      const cityIn = h('input', { type: 'text', required: true, maxlength: 60, value: cur.city, list: 'dist-cities', placeholder: 'mis. Jakarta Barat, Surabaya' });
+      const nameIn = h('input', { type: 'text', required: true, maxlength: 160, value: cur.name, placeholder: 'mis. Area Jakarta Barat 2, DKI Jakarta' });
+      const topIn = h('input', { type: 'checkbox', checked: cur.top });
+      fillCities();
+      const linksBox = h('div', { class: 'dist-form-links' });
+      const drawLinks = () => linksBox.replaceChildren(
+        ...cur.links.map((l, i) => h('div', { class: 'dist-link-row' },
+          h('select', { 'aria-label': `Jenis link ${i + 1}`, onchange: (e) => { l.type = e.target.value; l.label = ''; } },
+            Object.entries(data.kinds).map(([k, label]) => h('option', { value: k, text: label, selected: l.type === k }))),
+          h('input', { type: 'url', value: l.url, placeholder: 'https://…', 'aria-label': `Alamat link ${i + 1}`,
+            oninput: (e) => { l.url = e.target.value.trim(); },
+            onchange: (e) => { const g = guess(e.target.value); if (g !== 'web' && g !== l.type) { l.type = g; l.label = ''; drawLinks(); } } }),
+          iconBtn('trash', `Hapus link ${i + 1}`, () => { cur.links.splice(i, 1); drawLinks(); }, { class: 'danger', attrs: { disabled: cur.links.length === 1 } }))),
+        cur.links.length < 8 ? btn('Tambah link', () => { cur.links.push({ type: 'tokopedia', url: '' }); drawLinks(); linksBox.querySelector('.dist-link-row:last-of-type input')?.focus(); }, 'btn-sm', 'plus') : null);
+      drawLinks();
+      const save = async () => {
+        const body = { province: provIn.value, city: cityIn.value, name: nameIn.value, top: topIn.checked,
+          links: cur.links.filter((l) => l.url).map((l) => ({ type: l.type, url: /^https?:\/\//i.test(l.url) ? l.url : `https://${l.url}`, label: l.label || '' })) };
+        if (!body.province) return toast('Pilih provinsi.', 'error');
+        const out = await run(() => api(d ? 'PUT' : 'POST', d ? `/admin/api/distributors/${d.id}` : '/admin/api/distributors', body),
+          d ? 'Distributor diperbarui. Sudah tampil di website.' : 'Distributor ditambahkan. Sudah tampil di website.');
+        if (out) { dlg.close(); if (!d && prov && prov !== body.province) { prov = ''; sessionStorage.removeItem('dist-prov'); } load(); }
+      };
+      const dlg = dialog({
+        title: d ? 'Edit distributor' : 'Tambah distributor',
+        body: h('form', { class: 'dist-form', onsubmit: (e) => { e.preventDefault(); save(); } },
+          h('div', { class: 'row' }, field('Provinsi', provIn), field('Kota / kabupaten', cityIn)), dl,
+          field('Nama area', nameIn, '(tampil tebal di website)'),
+          h('label', { class: 'check' }, topIn, h('span', { text: 'Tandai TOP SELLER (tampil paling atas di kotanya)' })),
+          h('div', { class: 'field' }, h('span', {}, 'Link order', h('span', { class: 'hint', text: ' (jenis terdeteksi otomatis dari link)' })), linksBox)),
+        foot: [btn('Batal', () => dlg.close()), btn(d ? 'Simpan perubahan' : 'Tambah', save, 'btn-primary')],
+      });
+      (d ? nameIn : provIn).focus();
+    }
+    load();
+  }
+
+  // ============================================================ HOMEPAGE (page "home", served at "/")
+  async function viewHomepage() {
+    const { content } = layout({ active: 'halaman', title: 'Halaman', subtitle: 'Homepage = halaman utama yang terbuka di alamat domain (/).' });
+    content.append(halamanTabs('homepage'));
+    const main = h('div', {}, h('div', { class: 'card skeleton', style: 'height:300px;max-width:820px' }));
+    content.append(main);
+    const data = await run(() => api('GET', '/admin/api/pages'));
+    if (!data) return;
+    const p = data.pages.find((x) => x.slug === 'home');
+    if (!p) {
+      main.replaceChildren(h('div', { class: 'empty' }, icon('home'), h('strong', { text: 'Homepage belum ada' }),
+        h('span', { text: 'Pengunjung yang membuka alamat utama sementara diarahkan ke landing page MealBlend Women.' })));
+      return;
+    }
+    const cover = p.thumbnail || p.cover;
+    main.replaceChildren(h('article', { class: 'home-card' },
+      h('a', { class: 'home-thumb', href: '/admin/pages/home', tabindex: '-1', 'aria-hidden': 'true' }, cover ? h('img', { src: cover, alt: '', loading: 'lazy' }) : icon('image')),
+      h('div', { class: 'home-main' },
+        h('span', { class: 'kind-chip' }, icon('home'), 'Homepage'),
+        h('h2', { text: p.name }),
+        h('a', { class: 'slug', href: '/', target: '_blank', rel: 'noopener', text: `${location.host}/` }),
+        h('p', { class: 'fine', text: `${p.templates ? `${p.templates} template · ` : ''}${p.sections} section · Disimpan ${fmtDate(p.updatedAt)}${p.updatedBy ? ` oleh ${p.updatedBy}` : ''}` }),
+        p.unsaved ? h('span', { class: 'badge warn', text: 'Ada draft belum dipublikasikan' }) : null,
+        h('div', { class: 'actions' },
+          h('a', { class: 'btn btn-primary', href: '/admin/pages/home' }, icon('edit'), 'Edit Homepage'),
+          h('a', { class: 'btn', href: '/admin/reports?slug=home' }, icon('chart'), 'Statistik'),
+          h('a', { class: 'btn', href: '/', target: '_blank', rel: 'noopener' }, icon('external'), 'Lihat')))));
+  }
+
+  /** Shows an export code with copy + download. */
+  function exportCodeDialog(title, out, note) {
+    const ta = h('textarea', { readonly: true, class: 'code-out', 'aria-label': 'Kode ekspor', spellcheck: false });
+    ta.value = out.code;
+    const copy = async () => { try { await navigator.clipboard.writeText(out.code); toast('Kode disalin.'); } catch { ta.select(); document.execCommand('copy'); toast('Kode disalin.'); } };
+    const download = () => {
+      const a = h('a', { href: URL.createObjectURL(new Blob([out.code], { type: 'text/plain' })), download: out.filename });
+      document.body.append(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    };
+    dialog({ title, body: [h('p', { class: 'fine', text: note }), ta], foot: [btn('Unduh file', download, '', 'download'), btn('Salin kode', copy, 'btn-primary', 'copy')] });
+  }
+
+  async function viewTemplates() {
+    const { content } = layout({ active: 'halaman', title: 'Halaman', subtitle: 'Template = kumpulan section yang bisa dipakai di banyak Page. Ubah sekali, semua Page ikut.',
+      tools: [btn('Impor', () => importDialog(), '', 'upload'), btn('Template baru', () => newDialog(), 'btn-primary', 'plus')] });
+    content.append(halamanTabs('templates'));
+    const main = h('div');
+    content.append(main);
+    main.append(h('div', { class: 'tpl-list' }, [0, 1, 2].map(() => h('div', { class: 'tpl-row skeleton', style: 'height:88px' }))));
+    let list = [];
+    let query = '';
+    const box = h('div');
+    const search = h('label', { class: 'search' }, icon('search'),
+      h('input', { type: 'search', placeholder: 'Cari nama template…', 'aria-label': 'Cari template', oninput: (e) => { query = e.target.value.trim().toLowerCase(); render(); } }));
+    const count = h('span', { class: 'fine' });
+
+    async function load() {
+      const data = await run(() => api('GET', '/admin/api/templates'));
+      if (!data) return;
+      list = data.templates;
+      main.replaceChildren(h('div', { class: 'list-tools' }, search, count), box);
+      render();
+    }
+    function render() {
+      const shown = list.filter((t) => !query || t.name.toLowerCase().includes(query));
+      count.textContent = `${shown.length} dari ${list.length} template`;
+      if (!list.length) {
+        box.replaceChildren(h('div', { class: 'empty' }, icon('layers'), h('strong', { text: 'Belum ada template' }),
+          h('span', { text: 'Template berisi section yang bisa dipakai di banyak Page sekaligus.' }), btn('Template baru', () => newDialog(), 'btn-primary btn-sm', 'plus')));
+        return;
+      }
+      box.replaceChildren(shown.length ? h('ul', { class: 'tpl-list', 'aria-label': 'Daftar template' }, shown.map(row))
+        : h('div', { class: 'empty' }, icon('search'), h('strong', { text: 'Tidak ada yang cocok' }), h('span', { text: 'Coba kata lain.' })));
+    }
+    function row(t) {
+      const edit = `/admin/templates/${t.id}`;
+      return h('li', { class: 'tpl-row' },
+        h('a', { class: 'tpl-thumb', href: edit, tabindex: '-1', 'aria-hidden': 'true' }, t.cover ? h('img', { src: t.cover, alt: '', loading: 'lazy' }) : icon('layers')),
+        h('div', { class: 'tpl-main' },
+          h('a', { class: 'tpl-title', href: edit, text: t.name }),
+          h('div', { class: 'fine', text: `${t.sections} section · disimpan ${fmtDate(t.updatedAt)}${t.updatedBy ? ` oleh ${t.updatedBy}` : ''}` }),
+          t.unsaved ? h('div', { class: 'badges' }, h('span', { class: 'badge warn', text: 'Ada draft belum dipublikasikan' })) : null),
+        h('div', { class: 'tpl-actions' },
+          h('a', { class: 'btn btn-primary btn-sm', href: edit }, icon('edit'), 'Edit'),
+          btn('Duplikat', () => duplicate(t), 'btn-sm', 'copy'),
+          btn('Ekspor', () => exportOne(t), 'btn-sm', 'download'),
+          btn('Hapus', () => remove(t), 'btn-sm btn-danger', 'trash')));
+    }
+    async function newDialog() {
+      const name = await promptBox('Template baru', 'Nama template', '', { ok: 'Buat & edit', maxlength: 160 });
+      if (!name) return;
+      const out = await run(() => api('POST', '/admin/api/templates', { name }), 'Template dibuat.');
+      if (out) location.href = `/admin/templates/${out.id}`;
+    }
+    async function duplicate(t) {
+      const name = await promptBox(`Duplikat "${t.name}"`, 'Nama template baru', `${t.name} (salinan)`, { ok: 'Duplikat', maxlength: 160 });
+      if (!name) return;
+      if (await run(() => api('POST', '/admin/api/templates', { name, from: t.id }), 'Template diduplikat. Salinan ini tidak tersambung ke yang asli.')) load();
+    }
+    async function exportOne(t) {
+      const out = await run(() => api('GET', `/admin/api/templates/${t.id}/export`));
+      if (out) exportCodeDialog(`Ekspor "${t.name}"`, out, `${t.sections} section. Tempel di Impor (daftar Template) atau di Desain → Impor sebuah Page.`);
+    }
+    async function remove(t) {
+      if (t.usedIn.length) return toast(`Masih dipakai di ${t.usedIn.map((p) => p.name).join(', ')}. Hapus dari Page itu dulu (atau "Lepas jadi section").`, 'error');
+      if (!(await confirmBox(`Hapus template "${t.name}"? Versi terakhirnya tetap dicadangkan di riwayat server.`, { ok: 'Hapus', danger: true, title: 'Hapus template?' }))) return;
+      if (await run(() => api('DELETE', `/admin/api/templates/${t.id}`), 'Template dihapus.')) load();
+    }
+    function importDialog() {
+      const name = h('input', { type: 'text', maxlength: 160, placeholder: 'Kosongkan untuk memakai nama dari kode' });
+      const ta = h('textarea', { class: 'code-out', placeholder: 'Tempel kode MBP1.… di sini', 'aria-label': 'Kode impor', spellcheck: false });
+      const fileIn = h('input', { type: 'file', accept: '.mbpage,.txt', hidden: true, onchange: async (e) => { const f = e.target.files[0]; if (f) ta.value = await f.text(); } });
+      const go = async () => {
+        if (!ta.value.trim()) return toast('Tempel kode atau pilih file.', 'error');
+        const out = await run(() => api('POST', '/admin/api/templates/import', { code: ta.value, name: name.value }), 'Template diimpor.');
+        if (out) { d.close(); location.href = `/admin/templates/${out.id}`; }
+      };
+      const d = dialog({
+        title: 'Impor template',
+        body: [h('p', { class: 'fine', text: 'Kode dari tombol Ekspor (template atau halaman) di sistem ini. Section-nya menjadi template baru.' }), field('Nama template', name), ta, fileIn],
+        foot: [btn('Pilih file .mbpage', () => fileIn.click(), '', 'upload'), btn('Impor', go, 'btn-primary')],
+      });
+    }
+    load();
+  }
+
+  // ============================================================ EDITOR (pages and templates)
   async function viewEditor() {
     let page = null; // draft summary
     let global = null; // draft global settings
@@ -860,27 +1193,44 @@
     let options = { fonts: {}, widths: [] };
     let images = [];
     let livePromo;
-    let selected = sessionStorage.getItem(`sel:${SLUG}`) || null;
-    let tab = sessionStorage.getItem(`tab:${SLUG}`) || 'konten';
+    const IS_TPL = KIND === 'template';
+    const IS_HOME = !IS_TPL && SLUG === 'home';
+    const DOC = IS_TPL
+      ? { api: `/admin/api/templates/${SLUG}`, preview: `/admin/preview-template/${SLUG}`, back: '/admin/templates', label: 'Template' }
+      : { api: `/admin/api/pages/${SLUG}`, preview: `/admin/preview/${SLUG}`, back: IS_HOME ? '/admin/homepage' : '/admin/pages', label: IS_HOME ? 'Homepage' : 'Halaman' };
+    let templates = {}; // templates used by this page: id -> { name, sections, badges, updatedAt }
+    let usedIn = []; // template editor: pages that use this template
+    const SK = `${KIND}:${SLUG}`;
+    const expanded = new Set(); // template rows opened in the list
+    let selected = sessionStorage.getItem(`sel:${SK}`) || null;
+    let tab = sessionStorage.getItem(`tab:${SK}`) || 'konten';
+    let device = 'mobile';
+    try { device = localStorage.getItem('mb-device') || 'mobile'; } catch { /* ignore */ }
 
     // ---- header bar
     const nameEl = h('h1');
-    const statusEl = h('span', { class: 'status' });
+    const statusEl = h('span', { class: 'status', role: 'status' });
     const undoBtn = iconBtn('undo', 'Undo (Ctrl+Z)', () => undoRedo('undo'));
     const redoBtn = iconBtn('redo', 'Redo (Ctrl+Shift+Z)', () => undoRedo('redo'));
-    const saveBtn = btn('Simpan', () => publish(), 'btn-primary', 'check');
-    const liveLink = h('a', { class: 'btn', href: `/${SLUG}`, target: '_blank', rel: 'noopener', title: 'Buka halaman live' }, icon('external'), h('span', { class: 'hide-sm', text: 'Lihat live' }));
+    const saveBtn = btn('Publikasikan', () => publish(), 'btn-primary', 'check');
+    saveBtn.title = 'Publikasikan draft ke halaman live (Ctrl+S)';
+    const liveLink = IS_TPL ? null : h('a', { class: 'btn', href: IS_HOME ? '/' : `/${SLUG}`, target: '_blank', rel: 'noopener', title: 'Buka halaman live' }, icon('external'), h('span', { class: 'hide-sm', text: 'Lihat live' }));
+    const DEVICES = [['desktop', 'monitor', 'Desktop'], ['tablet', 'tablet', 'Tablet'], ['mobile', 'phone', 'HP']];
+    const devBtns = DEVICES.map(([id, ic, label]) => h('button', { type: 'button', class: 'dev-btn', dataset: { dev: id }, title: `Preview ${label}`, 'aria-label': `Preview ${label}`, onclick: () => setDevice(id) }, icon(ic), h('span', { text: label })));
+    const devToggle = h('div', { class: 'dev-toggle', role: 'group', 'aria-label': 'Ukuran preview' }, devBtns);
     const bar = h('header', { class: 'edit-bar' },
       h('button', { type: 'button', class: 'icon-btn nav-toggle', 'aria-label': 'Buka menu', onclick: () => document.getElementById('app').classList.add('nav-open') }, icon('menu')),
       btn('Kembali', () => goBack(), '', 'back'),
-      h('div', { class: 'edit-title' }, nameEl, statusEl),
+      h('div', { class: 'edit-title' }, IS_TPL ? h('span', { class: 'kind-chip' }, icon('layers'), 'Template') : IS_HOME ? h('span', { class: 'kind-chip' }, icon('home'), 'Homepage') : null, nameEl, statusEl),
+      devToggle,
       h('div', { class: 'edit-tools' },
         h('div', { class: 'undo-group', role: 'group', 'aria-label': 'Undo dan redo' }, undoBtn, redoBtn),
         btn('Preview', () => { previewWrap.classList.add('open'); fitPhone(); }, 'only-narrow', 'phone'),
-        btn('Coba di HP', () => phoneDialog(), 'hide-sm', 'phone'), liveLink, themeToggle(), saveBtn));
+        IS_TPL ? null : btn('Coba di HP', () => phoneDialog(), 'hide-sm', 'phone'), liveLink, themeToggle(), saveBtn));
 
     // ---- tabs
-    const TABS = [['konten', 'Konten'], ['desain', 'Desain'], ['seo', 'SEO'], ['global', 'Global'], ['riwayat', 'Riwayat']];
+    const TABS = IS_TPL ? [['konten', 'Konten'], ['riwayat', 'Riwayat']] : [['konten', 'Konten'], ['desain', 'Desain'], ['seo', 'SEO'], ['global', 'Global'], ['riwayat', 'Riwayat']];
+    if (!TABS.some(([id]) => id === tab)) tab = 'konten';
     const tabBtns = TABS.map(([id, label]) => h('button', { type: 'button', role: 'tab', class: 'etab', id: `tab-${id}`, 'aria-controls': 'tabpanel', text: label, onclick: () => setTab(id) }));
     const tabList = h('div', { class: 'etabs', role: 'tablist', 'aria-label': 'Bagian editor',
       onkeydown: (e) => {
@@ -890,14 +1240,14 @@
     const panel = h('div', { class: 'epanel', role: 'tabpanel', id: 'tabpanel' });
     function setTab(id) {
       tab = id;
-      sessionStorage.setItem(`tab:${SLUG}`, id);
+      sessionStorage.setItem(`tab:${SK}`, id);
       for (const b of tabBtns) { const on = b.id === `tab-${id}`; b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; }
       panel.setAttribute('aria-labelledby', `tab-${id}`);
       renderTab();
     }
 
     // ---- iPhone 11 preview (414 × 896 pt screen)
-    const iframe = h('iframe', { title: 'Preview halaman di iPhone 11', src: `/admin/preview/${SLUG}` });
+    const iframe = h('iframe', { title: `Preview ${DOC.label.toLowerCase()}`, src: DOC.preview });
     const phone = h('div', { class: 'iphone' },
       h('span', { class: 'ib ib-silent' }), h('span', { class: 'ib ib-volup' }), h('span', { class: 'ib ib-voldown' }), h('span', { class: 'ib ib-power' }),
       h('div', { class: 'iphone-screen' },
@@ -907,15 +1257,32 @@
         iframe,
         h('span', { class: 'home-ind', 'aria-hidden': 'true' })));
     const phoneBox = h('div', { class: 'phone-box' }, phone);
-    const previewWrap = h('aside', { class: 'preview', 'aria-label': 'Preview iPhone 11' },
+    const devCaption = h('p', { class: 'fine dev-caption' });
+    const previewWrap = h('aside', { class: 'preview', 'aria-label': 'Preview' },
       phoneBox,
-      h('p', { class: 'fine', text: 'iPhone 11 · 414 × 896. Klik section di preview untuk memilihnya; klik kanan untuk menu.' }),
+      devCaption,
       h('div', { class: 'only-narrow center' }, btn('Tutup preview', () => previewWrap.classList.remove('open'))));
+    // Frame sizes (outer, incl. bezel). Desktop has no frame and fills the preview area.
+    const FRAMES = { mobile: [466, 948, 'iPhone 11 · 414 × 896'], tablet: [868, 1228, 'iPad Air · 820 × 1180'], desktop: [0, 0, 'Desktop · lebar penuh'] };
     function fitPhone() {
-      const top = Math.max(phoneBox.getBoundingClientRect().top, 132);
-      const avail = Math.max(320, innerHeight - (previewWrap.classList.contains('open') ? 90 : top) - 44);
-      const s = Math.min(1, avail / 948);
+      const dev = innerWidth <= 1180 ? 'mobile' : device; // narrow admin screens: full-screen phone preview
+      previewWrap.dataset.dev = dev;
+      const [fw, fh, label] = FRAMES[dev] || FRAMES.mobile;
+      devCaption.textContent = `${label} · klik section di preview untuk memilihnya, klik kanan untuk menu.`;
+      if (!fw) { phoneBox.style.removeProperty('--s'); return; }
+      const r = previewWrap.getBoundingClientRect();
+      const availW = Math.max(240, (previewWrap.classList.contains('open') ? innerWidth : r.width) - 48);
+      const availH = Math.max(320, (previewWrap.classList.contains('open') ? innerHeight - 90 : r.height) - 72);
+      const s = Math.min(1, availW / fw, availH / fh);
       phoneBox.style.setProperty('--s', s.toFixed(4));
+    }
+    function setDevice(id) {
+      device = FRAMES[id] ? id : 'mobile';
+      try { localStorage.setItem('mb-device', device); } catch { /* ignore */ }
+      previewWrap.dataset.dev = device;
+      for (const b of devBtns) b.setAttribute('aria-pressed', String(b.dataset.dev === device));
+      fitPhone();
+      requestAnimationFrame(() => markPreview(false));
     }
     addEventListener('resize', fitPhone);
 
@@ -927,15 +1294,16 @@
       e.preventDefault();
       e.stopPropagation();
       const go = () => (target.tagName === 'A' ? (location.href = target.href) : logout());
-      const c = await choiceBox('Perubahan belum disimpan', 'Draft halaman ini belum dipublikasikan. Simpan dulu sebelum pindah?', [
+      const c = await choiceBox('Belum dipublikasikan', 'Perubahanmu aman tersimpan sebagai draft, tapi belum tampil di halaman live. Publikasikan sekarang?', [
         { label: 'Batal', value: null },
-        { label: 'Pindah tanpa simpan', value: 'leave', cls: 'btn-ghost' },
-        { label: 'Simpan & pindah', value: 'save', cls: 'btn-primary' },
+        { label: 'Nanti saja', value: 'leave', cls: 'btn-ghost' },
+        { label: 'Publikasikan & pindah', value: 'save', cls: 'btn-primary' },
       ]);
       if (c === 'leave') go();
       if (c === 'save' && (await publish())) go();
     }, true);
-    edContent.classList.add('editor-wrap');
+    edContent.classList.add('editor-wrap', 'editor-v3');
+    edRoot.classList.add('is-editor');
     edContent.append(h('div', { class: 'editor-inner' },
       h('div', { class: 'editor' },
         h('section', { class: 'panel' }, tabList, panel),
@@ -948,10 +1316,21 @@
     function markPreview(pulse, scroll = true) {
       const doc = pdoc();
       if (!doc || !doc.body) return;
-      for (const el of doc.querySelectorAll('.lp-sec.mb-sel')) el.classList.remove('mb-sel', 'mb-pulse');
-      const el = selected && doc.getElementById(selected);
+      for (const el of doc.querySelectorAll('.lp-sec.mb-sel')) el.classList.remove('mb-sel', 'mb-pulse', 'mb-grp', 'mb-grp-first', 'mb-grp-last');
+      for (const el of doc.querySelectorAll('.mb-tag')) el.remove();
+      // A template block is shown as one selection around all of its sections.
+      const group = selected ? [...doc.querySelectorAll(`.lp-sec[data-ref="${CSS.escape(selected)}"]`)] : [];
+      const el = group[0] || (selected && doc.getElementById(selected));
       if (!el) return;
-      el.classList.add('mb-sel');
+      for (const g of group.length ? group : [el]) g.classList.add('mb-sel');
+      if (group.length > 1) { group.forEach((g) => g.classList.add('mb-grp')); group[0].classList.add('mb-grp-first'); group.at(-1).classList.add('mb-grp-last'); }
+      if (group.length) {
+        const ref = page && page.sections.find((x) => x.id === selected);
+        const tag = doc.createElement('div');
+        tag.className = 'mb-tag';
+        tag.textContent = `Template · ${(ref && templates[ref.template]?.name) || 'tanpa nama'}`;
+        group[0].append(tag);
+      }
       if (pulse && scroll) {
         const win = iframe.contentWindow;
         const top = el.getBoundingClientRect().top + win.scrollY;
@@ -980,19 +1359,21 @@
         e.stopPropagation();
         if (suppressClick) return;
         const sec = e.target.closest('.lp-sec');
-        if (sec) select(sec.id, { from: 'preview' });
+        if (sec) select(sec.dataset.ref || sec.id, { from: 'preview', inner: sec.id });
       }, true);
       doc.addEventListener('contextmenu', (e) => {
         const sec = e.target.closest('.lp-sec');
         if (!sec) return;
         e.preventDefault();
-        select(sec.id, { from: 'preview' });
+        const id = sec.dataset.ref || sec.id;
+        select(id, { from: 'preview' });
         const r = iframe.getBoundingClientRect();
         const s = r.width / iframe.offsetWidth;
-        sectionMenu(sec.id, r.left + e.clientX * s, r.top + e.clientY * s);
+        sectionMenu(id, r.left + e.clientX * s, r.top + e.clientY * s);
       }, true);
       doc.addEventListener('keydown', (e) => handleKeys(e), true);
       setupBadgeDrag(doc);
+      setupDrop(doc);
     });
     // Promo badges: drag to move, drag the corner dot to resize (centre stays put). Saved as a draft step.
     let suppressClick = false;
@@ -1007,6 +1388,12 @@
         if (!el || e.button !== 0) return;
         e.preventDefault();
         e.stopPropagation();
+        if (el.closest('.lp-sec[data-ref]')) { // badge of a template: edited in that template
+          const ref = el.closest('.lp-sec').dataset.ref;
+          const t = page.sections.find((x) => x.id === ref);
+          toast('Badge ini milik template. Atur posisinya di editor template.', 'ok', t ? { label: 'Buka template', onclick: () => window.open(`/admin/templates/${t.template}`, '_blank') } : undefined);
+          return;
+        }
         const unit = doc.querySelector('.lp').getBoundingClientRect().width / 320;
         const css = win.getComputedStyle(el);
         const start = { x: e.clientX, y: e.clientY, cx: +css.getPropertyValue('--cx'), cy: +css.getPropertyValue('--cy'), w: +css.getPropertyValue('--bw') };
@@ -1040,15 +1427,26 @@
       }, true);
     }
 
+    function focusInPreview(id) {
+      const doc = pdoc();
+      const el = doc && doc.getElementById(id);
+      if (!el) return;
+      iframe.contentWindow.scrollTo({ top: Math.max(0, el.getBoundingClientRect().top + iframe.contentWindow.scrollY - 12), behavior: 'auto' });
+      el.classList.remove('mb-pulse'); void el.offsetWidth; el.classList.add('mb-pulse');
+    }
     function reloadPreview(pulse = false) {
       try { restoreY = iframe.contentWindow.scrollY; } catch { restoreY = 0; }
       pulseNext = pulse;
       try { iframe.contentWindow.location.reload(); } catch { iframe.src = iframe.src; }
     }
 
-    function select(id, { from = 'list' } = {}) {
+    function select(id, { from = 'list', inner } = {}) {
+      const s = page && page.sections.find((x) => x.id === id);
+      if (from === 'preview' && s && s.type === 'template') { openTpl(id, inner); return; }
+      if (from === 'preview' && s && ['block', 'image', 'html'].includes(s.type)) { openEditor(s, { scroll: false }); return; }
+      if (mode && from === 'preview') { flushProps(); mode = null; if (tab === 'konten') renderTab(); }
       selected = id;
-      sessionStorage.setItem(`sel:${SLUG}`, id);
+      sessionStorage.setItem(`sel:${SK}`, id);
       if (from === 'preview' && tab !== 'konten') setTab('konten');
       if (list) {
         for (const li of list.children) li.classList.toggle('selected', li.dataset.id === id);
@@ -1059,7 +1457,7 @@
     }
 
     // ---- state
-    function setState(out, { reload = true, pulse = false } = {}) {
+    function setState(out, { reload = true, pulse = false, render = true } = {}) {
       if (out.page) page = out.page;
       if (out.global) global = out.global;
       if (out.draft) draft = out.draft;
@@ -1068,18 +1466,22 @@
       if (out.images) images = out.images;
       if (out.options) options = out.options;
       if (out.promo !== undefined) livePromo = out.promo;
+      if (out.templates) templates = out.templates;
+      if (out.usedIn) usedIn = out.usedIn;
       if (selected && !page.sections.some((s) => s.id === selected)) selected = null;
       document.title = `${page.name} · Spencer's Indonesia`;
       nameEl.textContent = page.name;
-      statusEl.textContent = draft.dirty ? 'Belum disimpan' : `Tersimpan ${fmtDate(published.updatedAt)}`;
+      statusEl.textContent = draft.dirty ? 'Draft tersimpan · belum live' : `Live · ${fmtDate(published.updatedAt)}`;
+      statusEl.title = draft.dirty ? 'Semua perubahan otomatis tersimpan sebagai draft. Klik Publikasikan agar tampil di halaman live.' : 'Halaman live sama dengan draft.';
       statusEl.className = `status ${draft.dirty ? 'dirty' : 'saved'}`;
       undoBtn.disabled = !draft.canUndo;
       redoBtn.disabled = !draft.canRedo;
       saveBtn.disabled = !draft.dirty;
-      renderTab();
+      if (render) renderTab();
       if (reload) reloadPreview(pulse);
     }
     async function edit(method, url, body, msg, opts) {
+      await flushProps();
       const out = await run(() => api(method, url, body), msg);
       if (out) {
         setState(out, opts);
@@ -1087,7 +1489,7 @@
       }
       return out;
     }
-    const P = (p = '') => `/admin/api/pages/${SLUG}${p}`;
+    const P = (p = '') => `${DOC.api}${p}`;
 
     async function undoRedo(which) {
       if ((which === 'undo' && !draft.canUndo) || (which === 'redo' && !draft.canRedo)) return;
@@ -1095,14 +1497,35 @@
     }
 
     async function publish(force = false) {
+      await flushProps();
+      const dirtyTpl = IS_TPL ? [] : [...new Set(page.sections.filter((x) => x.type === 'template').map((x) => x.template))].filter((id) => templates[id] && templates[id].dirty);
+      if (dirtyTpl.length && !force) {
+        const names = dirtyTpl.map((id) => `"${templates[id].name}"`).join(', ');
+        const c = await choiceBox('Template juga diubah', `Template ${names} punya perubahan yang belum live. Template dipakai juga di halaman lain — mempublikasikannya mengubah semua halaman itu.`, [
+          { label: 'Batal', value: null },
+          { label: 'Halaman saja', value: 'page', cls: 'btn-ghost' },
+          { label: 'Halaman + template', value: 'all', cls: 'btn-primary' },
+        ]);
+        if (!c) return false;
+        if (c === 'all') {
+          for (const id of dirtyTpl) {
+            await loadTpl(id);
+            const out = await run(() => api('POST', `/admin/api/templates/${id}/publish`, { force: false }, { rev: tplDocs[id]?.draft?.rev ?? null }));
+            if (!out) return false;
+            tplDocs[id] = { ...tplDocs[id], ...out };
+            templates[id] = { ...templates[id], dirty: false };
+          }
+        }
+      }
       try {
-        const out = await run(() => api('POST', P('/publish'), { force }), 'Tersimpan. Halaman live sudah diperbarui.');
+        const out = await run(() => api('POST', P('/publish'), { force }), IS_TPL ? null : 'Dipublikasikan. Halaman live sudah diperbarui.');
+        if (out && IS_TPL) toast(out.usedIn && out.usedIn.length ? `Template dipublikasikan. ${out.usedIn.length} halaman yang memakainya ikut berubah.` : 'Template dipublikasikan.');
         if (!out) return false;
         if (out.slug && out.slug !== SLUG) { location.replace(`/admin/pages/${out.slug}`); return true; }
         setState(out, { reload: false });
         return true;
       } catch (e) {
-        if (e.code === 'LIVE_CHANGED' && (await confirmBox(`${e.message} Timpa dengan draft ini?`, { ok: 'Timpa & simpan', danger: true }))) return publish(true);
+        if (e.code === 'LIVE_CHANGED' && (await confirmBox(`${e.message} Timpa dengan draft ini?`, { ok: 'Timpa & publikasikan', danger: true }))) return publish(true);
         return false;
       }
     }
@@ -1118,7 +1541,7 @@
       dialog({
         title: 'Coba di HP', size: 'sm',
         body: h('div', { class: 'qr-box' }, document.importNode(svg, true),
-          h('p', { text: 'Pindai dengan kamera HP untuk melihat draft halaman ini sebelum disimpan. Perubahan berikutnya ikut tampil setelah halaman di HP dimuat ulang.' }),
+          h('p', { text: 'Pindai dengan kamera HP untuk melihat draft halaman ini sebelum dipublikasikan. Perubahan berikutnya ikut tampil setelah halaman di HP dimuat ulang.' }),
           h('code', { class: 'qr-url', text: out.url }),
           h('p', { class: 'fine', text: `Berlaku sampai ${fmtDate(out.expiresAt)}. Link ini tidak diindeks Google dan tidak dihitung di Laporan.` }),
           out.local ? h('p', { class: 'note', text: 'Mode lokal: HP harus terhubung ke Wi-Fi yang sama dengan komputer ini. Jika tidak terbuka, izinkan Node.js di Windows Firewall.' }) : null),
@@ -1127,14 +1550,17 @@
     }
 
     async function goBack() {
-      if (!draft.dirty) { location.href = '/admin'; return; }
-      const c = await choiceBox('Perubahan belum disimpan', 'Draft ini belum dipublikasikan. Apa yang ingin dilakukan?', [
+      await flushProps();
+      if (!draft.dirty) { location.href = DOC.back; return; }
+      const c = await choiceBox('Belum dipublikasikan', 'Perubahanmu tersimpan sebagai draft tapi belum live. Apa yang ingin dilakukan?', [
         { label: 'Batal', value: null },
         { label: 'Buang perubahan', value: 'discard', cls: 'btn-danger' },
-        { label: 'Simpan & keluar', value: 'save', cls: 'btn-primary' },
+        { label: 'Publikasikan & keluar', value: 'save', cls: 'btn-primary' },
+        { label: 'Keluar, simpan sebagai draft', value: 'leave', cls: 'btn-ghost' },
       ]);
-      if (c === 'save' && (await publish())) location.href = '/admin';
-      if (c === 'discard' && (await run(() => api('POST', P('/discard'))))) location.href = '/admin';
+      if (c === 'save' && (await publish())) location.href = DOC.back;
+      if (c === 'discard' && (await run(() => api('POST', P('/discard'))))) location.href = DOC.back;
+      if (c === 'leave') location.href = DOC.back;
     }
 
     // ---- keyboard shortcuts
@@ -1154,17 +1580,53 @@
       else if (selected && e.key === 'F2') { e.preventDefault(); startRename(selected); }
     }
     document.addEventListener('keydown', handleKeys);
+    if (!IS_TPL) {
+      const stamp = (t) => JSON.stringify(Object.entries(t || {}).map(([k, v]) => [k, v.updatedAt]).sort());
+      addEventListener('focus', async () => {
+        if (!page || !page.sections.some((x) => x.type === 'template')) return;
+        const out = await api('GET', P()).catch(() => null);
+        if (out && stamp(out.templates) !== stamp(templates)) { setState(out); toast('Template diperbarui. Preview dimuat ulang.'); }
+      });
+    }
 
     // ============================================================ tab: Konten
     let list = null;
-    const TYPE_LABEL = { image: 'Gambar', html: 'HTML', promo: '[PROMO]' };
+    const TYPE_LABEL = { image: 'Gambar', html: 'HTML', promo: '[PROMO]', template: 'Template', block: 'Elemen' };
     const promoLocked = () => toast('Isi section [PROMO] mengikuti promo yang aktif. Ubah di menu Promo.', 'ok', { label: 'Buka Promo', onclick: () => window.open('/admin/promo', '_blank') });
-    const openSection = (s) => (s.type === 'promo' ? promoLocked() : sectionDialog(s));
+    const openSection = (s) => (s.type === 'template' ? openTpl(s.id) : s.type === 'promo' ? promoLocked() : openEditor(s));
     function renderKonten() {
+      if (mode) {
+        const t = targetOf(mode);
+        if (mode.view === 'picker') return renderPicker(t);
+        if (mode.view === 'tpl') return renderTplPanel(mode.ref);
+        if (mode.view === 'new') return renderNewPanel(mode.type, t);
+        const sec = t.sections().find((x) => x.id === mode.id);
+        if (sec && sec.type === 'block' && blockDefs && blockDefs.blocks[sec.kind]) return renderBlockPanel(sec, t);
+        if (sec && sec.type === 'image') return renderImagePanel(sec, t);
+        if (sec && sec.type === 'html') return renderHtmlPanel(sec, t);
+        mode = mode.tpl ? { view: 'tpl', ref: mode.tpl } : null;
+        if (mode) return renderTplPanel(mode.ref);
+      }
+      list = h('ol', { class: 'sections', 'aria-label': IS_TPL ? 'Section template' : 'Isi halaman' });
+      renderList();
+      return [
+        ...(IS_TPL ? templateFields() : pageFields()),
+        promoWarnBox(),
+        h('div', { class: 'sec-head' }, h('h2', {}, IS_TPL ? 'Section ' : 'Isi halaman ', h('span', { class: 'badge', text: String(page.sections.length) })),
+          clipboard ? btn('Tempel', () => paste(1), 'btn-sm', 'paste') : null),
+        h('p', { class: 'fine', text: IS_TPL
+          ? 'Geser lewat pegangan atau pakai tombol naik/turun. Klik kanan untuk menu.'
+          : 'Susun dari Template dan Section. Template tersambung: ubah di editor template, semua halaman yang memakainya ikut berubah.' }),
+        list,
+        addButton(),
+      ];
+    }
+
+    function pageFields() {
       const name = h('input', { type: 'text', maxlength: 160, value: page.name, onchange: (e) => patch({ name: e.target.value }, 'Nama halaman diubah.') });
       const slugIn = h('input', { type: 'text', maxlength: 80, value: page.slug, autocapitalize: 'off', spellcheck: false,
         oninput: (e) => { e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-'); },
-        onchange: (e) => patch({ slug: e.target.value }, 'URL diubah. Berlaku setelah Simpan.') });
+        onchange: (e) => patch({ slug: e.target.value }, 'URL diubah. Berlaku setelah Publikasikan.') });
       const cat = h('select', { onchange: async (e) => {
         if (e.target.value === '__new') {
           const n = await promptBox('Kategori baru', 'Nama kategori', '', { ok: 'Tambah', maxlength: 60 });
@@ -1178,81 +1640,168 @@
       h('option', { value: '', text: 'Semua Halaman' }),
       [...new Set([...global.categories, page.category].filter(Boolean))].map((c) => h('option', { value: c, text: c, selected: c === page.category })),
       h('option', { value: '__new', text: '+ Kategori baru…' }));
-      list = h('ol', { class: 'sections', 'aria-label': 'Daftar section' });
-      const hasBadges = (page.badges || []).length > 0;
-      const parts = new Set(page.sections.filter((x) => x.type === 'promo' && x.visible).map((x) => x.part));
+      return [
+        field('Nama Halaman', name, '(hanya terlihat di admin)'),
+        IS_HOME ? h('div', { class: 'field' }, h('span', {}, 'URL Path', h('span', { class: 'hint', text: ' (Homepage selalu di alamat utama)' })), h('div', { class: 'prefix' }, h('span', { text: `${location.host}/` }), h('input', { type: 'text', value: '', disabled: true, 'aria-label': 'URL Homepage' })))
+          : h('label', { class: 'field' }, h('span', {}, 'URL Path', h('span', { class: 'hint', text: ' (Domain Utama)' })), h('div', { class: 'prefix' }, h('span', { text: '/' }), slugIn)),
+        page.slug !== SLUG ? h('p', { class: 'note', text: `Setelah Publikasikan, halaman pindah ke /${page.slug}. Link lama /${SLUG} otomatis diarahkan ke link baru.` }) : null,
+        field('Kategori', cat),
+      ];
+    }
+
+    function templateFields() {
+      const name = h('input', { type: 'text', maxlength: 160, value: page.name, onchange: (e) => patch({ name: e.target.value }, 'Nama template diubah.') });
+      return [
+        field('Nama Template', name, '(hanya terlihat di admin)'),
+        usedIn.length
+          ? h('details', { class: 'used-in' },
+            h('summary', {}, icon('file'), `Dipakai di ${usedIn.length} halaman`, h('span', { class: 'fine', text: ' · Publikasikan = semuanya ikut berubah' })),
+            h('ul', {}, usedIn.map((p) => h('li', {}, h('a', { href: `/admin/pages/${p.slug}`, target: '_blank', rel: 'noopener', text: p.name })))))
+          : h('p', { class: 'fine', text: 'Belum dipakai di Page mana pun.' }),
+      ];
+    }
+
+    /** Warnings when the live promo cannot fill the [PROMO] parts / badges this page (incl. its templates) uses. */
+    function promoWarnBox() {
+      const flat = page.sections.flatMap((s) => (s.type === 'template' ? (templates[s.template]?.sections || []).map((x) => ({ ...x, visible: x.visible && s.visible })) : [s]));
+      const badgeCount = (page.badges || []).length + page.sections.filter((s) => s.type === 'template').reduce((n, s) => n + (templates[s.template]?.badges || 0), 0);
+      const parts = new Set(flat.filter((x) => x.type === 'promo' && x.visible).map((x) => x.part));
       const warns = [];
-      if ((hasBadges || parts.size) && !livePromo) warns.push('Tidak ada promo yang berjalan, jadi section [PROMO] dan badge promo tidak tampil di halaman live.');
+      if ((badgeCount || parts.size) && !livePromo) warns.push('Tidak ada promo yang berjalan, jadi section [PROMO] dan badge promo tidak tampil di halaman live.');
       else if (livePromo) {
-        if (hasBadges && !livePromo.badge) warns.push(`Promo "${livePromo.name}" belum punya badge, jadi badge promo tidak tampil.`);
+        if (badgeCount && !livePromo.badge) warns.push(`Promo "${livePromo.name}" belum punya badge, jadi badge promo tidak tampil.`);
         if (parts.has('banner') && !livePromo.banner) warns.push(`Promo "${livePromo.name}" belum punya banner, jadi [PROMO] Banner tidak tampil.`);
         if (parts.has('bar') && !livePromo.bar) warns.push(`Promo "${livePromo.name}" belum punya teks bar, jadi [PROMO] Bar tidak tampil.`);
       }
-      const promoWarn = warns.length ? h('div', { class: 'warn-box' }, icon('megaphone'), h('div', {}, ...warns.map((w) => h('p', { text: w })), h('a', { href: '/admin/promo', text: 'Atur di menu Promo →' }))) : null;
-      renderList();
-      return [
-        field('Nama Halaman', name, '(hanya terlihat di admin)'),
-        h('div', { class: 'row' },
-          h('label', { class: 'field' }, h('span', { text: 'Domain' }), h('select', { disabled: true }, h('option', { text: 'Domain Utama' }))),
-          h('label', { class: 'field grow2' }, h('span', { text: 'URL Path' }), h('div', { class: 'prefix' }, h('span', { text: '/' }), slugIn))),
-        page.slug !== SLUG ? h('p', { class: 'note', text: `Setelah Simpan, halaman pindah ke /${page.slug}. Link lama /${SLUG} otomatis diarahkan ke link baru.` }) : null,
-        field('Kategori', cat),
-        promoWarn,
-        h('div', { class: 'sec-head' }, h('h2', {}, 'Section ', h('span', { class: 'badge', text: String(page.sections.length) })),
-          h('div', { class: 'row-tight' },
-            clipboard ? btn('Tempel', () => paste(1), 'btn-sm', 'paste') : null,
-            btn('[PROMO]', (e) => {
-              const r = e.currentTarget.getBoundingClientRect();
-              contextMenu(r.left, r.bottom + 4, [
-                { icon: 'image', label: 'Tambah [PROMO] Banner', action: () => addPromoSection('banner') },
-                { icon: 'rename', label: 'Tambah [PROMO] Bar merah', action: () => addPromoSection('bar') },
-              ]);
-            }, 'btn-sm', 'lock'),
-            btn('Tambah section', () => sectionDialog(null), 'btn-primary btn-sm', 'plus'))),
-        h('p', { class: 'fine', text: 'Geser lewat pegangan di kiri untuk mengurutkan. Klik kanan untuk Cut, Copy, Sembunyikan, Rename, Hapus.' }),
-        list,
-      ];
+      return warns.length ? h('div', { class: 'warn-box' }, icon('megaphone'), h('div', {}, ...warns.map((w) => h('p', { text: w })), h('a', { href: '/admin/promo', text: 'Atur di menu Promo →' }))) : null;
+    }
+
+    function addButton() {
+      return h('button', { type: 'button', class: 'add-block', onclick: () => openPicker() },
+      icon('plus'), h('span', { class: 'add-label' }, h('b', { text: 'Tambah' }), h('small', { text: IS_TPL ? 'Gambar, HTML, Teks, Tombol, FAQ…' : 'Template, Gambar, HTML, Teks, Tombol, FAQ…' })));
+    }
+
+    async function templatePicker() {
+      if (anyDialogOpen()) return;
+      const data = await run(() => api('GET', '/admin/api/templates'));
+      if (!data) return;
+      let q = '';
+      const box = h('ul', { class: 'pick-list', role: 'list' });
+      const at = (() => { const i = page.sections.findIndex((s) => s.id === selected); return i < 0 ? page.sections.length : i + 1; })();
+      const use = async (t) => {
+        d.close();
+        const before = new Set(page.sections.map((s) => s.id));
+        const out = await edit('POST', P('/sections'), { type: 'template', template: t.id, position: at }, `Template "${t.name}" dimuat.`);
+        const added = out && out.page.sections.find((s) => !before.has(s.id));
+        if (added) { selected = added.id; renderList(); pulseNext = true; }
+      };
+      const render = () => {
+        const shown = data.templates.filter((t) => !q || t.name.toLowerCase().includes(q));
+        box.replaceChildren(...(shown.length ? shown.map((t) => h('li', {},
+          h('button', { type: 'button', class: 'pick-row', onclick: () => use(t) },
+            h('span', { class: 'tpl-thumb sm' }, t.cover ? h('img', { src: t.cover, alt: '', loading: 'lazy' }) : icon('layers')),
+            h('span', { class: 'pick-main' }, h('b', { text: t.name }), h('small', { text: `${t.sections} section${t.usedIn.length ? ` · dipakai di ${t.usedIn.length} halaman` : ''}` })),
+            h('span', { class: 'btn btn-sm btn-primary', 'aria-hidden': 'true' }, 'Pakai'))))
+          : [h('li', { class: 'empty', text: data.templates.length ? 'Tidak ada yang cocok.' : 'Belum ada template. Buat di Halaman → Template.' })]));
+      };
+      const search = h('input', { type: 'search', placeholder: 'Cari template…', 'aria-label': 'Cari template', oninput: (e) => { q = e.target.value.trim().toLowerCase(); render(); } });
+      render();
+      const d = dialog({
+        title: 'Muat Template',
+        body: [h('p', { class: 'fine', text: `Dimasukkan ${at >= page.sections.length ? 'di paling bawah' : `setelah "${page.sections[at - 1]?.name}"`}. Template tetap tersambung: perubahan di template ikut tampil di halaman ini.` }),
+          h('label', { class: 'search block' }, icon('search'), search), box],
+        foot: [h('a', { class: 'btn', href: '/admin/templates', target: '_blank', rel: 'noopener' }, icon('layers'), 'Kelola template'), btn('Batal', () => d.close())],
+      });
+      search.focus();
+    }
+
+    const tplOf = (s) => templates[s.template];
+    const openTemplate = (s) => window.open(`/admin/templates/${s.template}`, '_blank', 'noopener');
+    async function detach(s) {
+      const t = tplOf(s);
+      if (!(await confirmBox(`Lepas "${t ? t.name : s.name}" dari halaman ini? Section-nya disalin ke halaman ini dan tidak lagi ikut berubah saat template diubah. Bisa dibatalkan dengan Undo.`, { ok: 'Lepas jadi section', title: 'Lepas template?' }))) return;
+      edit('POST', P(`/sections/${s.id}/detach`), undefined, 'Template dilepas menjadi section biasa.');
     }
 
     function renderList() {
       if (!list) return;
       list.replaceChildren(...page.sections.map((s, i) => {
         const last = i === page.sections.length - 1;
+        const isTpl = s.type === 'template';
+        const t = isTpl ? tplOf(s) : null;
+        const open = isTpl && expanded.has(s.id);
+        const name = isTpl && t ? t.name : s.name;
+        const sub = isTpl
+          ? (t ? `Template · ${t.sections.length} section${t.dirty ? ' · draft belum live' : ''}` : 'Template tidak ditemukan')
+          : s.type === 'promo' ? `Promo ${s.part === 'bar' ? 'bar merah' : 'banner'} · otomatis`
+            : s.type === 'image' ? `${TYPE_LABEL.image}${s.layout === 'slider' ? ' · slider' : ''} · ${s.items.length} file`
+              : s.type === 'block' ? `Elemen · ${blockDefs?.blocks[s.kind]?.label || s.kind}` : TYPE_LABEL.html;
         return h('li', {
-          class: `sec${s.id === selected ? ' selected' : ''}${s.visible ? '' : ' is-hidden'}`, tabindex: '0',
-          dataset: { id: s.id }, 'aria-label': `${i + 1}. ${s.name}`,
-          onclick: (e) => { if (!e.target.closest('button, input')) select(s.id); },
-          ondblclick: (e) => { if (!e.target.closest('button, input')) openSection(s); },
-          oncontextmenu: (e) => { e.preventDefault(); select(s.id); sectionMenu(s.id, e.clientX, e.clientY); },
+          class: `sec${isTpl ? ' sec-tpl' : ''}${s.id === selected ? ' selected' : ''}${s.visible ? '' : ' is-hidden'}${open ? ' open' : ''}`, tabindex: '0',
+          dataset: { id: s.id }, 'aria-label': `${i + 1}. ${name}${isTpl ? ' (template)' : ''}`,
+          onclick: (e) => { if (!e.target.closest('button, input, .sub-secs')) select(s.id); },
+          ondblclick: (e) => { if (!e.target.closest('button, input, .sub-secs')) openSection(s); },
+          oncontextmenu: (e) => { if (e.target.closest('.sub-secs')) return; e.preventDefault(); select(s.id); sectionMenu(s.id, e.clientX, e.clientY); },
           onkeydown: (e) => {
             if (e.target !== e.currentTarget) return;
             if (e.key === 'Enter') { select(s.id); }
             if (e.key === 'ContextMenu' || (e.shiftKey && e.key === 'F10')) { e.preventDefault(); const r = e.currentTarget.getBoundingClientRect(); select(s.id); sectionMenu(s.id, r.left + 40, r.bottom); }
           },
         },
-        h('button', { type: 'button', class: 'icon-btn grip', title: 'Geser untuk memindahkan', 'aria-label': `Pindahkan ${s.name}`, tabindex: '-1' }, icon('grip')),
-        h('span', { class: 'sec-num', text: String(i + 1) }),
-        h('span', { class: `sec-type ${s.type}`, title: TYPE_LABEL[s.type] }, icon(s.type === 'promo' ? 'lock' : s.type === 'html' ? 'code' : s.layout === 'slider' ? 'slider' : 'image')),
-        h('span', { class: 'sec-body' },
-          h('span', { class: 'sec-name', text: s.name }),
-          h('span', { class: 'sec-sub' },
-            h('span', { text: s.type === 'promo' ? `Promo ${s.part === 'bar' ? 'bar merah' : 'banner'} · otomatis` : s.type === 'image' ? `${TYPE_LABEL.image}${s.layout === 'slider' ? ' · slider' : ''} · ${s.items.length} file` : TYPE_LABEL.html }),
-            s.visible ? null : h('span', { class: 'badge warn', text: 'Disembunyikan' }),
-            (page.badges || []).filter((b) => b.section === s.id).map((b) => h('span', { class: 'badge-chip', title: 'Badge promo — geser di preview untuk mengatur posisi' },
-              icon('tag'), 'Badge Promo', h('button', { type: 'button', 'aria-label': 'Hapus badge promo', onclick: (e) => { e.stopPropagation(); removeBadge(b); } }, icon('x')))))),
-        h('span', { class: 'sec-actions' },
-          iconBtn('up', 'Naikkan', () => move(i, -1), { attrs: { disabled: i === 0 } }),
-          iconBtn('down', 'Turunkan', () => move(i, 1), { attrs: { disabled: last } }),
-          iconBtn(s.visible ? 'eye' : 'eyeOff', s.visible ? 'Sembunyikan' : 'Tampilkan', () => setVisible(s, !s.visible), { attrs: { 'aria-pressed': String(!s.visible) } }),
-          iconBtn(s.type === 'promo' ? 'lock' : 'edit', s.type === 'promo' ? 'Isi diatur di menu Promo' : 'Edit isi', () => openSection(s))));
+        h('div', { class: 'sec-line' },
+          h('button', { type: 'button', class: 'icon-btn grip', title: 'Geser untuk memindahkan', 'aria-label': `Pindahkan ${name}`, tabindex: '-1' }, icon('grip')),
+          h('span', { class: 'sec-num', text: String(i + 1) }),
+          h('span', { class: `sec-type ${s.type}`, title: TYPE_LABEL[s.type] }, icon(isTpl ? 'layers' : s.type === 'promo' ? 'lock' : s.type === 'html' ? 'code' : s.type === 'block' ? (blockDefs?.blocks[s.kind]?.icon || 'type') : s.layout === 'slider' ? 'slider' : 'image')),
+          h('span', { class: 'sec-body' },
+            h('span', { class: 'sec-name', text: name }),
+            h('span', { class: 'sec-sub' },
+              h('span', { text: sub }),
+              s.visible ? null : h('span', { class: 'badge warn', text: 'Disembunyikan' }),
+              (page.badges || []).filter((b) => b.section === s.id).map((b) => h('span', { class: 'badge-chip', title: 'Badge promo — geser di preview untuk mengatur posisi' },
+                icon('tag'), 'Badge Promo', h('button', { type: 'button', 'aria-label': 'Hapus badge promo', onclick: (e) => { e.stopPropagation(); removeBadge(b); } }, icon('x')))))),
+          h('span', { class: 'sec-actions' },
+            iconBtn('up', 'Naikkan', () => move(i, -1), { attrs: { disabled: i === 0 } }),
+            iconBtn('down', 'Turunkan', () => move(i, 1), { attrs: { disabled: last } }),
+            iconBtn(s.visible ? 'eye' : 'eyeOff', s.visible ? 'Sembunyikan' : 'Tampilkan', () => setVisible(s, !s.visible), { attrs: { 'aria-pressed': String(!s.visible) } }),
+            isTpl ? iconBtn('edit', 'Edit template di sini', () => openTpl(s.id), { attrs: { disabled: !t } })
+              : iconBtn(s.type === 'promo' ? 'lock' : 'edit', s.type === 'promo' ? 'Isi diatur di menu Promo' : 'Edit isi', () => openSection(s))),
+          isTpl && t ? iconBtn(open ? 'chevD' : 'chevR', open ? 'Tutup daftar section' : 'Lihat section di template ini', () => {
+            if (open) expanded.delete(s.id); else expanded.add(s.id);
+            renderList();
+          }, { class: 'expander', attrs: { 'aria-expanded': String(open) } }) : null),
+        open ? h('ol', { class: 'sub-secs', 'aria-label': `Section di ${name}` }, t.sections.map((x, k) => h('li', {},
+          h('button', { type: 'button', class: `sub-sec${x.visible ? '' : ' is-hidden'}`, title: 'Edit bagian ini (template)', onclick: () => openTpl(s.id, x.id), onmouseenter: () => focusInPreview(x.id) },
+            h('span', { class: 'sub-num', text: `${i + 1}.${k + 1}` }),
+            icon(x.type === 'promo' ? 'lock' : x.type === 'html' ? 'code' : x.type === 'block' ? (blockDefs?.blocks[x.kind]?.icon || 'type') : 'image'),
+            h('span', { text: x.name }),
+            x.visible ? null : h('small', { text: 'disembunyikan' }))))) : null);
       }));
-      if (!page.sections.length) list.append(h('li', { class: 'empty', text: 'Belum ada section. Klik "Tambah section".' }));
+      if (!page.sections.length) list.append(h('li', { class: 'empty', text: IS_TPL ? 'Belum ada section. Klik "Tambah" di bawah.' : 'Belum ada isi. Klik "Tambah" untuk memuat Template atau menambah Section.' }));
     }
 
     function sectionMenu(id, x, y) {
       const s = page.sections.find((v) => v.id === id);
       if (!s) return;
       const i = page.sections.indexOf(s);
+      if (s.type === 'template') {
+        const t = tplOf(s);
+        contextMenu(x, y, [
+          { icon: 'edit', label: 'Edit template di sini', disabled: !t, action: () => openTpl(s.id) },
+          { icon: 'external', label: 'Buka editor template penuh (tab baru)', disabled: !t, action: () => openTemplate(s) },
+          { icon: 'unlink', label: 'Lepas jadi section biasa', disabled: !t, action: () => detach(s) },
+          '-',
+          { icon: 'cut', label: 'Cut', kbd: 'Ctrl+X', action: () => clip('cut', id) },
+          { icon: 'copy', label: 'Copy', kbd: 'Ctrl+C', action: () => clip('copy', id) },
+          { icon: 'paste', label: 'Tempel di bawah', kbd: 'Ctrl+V', disabled: !clipboard, action: () => paste(1, i) },
+          '-',
+          { icon: 'eyeOff', label: 'Sembunyikan', disabled: !s.visible, action: () => setVisible(s, false) },
+          { icon: 'eye', label: 'Perlihatkan', disabled: s.visible, action: () => setVisible(s, true) },
+          { icon: 'copy', label: 'Pakai lagi di bawahnya', action: () => edit('POST', P(`/sections/${id}/duplicate`), undefined, 'Template dipakai sekali lagi.') },
+          '-',
+          { icon: 'trash', label: 'Hapus dari halaman', kbd: 'Del', danger: true, action: () => remove(s) },
+        ]);
+        return;
+      }
       contextMenu(x, y, [
         { icon: 'cut', label: 'Cut', kbd: 'Ctrl+X', action: () => clip('cut', id) },
         { icon: 'copy', label: 'Copy', kbd: 'Ctrl+C', action: () => clip('copy', id) },
@@ -1262,7 +1811,7 @@
         { icon: 'eyeOff', label: 'Sembunyikan', disabled: !s.visible, action: () => setVisible(s, false) },
         { icon: 'eye', label: 'Perlihatkan', disabled: s.visible, action: () => setVisible(s, true) },
         { icon: 'rename', label: 'Rename', kbd: 'F2', action: () => startRename(id) },
-        s.type === 'promo' ? { icon: 'lock', label: 'Isi diatur di menu Promo', action: promoLocked } : { icon: 'edit', label: 'Edit isi…', action: () => sectionDialog(s) },
+        s.type === 'promo' ? { icon: 'lock', label: 'Isi diatur di menu Promo', action: promoLocked } : { icon: 'edit', label: s.type === 'block' ? 'Atur elemen' : 'Edit isi…', action: () => openSection(s) },
         { icon: 'tag', label: 'Tambah badge promo di sini', action: () => addBadge(s) },
         { icon: 'copy', label: 'Duplikat', action: () => edit('POST', P(`/sections/${id}/duplicate`), undefined, 'Section diduplikat.') },
         '-',
@@ -1288,8 +1837,11 @@
       edit('PATCH', P(`/sections/${s.id}`), { visible }, visible ? 'Section diperlihatkan.' : 'Section disembunyikan.');
     }
     async function remove(s) {
-      if (!(await confirmBox(`Hapus section "${s.name}"? Bisa dibatalkan dengan Undo sebelum disimpan.`, { ok: 'Hapus', danger: true, title: 'Hapus section?' }))) return;
-      edit('DELETE', P(`/sections/${s.id}`), undefined, 'Section dihapus.');
+      const tpl = s.type === 'template';
+      const label = tpl ? (templates[s.template]?.name || s.name) : s.name;
+      if (!(await confirmBox(tpl ? `Hapus template "${label}" dari halaman ini? Template-nya sendiri tidak terhapus. Bisa dibatalkan dengan Undo.` : `Hapus section "${label}"? Bisa dibatalkan dengan Undo sebelum dipublikasikan.`,
+        { ok: 'Hapus', danger: true, title: tpl ? 'Hapus dari halaman?' : 'Hapus section?' }))) return;
+      edit('DELETE', P(`/sections/${s.id}`), undefined, tpl ? 'Template dihapus dari halaman.' : 'Section dihapus.');
     }
     async function addPromoSection(part) {
       const i = page.sections.findIndex((s) => s.id === selected);
@@ -1373,6 +1925,892 @@
 
     const patch = (body, msg) => edit('PATCH', P(), body, msg);
 
+    // ============================================================ elements: picker + settings panel (left panel, live preview)
+    let blockDefs = null; // { blocks, meta, pages, rotators } from /admin/api/blocks
+    // null = section list | { view: 'picker' | 'block' | 'section' | 'new' | 'tpl', id?, type?, ref?, tpl? }
+    // tpl = id of a template block on this page: the panel then edits that template in place.
+    let mode = null;
+    const openGroups = new Set();
+    const tplDocs = {}; // template id -> latest template editor payload (its own draft + revision)
+    const insertPos = () => { const i = page.sections.findIndex((s) => s.id === selected); return i < 0 ? page.sections.length : i + 1; };
+    const insertWhere = () => { const i = page.sections.findIndex((s) => s.id === selected); return i < 0 ? 'di paling bawah' : `setelah "${page.sections[i].type === 'template' ? templates[page.sections[i].template]?.name || page.sections[i].name : page.sections[i].name}"`; };
+
+    // ---- edit target: this document, or a template used by this page (edited in place; the preview shows its draft)
+    const pageTarget = { kind: 'page', api: DOC.api, sections: () => page.sections, apply: (out, o) => setState(out, o) };
+    function tplTarget(refId) {
+      const ref = page && page.sections.find((s) => s.id === refId && s.type === 'template');
+      if (!ref) return null;
+      const id = ref.template;
+      return {
+        kind: 'template', id, ref: refId, api: `/admin/api/templates/${id}`,
+        name: () => tplDocs[id]?.page.name || templates[id]?.name || ref.name,
+        sections: () => (tplDocs[id] ? tplDocs[id].page.sections : templates[id]?.sections || []),
+        apply(out, { reload = true, render = true } = {}) {
+          tplDocs[id] = { ...(tplDocs[id] || {}), ...out };
+          if (templates[id]) templates[id] = { ...templates[id], name: out.page.name, dirty: Boolean(out.draft && out.draft.dirty) };
+          if (render) renderTab();
+          if (reload) reloadPreview();
+        },
+      };
+    }
+    const targetOf = (m) => (m && m.tpl && tplTarget(m.tpl)) || pageTarget;
+    async function loadTpl(id) {
+      if (!tplDocs[id]) {
+        const out = await run(() => api('GET', `/admin/api/templates/${id}`, undefined, { rev: null }));
+        if (out) tplDocs[id] = out;
+      }
+      return tplDocs[id];
+    }
+    /** Edit through a target: the page uses edit(); a template sends its own draft revision. */
+    async function tedit(t, method, path, body, msg, opts) {
+      if (t.kind === 'page') return edit(method, P(path), body, msg, opts);
+      await flushProps();
+      const out = await run(() => api(method, `${t.api}${path}`, body, { rev: tplDocs[t.id]?.draft?.rev ?? null }), msg);
+      if (out) {
+        t.apply(out, opts);
+        if (out.notes && out.notes.length) toast(`Catatan: ${out.notes.join(', ')}`);
+      }
+      return out;
+    }
+
+    function go(next, { focus } = {}) {
+      flushProps();
+      hideExample();
+      mode = next;
+      if (panel.contains(document.activeElement)) document.activeElement.blur();
+      if (tab !== 'konten') setTab('konten'); else renderTab();
+      panel.scrollTop = 0;
+      if (focus) requestAnimationFrame(() => panel.querySelector(focus)?.focus());
+    }
+    function openPicker(tpl) { go({ view: 'picker', tpl }, { focus: '.pk-search input' }); }
+    /** Opens the settings of a section of this page (s) or of a template block (tpl = template block id). */
+    function openEditor(s, { tpl, pulse = true, scroll = true } = {}) {
+      if (s.type === 'block' && !blockDefs) { toast('Daftar elemen belum termuat. Muat ulang halaman.', 'error'); return; }
+      if (!tpl) { selected = s.id; sessionStorage.setItem(`sel:${SK}`, s.id); }
+      go({ view: s.type === 'block' ? 'block' : 'section', id: s.id, tpl });
+      if (tpl) focusInPreview(s.id); else markPreview(pulse, scroll);
+    }
+    async function openTpl(refId, innerId) {
+      const ref = page.sections.find((s) => s.id === refId && s.type === 'template');
+      if (!ref) return;
+      selected = refId;
+      sessionStorage.setItem(`sel:${SK}`, refId);
+      if (!(await loadTpl(ref.template))) return;
+      const inner = innerId && tplTarget(refId).sections().find((s) => s.id === innerId);
+      if (inner && inner.type !== 'promo') openEditor(inner, { tpl: refId });
+      else { go({ view: 'tpl', ref: refId }); markPreview(true, !innerId); }
+    }
+    function closeMode() {
+      const back = mode && mode.tpl && mode.view !== 'tpl' ? { view: 'tpl', ref: mode.tpl } : null;
+      go(back);
+      if (back) return;
+      const row = list && selected && list.querySelector(`[data-id="${CSS.escape(selected)}"]`);
+      if (row) { row.scrollIntoView({ block: 'center' }); row.focus({ preventScroll: true }); }
+    }
+    panel.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape' || !mode || anyDialogOpen() || openMenu) return;
+      if (e.target.isContentEditable || e.target.tagName === 'TEXTAREA') { e.target.blur(); return; }
+      e.preventDefault();
+      closeMode();
+    });
+
+    async function addBlock(kind, position) {
+      const t = targetOf(mode);
+      const before = new Set(t.sections().map((s) => s.id));
+      const tpl = mode && mode.tpl;
+      if (position == null) position = t.kind === 'page' ? insertPos() : t.sections().length;
+      hideExample();
+      const out = await tedit(t, 'POST', '/sections', { type: 'block', kind, position }, null);
+      const added = out && t.sections().find((s) => !before.has(s.id));
+      if (added) { pulseNext = true; openEditor(added, { tpl, pulse: false }); }
+    }
+
+    // ---- picker: example popover (real element with default settings) + drag into the preview
+    let dragKind = null;
+    let exTimer = null;
+    const exFrames = new Map();
+    const exBox = h('div', { class: 'pk-example', role: 'tooltip', hidden: true }, h('div', { class: 'pk-example-label', text: 'Contoh' }));
+    document.body.append(exBox);
+    function showExample(kind, anchor, delay) {
+      clearTimeout(exTimer);
+      exTimer = setTimeout(() => {
+        if (!anchor.isConnected || dragKind) return;
+        let f = exFrames.get(kind);
+        if (!f) {
+          f = h('iframe', { src: `/admin/block-preview/${kind}`, title: 'Contoh elemen', tabindex: '-1', loading: 'eager' });
+          f.addEventListener('load', () => { try { const d = f.contentDocument; f.style.height = `${Math.min(360, Math.max(60, d.documentElement.scrollHeight))}px`; } catch { /* ignore */ } });
+          exFrames.set(kind, f);
+        }
+        exBox.replaceChildren(exBox.firstChild, f);
+        exBox.firstChild.textContent = `Contoh · ${blockDefs.blocks[kind].label}`;
+        const r = anchor.getBoundingClientRect();
+        const pr = panel.getBoundingClientRect();
+        exBox.hidden = false;
+        exBox.style.left = `${pr.right + 14}px`;
+        exBox.style.top = `${Math.max(70, Math.min(r.top - 10, innerHeight - 420))}px`;
+      }, delay);
+    }
+    function hideExample() { clearTimeout(exTimer); exBox.hidden = true; }
+    panel.addEventListener('scroll', hideExample, { passive: true });
+
+    // drop target inside the preview iframe: a line before/after the section under the pointer
+    let dropAt = null;
+    function clearDrop() { const d = pdoc(); d && d.querySelector('.mb-drop')?.remove(); dropAt = null; }
+    function dropTarget(doc, e) {
+      const el = e.target.closest && e.target.closest('.lp-sec');
+      if (!el) return page.sections.length ? null : { index: 0, y: 0 };
+      const id = el.dataset.ref || el.id;
+      const i = page.sections.findIndex((s) => s.id === id);
+      if (i < 0) return null;
+      const group = el.dataset.ref ? [...doc.querySelectorAll(`.lp-sec[data-ref="${CSS.escape(id)}"]`)] : [el];
+      const top = group[0].getBoundingClientRect().top;
+      const bottom = group.at(-1).getBoundingClientRect().bottom;
+      const after = e.clientY > (top + bottom) / 2;
+      return { index: after ? i + 1 : i, y: (after ? bottom : top) + doc.defaultView.scrollY };
+    }
+    function setupDrop(doc) {
+      doc.addEventListener('dragover', (e) => {
+        if (!dragKind) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+        const t = dropTarget(doc, e);
+        if (!t) return;
+        dropAt = t.index;
+        let line = doc.querySelector('.mb-drop');
+        if (!line) { line = doc.createElement('div'); line.className = 'mb-drop'; const tag = doc.createElement('span'); tag.textContent = `Lepas di sini: ${blockDefs.blocks[dragKind].label}`; line.append(tag); doc.body.append(line); }
+        line.style.top = `${t.y}px`;
+      });
+      doc.addEventListener('dragleave', (e) => { if (!e.relatedTarget) { const l = doc.querySelector('.mb-drop'); if (l) l.remove(); } });
+      doc.addEventListener('drop', (e) => {
+        if (!dragKind) return;
+        e.preventDefault();
+        const kind = dragKind;
+        const at = dropAt;
+        dragKind = null;
+        clearDrop();
+        if (at != null) addBlock(kind, at);
+      });
+    }
+
+    function renderPicker(t = pageTarget) {
+      let q = '';
+      const body = h('div', { class: 'pk-body' });
+      const inTpl = t.kind === 'template';
+      const leave = (fn) => () => { mode = null; renderTab(); fn(); };
+      const BASIC = [
+        { label: 'Gambar', icon: 'image', desc: 'Foto/banner, bisa jadi slider.', run: () => go({ view: 'new', type: 'image', tpl: t.ref }) },
+        { label: 'HTML', icon: 'code', desc: 'Kode atau file HTML sendiri.', run: () => go({ view: 'new', type: 'html', tpl: t.ref }, { focus: '.code-edit' }) },
+        IS_TPL || inTpl ? null : { label: 'Template', icon: 'layers', desc: 'Grup section yang tersambung.', run: leave(() => templatePicker()) },
+      ].filter(Boolean);
+      const EXTRA = inTpl ? [] : [
+        { label: '[PROMO] Banner', icon: 'lock', desc: 'Banner dari promo yang aktif.', run: leave(() => addPromoSection('banner')) },
+        { label: '[PROMO] Bar merah', icon: 'megaphone', desc: 'Bar teks dari promo yang aktif.', run: leave(() => addPromoSection('bar')) },
+        clipboard && !(IS_TPL && clipboard.template) ? { label: `Tempel "${clipboard.name}"`, icon: 'paste', desc: 'Section yang terakhir di-copy.', run: leave(() => paste(1)) } : null,
+      ].filter(Boolean);
+      const blocks = Object.entries(blockDefs ? blockDefs.blocks : {}).map(([kind, b]) => ({ kind, label: b.label, icon: b.icon, desc: b.desc, cat: b.cat, run: () => addBlock(kind) }));
+      const CATS = [['Konten', 'Teks & tata letak'], ['Media', 'Media'], ['Jualan', 'Jualan & kepercayaan'], ['Konversi', 'Konversi']];
+      const card = (it, main) => h('button', { type: 'button', class: `pk-card${main ? ' pk-main' : ''}`, onclick: it.run,
+        draggable: it.kind && !inTpl ? 'true' : null, dataset: it.kind ? { kind: it.kind } : undefined,
+        onmouseenter: it.kind ? (e) => showExample(it.kind, e.currentTarget, 350) : null, onmouseleave: it.kind ? hideExample : null,
+        onfocus: it.kind ? (e) => showExample(it.kind, e.currentTarget, 0) : null, onblur: it.kind ? hideExample : null,
+        ondragstart: it.kind ? (e) => { hideExample(); dragKind = it.kind; e.dataTransfer.effectAllowed = 'copy'; e.dataTransfer.setData('text/plain', it.kind); } : null,
+        ondragend: it.kind ? () => { dragKind = null; clearDrop(); } : null },
+        h('span', { class: 'pk-ic' }, icon(it.icon)), h('span', { class: 'pk-txt' }, h('b', { text: it.label }), h('small', { text: it.desc })));
+      const group = (title, items, main) => (items.length ? [h('h3', { class: 'pk-cat', text: title }), h('div', { class: 'pk-grid' }, items.map((it) => card(it, main)))] : []);
+      const draw = () => {
+        const m = (it) => !q || `${it.label} ${it.desc}`.toLowerCase().includes(q);
+        const parts = [
+          ...group('Utama', BASIC.filter(m), true),
+          ...CATS.flatMap(([c, title]) => group(title, blocks.filter((b) => b.cat === c && m(b)))),
+          ...group('Lainnya', EXTRA.filter(m)),
+        ];
+        body.replaceChildren(...(parts.length ? parts : [h('p', { class: 'empty', text: `Tidak ada elemen "${q}".` })]));
+      };
+      draw();
+      const search = h('input', { type: 'search', placeholder: 'Cari: tombol, FAQ, video…', 'aria-label': 'Cari elemen',
+        oninput: (e) => { q = e.target.value.trim().toLowerCase(); draw(); },
+        onkeydown: (e) => { if (e.key === 'Enter') { e.preventDefault(); body.querySelector('.pk-card')?.click(); } } });
+      return [
+        h('div', { class: 'bp-head' },
+          iconBtn('back', inTpl ? 'Kembali ke template (Esc)' : 'Kembali ke daftar isi (Esc)', closeMode),
+          h('div', { class: 'bp-title' }, h('b', { text: inTpl ? `Tambah ke template ${t.name()}` : 'Tambah' }), h('small', { text: inTpl ? 'Masuk di paling bawah template' : `Klik: masuk ${insertWhere()} · atau seret elemen ke preview` }))),
+        inTpl ? tplWarn(t) : null,
+        h('label', { class: 'search block pk-search' }, icon('search'), search),
+        body,
+      ];
+    }
+
+    // ---- settings panels: changes are queued, sent as one PATCH and the section is re-rendered in the preview
+    let pending = null; // { t, id, body: () => JSON | FormData }
+    let propsTimer = null;
+    let propsChain = Promise.resolve();
+    function queuePatch(t, id, body, delay = 350) {
+      if (pending && (pending.id !== id || pending.t.api !== t.api)) flushProps();
+      pending = { t, id, body };
+      clearTimeout(propsTimer);
+      propsTimer = setTimeout(flushProps, delay);
+      statusEl.textContent = 'Menyimpan…';
+      statusEl.className = 'status dirty';
+    }
+    function flushProps() {
+      clearTimeout(propsTimer);
+      if (pending) {
+        const { t, id, body } = pending;
+        pending = null;
+        const payload = body();
+        propsChain = propsChain.then(async () => {
+          try {
+            const url = `${t.api}/sections/${encodeURIComponent(id)}?render=${encodeURIComponent(id)}`;
+            const out = t.kind === 'page' ? await api('PATCH', url, payload) : await api('PATCH', url, payload, { rev: tplDocs[t.id]?.draft?.rev ?? null });
+            if (t.kind === 'page') setState(out, { reload: false, render: false });
+            else { t.apply(out, { reload: false, render: false }); setState({}, { reload: false, render: false }); }
+            showNotes(id, out.notes);
+            if (out.html) swapPreview(id, out.html); else reloadPreview();
+          } catch (e) {
+            toast(e.message, 'error', e.status === 409 ? { label: 'Muat ulang', onclick: () => location.reload() } : null);
+          }
+        });
+      }
+      return propsChain;
+    }
+    function showNotes(id, notes) {
+      const box = panel.querySelector(`[data-notes="${CSS.escape(id)}"]`);
+      if (box) box.replaceChildren(...(notes || []).map((n) => h('li', { text: n })));
+    }
+    function swapPreview(id, html) {
+      const doc = pdoc();
+      const el = doc && doc.getElementById(id);
+      if (!el) { reloadPreview(); return; }
+      const t = doc.createElement('template');
+      t.innerHTML = html; // server-rendered + sanitised section, same markup as a preview reload
+      const next = t.content.firstElementChild;
+      if (!next) { reloadPreview(); return; }
+      if (el.dataset.ref) next.dataset.ref = el.dataset.ref; // section of a template block
+      el.replaceWith(next);
+      try { iframe.contentWindow.LP?.init(next); } catch { /* preview script not ready */ }
+      markPreview(false, false);
+    }
+
+    /** Header shared by every settings panel: back, type icon, editable name, context line, menu. */
+    function panelHead(s, t, ic, kindLabel) {
+      const name = h('input', { class: 'bp-name', type: 'text', maxlength: 120, value: s.name, 'aria-label': 'Nama (hanya terlihat di admin)',
+        onkeydown: (e) => { if (e.key === 'Enter') e.target.blur(); },
+        onchange: (e) => { const v = e.target.value.trim(); if (v && v !== s.name) tedit(t, 'PATCH', `/sections/${s.id}`, { name: v }, null, { reload: false }); } });
+      const more = iconBtn('more', 'Menu', (e) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        if (t.kind === 'page') sectionMenu(s.id, r.left, r.bottom + 4); else tplSectionMenu(t, s, r.left, r.bottom + 4);
+      });
+      return h('div', { class: 'bp-head' },
+        iconBtn('back', t.kind === 'page' ? 'Kembali ke daftar isi (Esc)' : 'Kembali ke template (Esc)', closeMode),
+        h('span', { class: 'bp-ic' }, icon(ic)),
+        h('div', { class: 'bp-title' }, name, h('small', { text: `${t.kind === 'page' ? '' : `Template ${t.name()} · `}${kindLabel}${s.visible ? '' : ' · disembunyikan'}` })),
+        more);
+    }
+    const tplWarn = (t) => (t.kind === 'page' ? null : h('div', { class: 'tpl-warn' }, icon('layers'),
+      h('span', {}, 'Mengubah template ', h('b', { text: t.name() }), ` — ikut berubah di ${(tplDocs[t.id]?.usedIn || []).length || 'semua'} halaman yang memakainya setelah template dipublikasikan.`)));
+    const FOOT = 'Perubahan langsung tampil di preview dan otomatis tersimpan sebagai draft. Klik Publikasikan agar tampil di halaman live.';
+    const footFor = (t) => h('p', { class: 'fine bp-foot', text: t.kind === 'page' ? FOOT : 'Tersimpan sebagai draft template. Kembali ke template untuk mempublikasikannya.' });
+
+    function renderBlockPanel(s, t = pageTarget) {
+      const def = blockDefs.blocks[s.kind];
+      const bp = structuredClone(s.props || {});
+      const changed = () => queuePatch(t, s.id, () => ({ props: structuredClone(bp) }));
+      const groups = {};
+      for (const f of def.fields) (groups[f.group || ''] ||= []).push(f);
+      const GROUP_LABEL = { Tampilan: 'Jarak & warna latar', Tracking: 'Iklan & tracking', Posisi: 'Posisi teks & tombol' };
+      return [
+        panelHead(s, t, def.icon, def.label),
+        tplWarn(t),
+        h('div', { class: 'bp-form' }, fieldsForm(groups[''] || [], bp, changed)),
+        ...Object.entries(groups).filter(([g]) => g).map(([g, fs]) => {
+          const key = `${s.kind}:${g}`;
+          return h('details', { class: 'bp-sec', open: openGroups.has(key), ontoggle: (e) => { if (e.target.open) openGroups.add(key); else openGroups.delete(key); } },
+            h('summary', {}, icon('chevR'), h('span', { text: GROUP_LABEL[g] || g })),
+            h('div', { class: 'bp-form' }, fieldsForm(fs, bp, changed)));
+        }),
+        footFor(t),
+      ];
+    }
+
+    // spacing above a section (design units, same hint as element sizes)
+    function spacingField(s, t) {
+      const obj = { mt: s.mt || 0 };
+      return h('div', { class: 'bp-form' }, fieldsForm([{ k: 'mt', t: 'number', label: 'Jarak dari bagian di atasnya', min: -200, max: 400, d: 0, unit: 'px', full: true }], obj,
+        () => queuePatch(t, s.id, () => ({ mt: obj.mt }), 500)));
+    }
+
+    // ---- Gambar: images stacked or as a slider; alt text + link per image
+    function imageForm(rows, layout, files = []) {
+      const fd = new FormData();
+      fd.append('layout', layout);
+      fd.append('items', JSON.stringify(rows.map((r) => (r.file != null ? { file: r.file, alt: r.alt || '', href: r.href || '', ...(r.replaces != null ? { replaces: r.replaces } : {}) } : { keep: r.keep, alt: r.alt || '', href: r.href || '' }))));
+      for (const f of files) fd.append('images', f, f.name);
+      return fd;
+    }
+    const okImage = (f) => {
+      if (!/^image\/(png|jpeg|webp|gif|avif)$/.test(f.type)) { toast(`"${f.name}" bukan JPG/PNG/WebP/GIF/AVIF.`, 'error'); return false; }
+      if (f.size > 15 * 1024 * 1024) { toast(`"${f.name}" lebih dari 15 MB.`, 'error'); return false; }
+      return true;
+    };
+    function renderImagePanel(s, t = pageTarget) {
+      const rows = s.items.map((it, i) => ({ keep: i, alt: it.alt, href: it.href, thumb: `${it.src}.${it.ext || 'webp'}` }));
+      let layout = s.layout === 'slider' ? 'slider' : 'stack';
+      const path = `/sections/${s.id}?render=${encodeURIComponent(s.id)}`;
+      // structural change: send now, then rebuild the panel from the saved section
+      const commit = async (files = [], msg = null) => {
+        await flushProps();
+        const out = await tedit(t, 'PATCH', path, imageForm(rows, layout, files), msg, { reload: false });
+        if (out && out.html) swapPreview(s.id, out.html);
+      };
+      const typed = () => queuePatch(t, s.id, () => imageForm(rows, layout), 600);
+      const replaceIn = (row) => h('input', { type: 'file', accept: IMG_ACCEPT, hidden: true, onchange: (e) => {
+        const f = e.target.files[0];
+        if (!f || !okImage(f)) return;
+        const i = rows.indexOf(row);
+        rows[i] = { file: 0, replaces: row.keep, alt: row.alt, href: row.href };
+        commit([f], 'Gambar diganti.');
+      } });
+      const addIn = h('input', { type: 'file', multiple: true, accept: IMG_ACCEPT, hidden: true, onchange: (e) => {
+        const files = [...e.target.files].filter(okImage).slice(0, 40 - rows.length);
+        e.target.value = '';
+        if (!files.length) return;
+        files.forEach((f, k) => rows.push({ file: k, alt: '', href: '' }));
+        commit(files, files.length > 1 ? `${files.length} gambar ditambahkan.` : 'Gambar ditambahkan.');
+      } });
+      const seg = h('div', { class: 'seg-btns', role: 'radiogroup', 'aria-label': 'Tata letak' },
+        [['stack', 'Tumpuk ke bawah'], ['slider', 'Slider']].map(([v, label]) => h('button', { type: 'button', role: 'radio', 'aria-checked': String(layout === v), text: label,
+          onclick: () => { if (layout === v) return; layout = v; commit([], v === 'slider' ? 'Jadi slider.' : 'Jadi tumpuk.'); } })));
+      const list = h('ul', { class: 'img-rows' }, rows.map((row, i) => {
+        const rep = replaceIn(row);
+        return h('li', { class: 'img-row' },
+          h('img', { class: 'img-thumb sm', src: row.thumb, alt: '' }),
+          h('div', { class: 'img-row-fields' },
+            h('input', { class: 'input', type: 'text', maxlength: 300, value: row.alt || '', placeholder: 'Deskripsi gambar (alt)', 'aria-label': `Deskripsi gambar ${i + 1}`, oninput: (e) => { row.alt = e.target.value; typed(); } }),
+            h('input', { class: 'input', type: 'text', maxlength: 1000, value: row.href || '', placeholder: 'Link saat diklik (opsional)', 'aria-label': `Link gambar ${i + 1}`, oninput: (e) => { row.href = e.target.value.trim(); typed(); } })),
+          h('div', { class: 'img-row-ctl' },
+            iconBtn('up', 'Naikkan', () => { rows.splice(i - 1, 0, rows.splice(i, 1)[0]); commit(); }, { class: 'sm', attrs: { disabled: i === 0 } }),
+            iconBtn('down', 'Turunkan', () => { rows.splice(i + 1, 0, rows.splice(i, 1)[0]); commit(); }, { class: 'sm', attrs: { disabled: i === rows.length - 1 } }),
+            iconBtn('swap', 'Ganti gambar', () => rep.click(), { class: 'sm' }),
+            iconBtn('trash', 'Hapus gambar', () => { if (rows.length === 1) { toast('Section gambar minimal berisi 1 gambar. Hapus section-nya lewat menu ⋮.', 'error'); return; } rows.splice(i, 1); commit([], 'Gambar dihapus.'); }, { class: 'sm danger' }),
+            rep));
+      }));
+      return [
+        panelHead(s, t, layout === 'slider' ? 'slider' : 'image', `Gambar${layout === 'slider' ? ' · slider' : ''} · ${rows.length} file`),
+        tplWarn(t),
+        h('div', { class: 'bp-row' }, h('span', { class: 'bp-label', text: 'Tata letak' }), seg),
+        h('div', { class: 'bp-row' }, h('span', { class: 'bp-label', text: 'Gambar' }), list,
+          dropZone(addIn, (fl) => { addIn.files = fl; addIn.dispatchEvent(new Event('change')); }, 'Tambah gambar', 'JPG, PNG, WebP, GIF, AVIF · maks 15 MB · otomatis dikompres & EXIF dihapus')),
+        spacingField(s, t),
+        footFor(t),
+      ];
+    }
+
+    // ---- HTML: code with live preview, .html upload, supporting images
+    function renderHtmlPanel(s, t = pageTarget) {
+      const path = `/sections/${s.id}?render=${encodeURIComponent(s.id)}`;
+      const code = h('textarea', { class: 'code-edit', spellcheck: false, 'aria-label': 'Kode HTML',
+        oninput: () => queuePatch(t, s.id, () => ({ code: code.value }), 1200),
+        onkeydown: (e) => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); queuePatch(t, s.id, () => ({ code: code.value }), 0); } } });
+      code.value = s.source || '';
+      const send = async (fd, msg) => {
+        await flushProps();
+        const out = await tedit(t, 'PATCH', path, fd, msg, { reload: false });
+        if (out && out.html) swapPreview(s.id, out.html);
+      };
+      const htmlIn = h('input', { type: 'file', accept: '.html,.htm,text/html', hidden: true, onchange: (e) => {
+        const f = e.target.files[0];
+        e.target.value = '';
+        if (!f) return;
+        if (!/\.html?$/i.test(f.name)) return toast('Pilih file .html', 'error');
+        if (f.size > 1024 * 1024) return toast('File HTML maksimal 1 MB.', 'error');
+        const fd = new FormData();
+        fd.append('htmlFile', f, f.name);
+        send(fd, `"${f.name}" dipakai.`);
+      } });
+      const assetIn = h('input', { type: 'file', multiple: true, accept: IMG_ACCEPT, hidden: true, onchange: (e) => {
+        const files = [...e.target.files].filter(okImage);
+        e.target.value = '';
+        if (!files.length) return;
+        const fd = new FormData();
+        fd.append('code', code.value);
+        for (const f of files) fd.append('assets', f, f.name);
+        send(fd, 'Gambar pendukung diunggah. Nama file yang sama di kode HTML otomatis memakai gambar ini.');
+      } });
+      return [
+        panelHead(s, t, 'code', 'HTML'),
+        tplWarn(t),
+        h('div', { class: 'bp-row' },
+          h('div', { class: 'code-head' }, h('span', { class: 'bp-label', text: 'Kode HTML' }), h('span', { class: 'fine', text: 'Preview ikut berubah saat berhenti mengetik · Ctrl+Enter = sekarang' })),
+          code,
+          h('ul', { class: 'html-notes', 'data-notes': s.id })),
+        h('div', { class: 'row-buttons' }, btn('Upload file .html', () => htmlIn.click(), 'btn-sm', 'upload'), btn('Gambar pendukung', () => assetIn.click(), 'btn-sm', 'image'), htmlIn, assetIn),
+        h('details', { class: 'bp-sec' }, h('summary', {}, icon('chevR'), h('span', { text: 'Diamankan otomatis' })),
+          h('ul', { class: 'fine html-rules' },
+            h('li', { text: 'Hanya isi <body> yang dipakai; <style> tetap dan hanya berlaku di section ini.' }),
+            h('li', { text: 'Script, iframe, form dan atribut on* dihapus. Video YouTube diubah jadi pemutar halaman.' }),
+            h('li', { text: 'Lebar konten dibatasi selebar halaman.' }))),
+        spacingField(s, t),
+        footFor(t),
+      ];
+    }
+
+    // ---- new Gambar / HTML: nothing is created until there is content
+    function renderNewPanel(type, t) {
+      const tpl = mode && mode.tpl;
+      const create = async (fd, msg) => {
+        const before = new Set(t.sections().map((x) => x.id));
+        fd.append('type', type);
+        fd.append('position', String(t.kind === 'page' ? insertPos() : t.sections().length));
+        const out = await tedit(t, 'POST', '/sections', fd, msg);
+        const added = out && t.sections().find((x) => !before.has(x.id));
+        if (added) { pulseNext = true; openEditor(added, { tpl, pulse: false }); }
+      };
+      const head = h('div', { class: 'bp-head' }, iconBtn('back', 'Batal (Esc)', closeMode), h('span', { class: 'bp-ic' }, icon(type === 'html' ? 'code' : 'image')),
+        h('div', { class: 'bp-title' }, h('b', { text: type === 'html' ? 'HTML baru' : 'Gambar baru' }), h('small', { text: t.kind === 'page' ? `Masuk ${insertWhere()}` : `Masuk ke template ${t.name()} (paling bawah)` })));
+      if (type === 'image') {
+        let layout = 'stack';
+        const addIn = h('input', { type: 'file', multiple: true, accept: IMG_ACCEPT, hidden: true, onchange: (e) => {
+          const files = [...e.target.files].filter(okImage).slice(0, 40);
+          e.target.value = '';
+          if (!files.length) return;
+          const fd = imageForm(files.map((f, k) => ({ file: k, alt: '', href: '' })), layout, files);
+          fd.append('name', files.length > 1 ? 'Section Gambar' : files[0].name.replace(/\.[a-z0-9]+$/i, '').slice(0, 60) || 'Section Gambar');
+          create(fd, 'Gambar ditambahkan.');
+        } });
+        const seg = h('div', { class: 'seg-btns', role: 'radiogroup', 'aria-label': 'Tata letak' },
+          [['stack', 'Tumpuk ke bawah'], ['slider', 'Slider']].map(([v, label]) => h('button', { type: 'button', role: 'radio', 'aria-checked': String(layout === v), text: label,
+            onclick: () => { layout = v; for (const b of seg.children) b.setAttribute('aria-checked', String(b.textContent === label)); } })));
+        return [head, tplWarn(t), h('div', { class: 'bp-row' }, h('span', { class: 'bp-label', text: 'Tata letak' }), seg),
+          dropZone(addIn, (fl) => { addIn.files = fl; addIn.dispatchEvent(new Event('change')); }, 'Pilih gambar', 'Bisa beberapa sekaligus · JPG, PNG, WebP, GIF, AVIF · maks 15 MB')];
+      }
+      const code = h('textarea', { class: 'code-edit', spellcheck: false, 'aria-label': 'Kode HTML', placeholder: '<div class="promo">…</div>\n<style>.promo{…}</style>' });
+      const htmlIn = h('input', { type: 'file', accept: '.html,.htm,text/html', hidden: true, onchange: (e) => {
+        const f = e.target.files[0];
+        if (f) f.text().then((txt) => { code.value = txt; });
+      } });
+      return [head, tplWarn(t),
+        h('div', { class: 'bp-row' }, h('span', { class: 'bp-label', text: 'Tempel kode HTML' }), code),
+        h('div', { class: 'row-buttons' }, btn('Atau upload file .html', () => htmlIn.click(), 'btn-sm', 'upload'), htmlIn),
+        h('div', { class: 'row-buttons' }, btn('Tambahkan', () => {
+          if (!code.value.trim()) return toast('Tempel kode HTML atau upload file .html.', 'error');
+          const fd = new FormData();
+          fd.append('name', 'Section HTML');
+          fd.append('code', code.value);
+          create(fd, 'Section HTML ditambahkan.');
+        }, 'btn-primary', 'plus'))];
+    }
+
+    // ---- a template block edited in place: its sections, publish / discard, with a clear "shared" warning
+    function tplSectionMenu(t, s, x, y) {
+      const secs = t.sections();
+      const i = secs.findIndex((v) => v.id === s.id);
+      contextMenu(x, y, [
+        { icon: s.visible ? 'eyeOff' : 'eye', label: s.visible ? 'Sembunyikan' : 'Perlihatkan', action: () => tedit(t, 'PATCH', `/sections/${s.id}`, { visible: !s.visible }, null) },
+        { icon: 'copy', label: 'Duplikat', action: () => tedit(t, 'POST', `/sections/${s.id}/duplicate`, undefined, 'Section diduplikat.') },
+        { icon: 'up', label: 'Naikkan', disabled: i <= 0, action: () => tplMove(t, i, -1) },
+        { icon: 'down', label: 'Turunkan', disabled: i < 0 || i >= secs.length - 1, action: () => tplMove(t, i, 1) },
+        '-',
+        { icon: 'trash', label: 'Hapus dari template', danger: true, action: async () => {
+          if (!(await confirmBox(`Hapus "${s.name}" dari template ${t.name()}? Semua halaman yang memakai template ini ikut kehilangan bagian ini setelah template dipublikasikan.`, { ok: 'Hapus', danger: true }))) return;
+          const out = await tedit(t, 'DELETE', `/sections/${s.id}`, undefined, 'Dihapus dari draft template.');
+          if (out && mode && mode.id === s.id) go({ view: 'tpl', ref: t.ref });
+        } },
+      ]);
+    }
+    function tplMove(t, i, dir) {
+      const ids = t.sections().map((s) => s.id);
+      const [id] = ids.splice(i, 1);
+      ids.splice(i + dir, 0, id);
+      return tedit(t, 'PUT', '/order', { ids }, null);
+    }
+    function renderTplPanel(refId) {
+      const t = tplTarget(refId);
+      if (!t) { mode = null; return renderKonten(); }
+      const doc = tplDocs[t.id];
+      if (!doc) { loadTpl(t.id).then((d) => { if (d && mode && mode.ref === refId) renderTab(); }); return [h('p', { class: 'fine', text: 'Memuat template…' })]; }
+      const dirty = Boolean(doc.draft && doc.draft.dirty);
+      const usedIn = doc.usedIn || [];
+      const name = h('input', { class: 'bp-name', type: 'text', maxlength: 160, value: doc.page.name, 'aria-label': 'Nama template',
+        onkeydown: (e) => { if (e.key === 'Enter') e.target.blur(); },
+        onchange: (e) => { const v = e.target.value.trim(); if (v && v !== doc.page.name) tedit(t, 'PATCH', '', { name: v }, null, { reload: false }); } });
+      const publishTpl = async () => {
+        const out = await run(() => api('POST', `${t.api}/publish`, { force: false }, { rev: doc.draft?.rev ?? null }));
+        if (!out) return;
+        t.apply(out, { reload: true });
+        if (templates[t.id]) templates[t.id] = { ...templates[t.id], dirty: false, sections: out.page.sections, updatedAt: out.published?.updatedAt };
+        toast(usedIn.length > 1 ? `Template dipublikasikan. ${usedIn.length} halaman ikut berubah.` : 'Template dipublikasikan.');
+      };
+      const discardTpl = async () => {
+        if (!(await confirmBox(`Buang semua perubahan draft template "${doc.page.name}"? Template kembali ke versi live.`, { ok: 'Buang', danger: true }))) return;
+        if (!(await run(() => api('POST', `${t.api}/discard`, undefined, { rev: doc.draft?.rev ?? null }), 'Perubahan template dibuang.'))) return;
+        delete tplDocs[t.id];
+        if (templates[t.id]) templates[t.id].dirty = false;
+        await loadTpl(t.id);
+        renderTab();
+        reloadPreview();
+      };
+      const secs = t.sections();
+      return [
+        h('div', { class: 'bp-head' },
+          iconBtn('back', 'Kembali ke daftar isi (Esc)', closeMode),
+          h('span', { class: 'bp-ic tpl' }, icon('layers')),
+          h('div', { class: 'bp-title' }, name, h('small', { text: `Template · ${secs.length} section` })),
+          h('a', { class: 'icon-btn', href: `/admin/templates/${t.id}`, target: '_blank', rel: 'noopener', title: 'Buka editor template penuh (tab baru)', 'aria-label': 'Buka editor template penuh' }, icon('external'))),
+        h('div', { class: 'tpl-warn strong' }, icon('layers'), h('div', {},
+          h('p', {}, 'Template ini tersambung ke ', h('b', { text: `${usedIn.length} halaman` }), '. Perubahan di sini tersimpan sebagai draft template dan tampil di preview ini; halaman live baru berubah setelah ', h('b', { text: 'Publikasikan template' }), '.'),
+          usedIn.length ? h('details', {}, h('summary', { text: 'Lihat halaman yang memakai' }), h('ul', {}, usedIn.map((p) => h('li', {}, h('a', { href: `/admin/pages/${p.slug}`, target: '_blank', rel: 'noopener', text: p.name }))))) : null)),
+        h('div', { class: `tpl-status${dirty ? ' dirty' : ''}`, role: 'status' }, h('span', { text: dirty ? 'Draft template belum live' : 'Template sama dengan versi live' }),
+          dirty ? btn('Buang', discardTpl, 'btn-sm btn-ghost') : null,
+          btn('Publikasikan template', publishTpl, 'btn-sm btn-primary', 'check')),
+        h('ol', { class: 'tpl-secs' }, secs.map((x, i) => h('li', { class: `tpl-sec${x.visible ? '' : ' is-hidden'}` },
+          h('button', { type: 'button', class: 'tpl-sec-main', disabled: x.type === 'promo', title: x.type === 'promo' ? 'Isi [PROMO] diatur di menu Promo' : 'Edit di panel ini',
+            onclick: () => openEditor(x, { tpl: refId }), onmouseenter: () => focusInPreview(x.id) },
+          h('span', { class: 'sub-num', text: String(i + 1) }),
+          icon(x.type === 'promo' ? 'lock' : x.type === 'html' ? 'code' : x.type === 'block' ? (blockDefs?.blocks[x.kind]?.icon || 'type') : x.layout === 'slider' ? 'slider' : 'image'),
+          h('span', { class: 'tpl-sec-name', text: x.name }), x.visible ? null : h('small', { text: 'disembunyikan' })),
+          iconBtn('more', `Menu ${x.name}`, (e) => { const r = e.currentTarget.getBoundingClientRect(); tplSectionMenu(t, x, r.left, r.bottom + 4); }, { class: 'sm' })))),
+        h('button', { type: 'button', class: 'add-block', onclick: () => openPicker(refId) },
+          icon('plus'), h('span', { class: 'add-label' }, h('b', { text: 'Tambah ke template' }), h('small', { text: 'Gambar, HTML, Teks, Tombol, FAQ…' }))),
+      ];
+    }
+
+    // One form row per schema field; showIf rows hide/show as the controlling value changes.
+    let uid = 0;
+    const HALF = new Set(['number', 'color', 'font', 'datetime']);
+    function fieldsForm(fields, obj, changed) {
+      const conds = [];
+      const sync = () => { for (const [row, [k, v]] of conds) row.hidden = obj[k] !== v; };
+      const onChange = () => { sync(); changed(); };
+      const rows = fields.map((f) => {
+        const id = `bp-${++uid}`;
+        const ctl = control(f, obj, onChange, id);
+        const half = !f.full && (HALF.has(f.t) || (f.t === 'select' && f.options.length > 3));
+        const row = f.t === 'toggle' ? h('div', { class: 'bp-row' }, ctl)
+          : f.t === 'group' ? h('div', { class: 'bp-row' }, ctl)
+            : h('div', { class: `bp-row${half ? ' half' : ''}` }, h('label', { class: 'bp-label', for: id, text: f.label }), ctl, f.hint ? h('small', { class: 'bp-hint', text: f.hint }) : null);
+        if (f.showIf) conds.push([row, f.showIf]);
+        return row;
+      });
+      sync();
+      return rows;
+    }
+
+    function control(f, obj, changed, id) {
+      const v = obj[f.k];
+      switch (f.t) {
+        case 'text': return h('input', { id, class: 'input', type: 'text', maxlength: f.max || 200, value: v ?? '', oninput: (e) => { obj[f.k] = e.target.value; changed(); } });
+        case 'textarea': {
+          const ta = h('textarea', { id, class: 'input', rows: 3, maxlength: f.max || 2000, oninput: (e) => { obj[f.k] = e.target.value; changed(); } });
+          ta.value = v ?? '';
+          return ta;
+        }
+        case 'rich': return richEditor(v, (html) => { obj[f.k] = html; changed(); }, f.label, id);
+        case 'number': {
+          // Sizes are relative to the page width (1/320): show what they become on a phone and on desktop.
+          const rel = f.unit === 'px';
+          const unit = rel ? h('span', { class: 'px-hint' }) : f.unit ? h('span', { text: f.unit }) : null;
+          const show = (n) => {
+            if (!rel) return;
+            const w = (page.settings && page.settings.maxWidth) || (global && global.maxWidth) || 480;
+            unit.textContent = `≈${Math.round((n * 375) / 320)}px HP`;
+            unit.title = `Ukuran ikut lebar layar: ≈${Math.round((n * 375) / 320)}px di HP (375px), ≈${Math.round((n * w) / 320)}px di desktop (${w}px).`;
+          };
+          show(Number(v ?? f.d ?? 0));
+          return h('div', { class: 'num-unit' },
+            h('input', { id, class: 'input', type: 'number', inputmode: 'decimal', min: f.min ?? 0, max: f.max ?? 1000, step: f.step || 1, value: v ?? f.d ?? 0,
+              oninput: (e) => { if (e.target.value === '' || !e.target.checkValidity()) return; obj[f.k] = Number(e.target.value); show(obj[f.k]); changed(); } }),
+            unit);
+        }
+        case 'color': {
+          const code = h('code', { text: v || (f.optional ? 'tidak ada' : '') });
+          const inp = h('input', { id, type: 'color', value: v || f.d || '#ffffff', 'aria-label': f.label,
+            oninput: (e) => { obj[f.k] = e.target.value; code.textContent = e.target.value; wrap.classList.remove('none'); changed(); } });
+          const wrap = h('div', { class: `bp-color${v ? '' : ' none'}` }, inp, code,
+            f.optional ? iconBtn('x', `Hapus ${f.label.toLowerCase()}`, () => { obj[f.k] = ''; code.textContent = 'tidak ada'; wrap.classList.add('none'); changed(); }, { class: 'sm' }) : null);
+          return wrap;
+        }
+        case 'select': {
+          if (f.options.length <= 3) {
+            const seg = h('div', { id, class: 'seg-btns', role: 'radiogroup', 'aria-label': f.label },
+              f.options.map(([val, label]) => h('button', { type: 'button', role: 'radio', 'aria-checked': String(String(v) === val), text: label,
+                onclick: () => { obj[f.k] = val; for (const b of seg.children) b.setAttribute('aria-checked', String(b.textContent === label)); changed(); } })));
+            return seg;
+          }
+          return h('select', { id, class: 'input', onchange: (e) => { obj[f.k] = e.target.value; changed(); } },
+            f.options.map(([val, label]) => h('option', { value: val, text: label, selected: String(v) === val })));
+        }
+        case 'toggle': {
+          const sw = h('button', { id, type: 'button', class: 'switch', role: 'switch', 'aria-checked': String(Boolean(v)), 'aria-label': f.label,
+            onclick: () => { obj[f.k] = !obj[f.k]; sw.setAttribute('aria-checked', String(obj[f.k])); changed(); } }, h('span'));
+          return h('div', { class: 'switch-wrap bp-toggle' }, sw, h('label', { for: id, text: f.label }));
+        }
+        case 'font': return h('select', { id, class: 'input', onchange: (e) => { obj[f.k] = e.target.value; changed(); } },
+          h('option', { value: '', text: 'Ikuti halaman', selected: !v }),
+          Object.entries(blockDefs.meta.fonts).map(([val, label]) => h('option', { value: val, text: label, selected: v === val })));
+        case 'icon': return iconPicker(f, obj, changed, id);
+        case 'datetime': return h('input', { id, class: 'input', type: 'datetime-local', value: (v || '').slice(0, 16), onchange: (e) => { obj[f.k] = e.target.value; changed(); } });
+        case 'link': return linkEditor(f, obj, changed, id);
+        case 'image': return imageEditor(f, obj, changed, id);
+        case 'images': return imagesEditor(f, obj, changed, id);
+        case 'items': return itemsEditor(f, obj, changed, id);
+        case 'group': {
+          obj[f.k] = obj[f.k] && typeof obj[f.k] === 'object' ? obj[f.k] : {};
+          return h('fieldset', { class: 'bp-fieldset' }, h('legend', { text: f.label }), fieldsForm(f.fields, obj[f.k], changed));
+        }
+        default: return h('span', { class: 'fine', text: '—' });
+      }
+    }
+
+    const NSVG = 'http://www.w3.org/2000/svg';
+    function pathIcon(d) {
+      const svg = document.createElementNS(NSVG, 'svg');
+      svg.setAttribute('viewBox', '0 0 24 24');
+      svg.setAttribute('class', 'i');
+      svg.setAttribute('aria-hidden', 'true');
+      const p = document.createElementNS(NSVG, 'path');
+      p.setAttribute('d', d || '');
+      svg.append(p);
+      return svg;
+    }
+    const ICON_NAMES = { check: 'Centang', star: 'Bintang', heart: 'Hati', leaf: 'Daun', shield: 'Perisai', truck: 'Truk', clock: 'Jam', gift: 'Hadiah', phone: 'Telepon', chat: 'Chat', fire: 'Api', bolt: 'Petir', smile: 'Senyum', award: 'Penghargaan', cart: 'Keranjang', wa: 'WhatsApp', arrow: 'Panah' };
+    function iconPicker(f, obj, changed, id) {
+      const opts = [...(f.none ? ['none'] : []), ...blockDefs.meta.icons];
+      const cur = () => obj[f.k] || (f.none ? 'none' : 'check');
+      const grid = h('div', { id, class: 'icon-grid', role: 'radiogroup', 'aria-label': f.label },
+        opts.map((name) => h('button', { type: 'button', role: 'radio', 'aria-checked': String(cur() === name), title: name === 'none' ? 'Tanpa ikon' : ICON_NAMES[name] || name, 'aria-label': name === 'none' ? 'Tanpa ikon' : ICON_NAMES[name] || name, dataset: { v: name },
+          onclick: () => { obj[f.k] = name; for (const b of grid.children) b.setAttribute('aria-checked', String(b.dataset.v === name)); changed(); } },
+        name === 'none' ? h('span', { class: 'none', text: 'Tanpa' }) : pathIcon(blockDefs.meta.paths[name]))));
+      return grid;
+    }
+
+    // ---- smart link (WhatsApp / CS Rotator / page / section / URL / phone / email / PDF)
+    const LINK_TYPES = [['none', 'Tidak ada'], ['wa', 'WhatsApp'], ['rotator', 'CS Rotator (bergiliran)'], ['page', 'Halaman lain'], ['section', 'Bagian di halaman ini'], ['url', 'Link / URL'], ['tel', 'Telepon'], ['email', 'Email'], ['file', 'File PDF']];
+    function linkEditor(f, obj, changed, id) {
+      if (!obj[f.k] || typeof obj[f.k] !== 'object') obj[f.k] = { type: 'none' };
+      const L = () => obj[f.k];
+      const box = h('div', { class: 'lk-fields' });
+      const sel = h('select', { id, class: 'input', onchange: (e) => { const old = L(); obj[f.k] = { type: e.target.value, ...(old.message ? { message: old.message } : {}) }; draw(); changed(); } },
+        LINK_TYPES.filter(([t]) => !f.only || f.only.includes(t)).map(([t, label]) => h('option', { value: t, text: label, selected: L().type === t })));
+      const sub = (label, ctl, hint) => h('label', { class: 'bp-sub' }, h('span', { text: label }), ctl, hint ? h('small', { class: 'bp-hint', text: hint }) : null);
+      const inp = (k, attrs = {}) => h('input', { class: 'input', type: 'text', value: L()[k] || '', oninput: (e) => { L()[k] = e.target.value; changed(); }, ...attrs });
+      const msg = (hint) => {
+        const ta = h('textarea', { class: 'input', rows: 2, maxlength: 500, placeholder: 'Halo kak, saya mau tanya…', oninput: (e) => { L().message = e.target.value; changed(); } });
+        ta.value = L().message || '';
+        return sub('Pesan otomatis', ta, hint);
+      };
+      const choose = (k, items, empty) => h('select', { class: 'input', onchange: (e) => { L()[k] = e.target.value; changed(); } },
+        h('option', { value: '', text: empty, selected: !L()[k] }), items.map(([val, label]) => h('option', { value: val, text: label, selected: L()[k] === val })));
+      function draw() {
+        const t = L().type;
+        const rotators = (global && global.rotators) || blockDefs.rotators || [];
+        const secs = page.sections.flatMap((s) => (s.type === 'template' ? (templates[s.template]?.sections || []) : [s])).filter((s) => s.visible !== false);
+        const parts = {
+          wa: () => [sub('Nomor WhatsApp', inp('phone', { inputmode: 'tel', placeholder: '0812xxxxxxx', maxlength: 30 }), 'Boleh 08…, 628… atau +62…'), msg()],
+          rotator: () => [
+            rotators.length ? sub('Grup CS', choose('rotator', rotators.map((r) => [r.id, r.name]), 'Pilih grup…'))
+              : h('p', { class: 'note', text: IS_TPL ? 'Belum ada CS Rotator. Buat di editor Page → tab Global.' : 'Belum ada CS Rotator. Buat dulu di tab Global → CS Rotator.' }),
+            msg('Kosongkan untuk memakai pesan default grup.')],
+          page: () => [sub('Halaman', choose('page', blockDefs.pages.map((p) => [p.slug, `${p.name} (/${p.slug})`]), 'Pilih halaman…'))],
+          section: () => [sub('Scroll ke', choose('section', secs.map((s) => [s.id, s.name]), 'Pilih bagian…'), 'Pengunjung di-scroll ke bagian itu.')],
+          url: () => [sub('Alamat link', inp('url', { type: 'url', placeholder: 'https://…', maxlength: 1000 }), 'Dibuka di tab baru bila ke situs lain.')],
+          tel: () => [sub('Nomor telepon', inp('phone', { inputmode: 'tel', placeholder: '0812xxxxxxx', maxlength: 30 }))],
+          email: () => [sub('Email', inp('email', { type: 'email', maxlength: 200, placeholder: 'nama@domain.com' })), sub('Subjek (opsional)', inp('subject', { maxlength: 200 }))],
+          file: () => {
+            const fileIn = h('input', { type: 'file', accept: 'application/pdf,.pdf', hidden: true, onchange: async (e) => {
+              const file = e.target.files[0];
+              e.target.value = '';
+              if (!file) return;
+              if (file.size > 10 * 1024 * 1024) { toast('PDF maksimal 10 MB.', 'error'); return; }
+              const fd = new FormData();
+              fd.append('pdfFile', file, file.name);
+              const out = await run(() => api('POST', P('/files'), fd), 'PDF diunggah.');
+              if (out) { L().file = out.file; draw(); changed(); }
+            } });
+            return [L().file ? h('div', { class: 'lk-file' }, icon('file'), h('a', { href: L().file, target: '_blank', rel: 'noopener', text: L().file.split('/').pop() })) : null,
+              h('div', { class: 'row-buttons' }, btn(L().file ? 'Ganti PDF' : 'Upload PDF', () => fileIn.click(), 'btn-sm', 'upload'), fileIn),
+              h('small', { class: 'bp-hint', text: 'Maks 10 MB. Dibuka di tab baru.' })];
+          },
+        };
+        box.replaceChildren(...(parts[t] ? parts[t]() : []).filter(Boolean));
+      }
+      draw();
+      return h('div', { class: 'lk' }, sel, box);
+    }
+
+    // ---- images
+    const IMG_ACCEPT = 'image/png,image/jpeg,image/webp,image/gif,image/avif';
+    const thumbOf = (img) => `${img.src}.${img.ext || 'webp'}`;
+    async function uploadImages(files) {
+      const fd = new FormData();
+      let n = 0;
+      for (const f of files) {
+        if (!/^image\/(png|jpeg|webp|gif|avif)$/.test(f.type)) { toast(`"${f.name}" bukan JPG/PNG/WebP/GIF/AVIF.`, 'error'); continue; }
+        if (f.size > 15 * 1024 * 1024) { toast(`"${f.name}" lebih dari 15 MB.`, 'error'); continue; }
+        fd.append('images', f, f.name);
+        n++;
+      }
+      if (!n) return null;
+      const out = await run(() => api('POST', P('/assets'), fd));
+      return out ? out.images : null;
+    }
+    function imageEditor(f, obj, changed, id) {
+      const box = h('div', { class: 'img-pick' });
+      const fileIn = h('input', { id, type: 'file', accept: IMG_ACCEPT, hidden: true, onchange: async (e) => {
+        const imgs = await uploadImages([...e.target.files]);
+        e.target.value = '';
+        if (imgs && imgs[0]) { obj[f.k] = { ...imgs[0], alt: obj[f.k]?.alt || '' }; draw(); changed(); }
+      } });
+      function draw() {
+        const img = obj[f.k];
+        box.replaceChildren(
+          img ? h('img', { class: 'img-thumb', src: thumbOf(img), alt: '' }) : h('button', { type: 'button', class: 'img-empty', onclick: () => fileIn.click() }, icon('upload'), h('span', { text: 'Upload gambar' })),
+          h('div', { class: 'img-side' },
+            img ? h('input', { class: 'input', type: 'text', maxlength: 300, value: img.alt || '', placeholder: 'Deskripsi gambar (alt)', 'aria-label': 'Deskripsi gambar', oninput: (e) => { img.alt = e.target.value; changed(); } }) : null,
+            h('div', { class: 'row-buttons' },
+              img ? btn('Ganti', () => fileIn.click(), 'btn-sm', 'swap') : null,
+              img ? btn('Hapus', () => { obj[f.k] = null; draw(); changed(); }, 'btn-sm btn-ghost', 'trash') : null)),
+          fileIn);
+      }
+      draw();
+      return box;
+    }
+    function imagesEditor(f, obj, changed, id) {
+      if (!Array.isArray(obj[f.k])) obj[f.k] = [];
+      const arr = obj[f.k];
+      const box = h('div', { class: 'imgs' });
+      const fileIn = h('input', { id, type: 'file', accept: IMG_ACCEPT, multiple: true, hidden: true, onchange: async (e) => {
+        const room = (f.max || 30) - arr.length;
+        const imgs = await uploadImages([...e.target.files].slice(0, room));
+        e.target.value = '';
+        if (imgs && imgs.length) { arr.push(...imgs); draw(); changed(); }
+      } });
+      const mv = (i, d) => { arr.splice(i + d, 0, arr.splice(i, 1)[0]); draw(); changed(); };
+      function draw() {
+        box.replaceChildren(
+          h('ul', { class: 'imgs-grid' }, arr.map((img, i) => h('li', {},
+            h('img', { src: thumbOf(img), alt: '' }),
+            h('div', { class: 'imgs-ctl' },
+              iconBtn('chevL', 'Geser ke kiri', () => mv(i, -1), { class: 'sm', attrs: { disabled: i === 0 } }),
+              iconBtn('chevR', 'Geser ke kanan', () => mv(i, 1), { class: 'sm', attrs: { disabled: i === arr.length - 1 } }),
+              iconBtn('trash', 'Hapus gambar', () => { arr.splice(i, 1); draw(); changed(); }, { class: 'sm danger' })),
+            h('input', { class: 'input', type: 'text', maxlength: 300, value: img.alt || '', placeholder: 'Deskripsi (alt)', 'aria-label': `Deskripsi gambar ${i + 1}`, oninput: (e) => { img.alt = e.target.value; changed(); } }))),
+          arr.length < (f.max || 30) ? h('li', {}, h('button', { type: 'button', class: 'img-empty', onclick: () => fileIn.click() }, icon('plus'), h('span', { text: 'Tambah' }))) : null),
+          fileIn);
+      }
+      draw();
+      return box;
+    }
+
+    // ---- repeatable items (FAQ, testimoni, poin, rekening)
+    function itemsEditor(f, obj, changed, id) {
+      if (!Array.isArray(obj[f.k])) obj[f.k] = [];
+      const arr = obj[f.k];
+      let openIdx = arr.length === 1 ? 0 : -1;
+      const box = h('div', { id, class: 'it-list' });
+      const titleOf = (it, i) => String(it.q || it.name || it.title || it.bank || '').replace(/<[^>]*>/g, '').trim() || `${f.label} ${i + 1}`;
+      const blank = () => Object.fromEntries(f.fields.map((x) => [x.k, x.d !== undefined ? structuredClone(x.d) : x.t === 'number' ? 0 : x.t === 'image' ? null : '']));
+      function draw() {
+        box.replaceChildren(
+          ...arr.map((it, i) => {
+            const title = h('span', { class: 'it-t', text: titleOf(it, i) });
+            const stop = (fn) => (e) => { e.preventDefault(); e.stopPropagation(); fn(); };
+            return h('details', { class: 'it-card', open: openIdx === i, ontoggle: (e) => { if (e.target.open) openIdx = i; } },
+              h('summary', {},
+                icon('chevR'), h('span', { class: 'it-n', text: String(i + 1) }), title,
+                h('span', { class: 'it-ctl' },
+                  iconBtn('up', 'Naikkan', stop(() => { arr.splice(i - 1, 0, arr.splice(i, 1)[0]); openIdx = i - 1; draw(); changed(); }), { class: 'sm', attrs: { disabled: i === 0 } }),
+                  iconBtn('down', 'Turunkan', stop(() => { arr.splice(i + 1, 0, arr.splice(i, 1)[0]); openIdx = i + 1; draw(); changed(); }), { class: 'sm', attrs: { disabled: i === arr.length - 1 } }),
+                  iconBtn('trash', 'Hapus', stop(() => { arr.splice(i, 1); openIdx = -1; draw(); changed(); }), { class: 'sm danger' }))),
+              h('div', { class: 'bp-form it-body' }, fieldsForm(f.fields, it, () => { title.textContent = titleOf(it, i); changed(); })));
+          }),
+          arr.length < (f.max || 30) ? h('button', { type: 'button', class: 'btn btn-sm it-add', onclick: () => { arr.push(blank()); openIdx = arr.length - 1; draw(); changed(); box.lastElementChild?.previousElementSibling?.querySelector('input, textarea, [contenteditable]')?.focus(); } }, icon('plus'), f.add || 'Tambah') : null);
+      }
+      draw();
+      return box;
+    }
+
+    // ---- rich text: a small toolbar over a contenteditable; output is cleaned here and sanitised again on the server
+    const RT_TAGS = new Set(['P', 'BR', 'H2', 'H3', 'H4', 'STRONG', 'EM', 'U', 'S', 'UL', 'OL', 'LI', 'A', 'SPAN', 'DIV', 'MARK', 'SMALL']);
+    const RT_RENAME = { B: 'strong', I: 'em', STRIKE: 's', DEL: 's', FONT: 'span' };
+    const FONT_EM = { 1: '0.75em', 2: '0.85em', 3: '1em', 4: '1.25em', 5: '1.5em', 6: '2em', 7: '2.5em' };
+    function safeCopy(src, doc) {
+      const out = doc.createDocumentFragment();
+      for (const n of src.childNodes) {
+        if (n.nodeType === 3) { out.append(doc.createTextNode(n.nodeValue)); continue; }
+        if (n.nodeType !== 1) continue;
+        const tag = RT_RENAME[n.tagName] ? RT_RENAME[n.tagName].toUpperCase() : n.tagName;
+        if (!RT_TAGS.has(tag)) { out.append(safeCopy(n, doc)); continue; }
+        const el = doc.createElement(tag.toLowerCase());
+        const style = [];
+        if (n.getAttribute('style')) for (const part of n.getAttribute('style').split(';')) {
+          const [k, ...rest] = part.split(':');
+          const prop = (k || '').trim().toLowerCase();
+          const val = rest.join(':').trim();
+          if (['color', 'background-color', 'font-size', 'text-align', 'font-weight'].includes(prop) && val && !/[<>"]|url\(|expression/i.test(val)) style.push(`${prop}: ${val}`);
+        }
+        if (n.tagName === 'FONT') {
+          if (n.getAttribute('color')) style.push(`color: ${n.getAttribute('color')}`);
+          if (FONT_EM[n.getAttribute('size')]) style.push(`font-size: ${FONT_EM[n.getAttribute('size')]}`);
+        }
+        if (style.length) el.setAttribute('style', style.join('; '));
+        if (tag === 'A') {
+          const href = n.getAttribute('href') || '';
+          if (/^(https?:|mailto:|tel:|#)/i.test(href)) el.setAttribute('href', href);
+        }
+        el.append(safeCopy(n, doc));
+        out.append(el);
+      }
+      return out;
+    }
+    function richEditor(value, onChange, label, id) {
+      const area = h('div', { id, class: 'rte-area', contenteditable: 'true', role: 'textbox', 'aria-multiline': 'true', 'aria-label': label, spellcheck: 'true' });
+      area.append(safeCopy(new DOMParser().parseFromString(`<body>${value || ''}</body>`, 'text/html').body, document));
+      const emit = () => {
+        // execCommand writes <font size=7> for our size picker: turn those into em sizes first.
+        for (const fnt of area.querySelectorAll('font[size="7"]')) { fnt.removeAttribute('size'); fnt.style.fontSize = area.dataset.size || '1em'; }
+        const tmp = document.createElement('div');
+        tmp.append(safeCopy(area, document));
+        onChange(tmp.innerHTML);
+      };
+      let saved = null;
+      const keep = () => { const sel = getSelection(); if (sel.rangeCount && area.contains(sel.anchorNode)) saved = sel.getRangeAt(0).cloneRange(); };
+      const restore = () => { area.focus(); if (saved) { const sel = getSelection(); sel.removeAllRanges(); sel.addRange(saved); } };
+      const cmd = (c, v = null, css = false) => { restore(); document.execCommand('styleWithCSS', false, css); document.execCommand(c, false, v); emit(); keep(); };
+      const tb = (ic, label2, fn) => h('button', { type: 'button', class: 'rte-b', title: label2, 'aria-label': label2, onmousedown: (e) => e.preventDefault(), onclick: fn }, icon(ic));
+      const block = h('select', { class: 'rte-sel', 'aria-label': 'Jenis teks', onmousedown: keep,
+        onchange: (e) => { cmd('formatBlock', e.target.value); e.target.value = ''; } },
+      h('option', { value: '', text: 'Gaya', disabled: true, selected: true }), h('option', { value: 'p', text: 'Paragraf' }), h('option', { value: 'h2', text: 'Judul besar' }), h('option', { value: 'h3', text: 'Judul' }), h('option', { value: 'h4', text: 'Sub judul' }));
+      const size = h('select', { class: 'rte-sel', 'aria-label': 'Ukuran teks terpilih', onmousedown: keep,
+        onchange: (e) => { area.dataset.size = e.target.value; cmd('fontSize', '7'); e.target.value = ''; } },
+      h('option', { value: '', text: 'Ukuran', disabled: true, selected: true }), [['0.8em', 'Kecil'], ['1em', 'Normal'], ['1.25em', 'Besar'], ['1.6em', 'Lebih besar'], ['2.2em', 'Sangat besar']].map(([v, l]) => h('option', { value: v, text: l })));
+      const colorIn = h('input', { type: 'color', value: '#e3262f', 'aria-label': 'Warna teks terpilih', onpointerdown: keep, onchange: (e) => cmd('foreColor', e.target.value) });
+      const markIn = h('input', { type: 'color', value: '#fff3b0', 'aria-label': 'Stabilo teks terpilih', onpointerdown: keep, onchange: (e) => cmd('hiliteColor', e.target.value, true) });
+      const bar = h('div', { class: 'rte-bar', role: 'toolbar', 'aria-label': `Format ${label}` },
+        block, size,
+        tb('bold', 'Tebal (Ctrl+B)', () => cmd('bold')), tb('italic', 'Miring (Ctrl+I)', () => cmd('italic')), tb('underline', 'Garis bawah (Ctrl+U)', () => cmd('underline')),
+        h('label', { class: 'rte-color', title: 'Warna teks', onpointerdown: keep }, icon('textColor'), colorIn),
+        h('label', { class: 'rte-color', title: 'Stabilo', onpointerdown: keep }, icon('marker'), markIn),
+        h('span', { class: 'rte-sep' }),
+        tb('alignL', 'Rata kiri', () => cmd('justifyLeft', null, true)), tb('alignC', 'Rata tengah', () => cmd('justifyCenter', null, true)), tb('alignR', 'Rata kanan', () => cmd('justifyRight', null, true)),
+        tb('list', 'Daftar titik', () => cmd('insertUnorderedList')), tb('listOl', 'Daftar nomor', () => cmd('insertOrderedList')),
+        tb('link', 'Tambah link', async () => {
+          keep();
+          const url = await promptBox('Tambah link', 'Alamat (https://…, wa.me/…, #bagian)', 'https://', { ok: 'Pasang', maxlength: 1000 });
+          if (!url || url === 'https://') return;
+          const href = /^(https?:|mailto:|tel:|#)/i.test(url) ? url : `https://${url.replace(/^\/+/, '')}`;
+          cmd('createLink', href);
+        }),
+        tb('eraser', 'Hapus format', () => { cmd('removeFormat'); cmd('unlink'); }));
+      area.addEventListener('input', emit);
+      area.addEventListener('keyup', keep);
+      area.addEventListener('mouseup', keep);
+      area.addEventListener('blur', keep);
+      area.addEventListener('paste', (e) => { e.preventDefault(); document.execCommand('insertText', false, e.clipboardData.getData('text/plain')); });
+      area.addEventListener('drop', (e) => e.preventDefault());
+      area.addEventListener('focus', () => document.execCommand('defaultParagraphSeparator', false, 'p'), { once: true });
+      return h('div', { class: 'rte' }, bar, area);
+    }
+
     // ============================================================ tab: Desain
     function renderDesain() {
       const st = page.settings;
@@ -1440,7 +2878,7 @@
       const go = async () => {
         if (!ta.value.trim()) return toast('Tempel kode atau pilih file.', 'error');
         if (!(await confirmBox('Isi halaman ini (section, desain, SEO) akan diganti dengan hasil impor. URL halaman tetap. Bisa dibatalkan dengan Undo. Lanjutkan?', { ok: 'Impor' }))) return;
-        const out = await edit('POST', P('/import'), { code: ta.value }, 'Impor berhasil. Periksa lalu Simpan.');
+        const out = await edit('POST', P('/import'), { code: ta.value }, 'Impor berhasil. Periksa lalu Publikasikan.');
         if (out) d.close();
       };
       const d = dialog({
@@ -1499,17 +2937,58 @@
           fd.append('images', f, f.name);
           await edit('POST', P('/favicon'), fd, 'Favicon diunggah.', { reload: false });
         } });
+      // CS Rotator: each group gets its own /go/wa/<id> link; visitors are sent to the numbers in turn.
+      const rs = structuredClone(global.rotators || []);
+      const saveRot = (msg) => setG({ rotators: rs }, msg);
+      const rotList = h('div', { class: 'rot-list' }, rs.map((r, i) => {
+        const nums = h('textarea', { class: 'input', rows: 3, 'aria-label': `Nomor WhatsApp ${r.name}`, placeholder: '0812xxxxxxx\n0813xxxxxxx',
+          onchange: (e) => { r.numbers = e.target.value.split(/[\n,;]+/).map((x) => x.trim()).filter(Boolean); saveRot('Nomor CS diperbarui.'); } });
+        nums.value = r.numbers.join('\n');
+        const msg = h('textarea', { class: 'input', rows: 2, maxlength: 500, 'aria-label': `Pesan default ${r.name}`, placeholder: 'Halo kak, saya mau pesan…',
+          onchange: (e) => { r.message = e.target.value; saveRot('Pesan default diperbarui.'); } });
+        msg.value = r.message || '';
+        return h('div', { class: 'rot-card' },
+          h('div', { class: 'rot-head' },
+            h('input', { class: 'input', type: 'text', maxlength: 60, value: r.name, 'aria-label': 'Nama grup', onchange: (e) => { r.name = e.target.value.trim() || r.name; saveRot('Nama grup diubah.'); } }),
+            iconBtn('trash', `Hapus ${r.name}`, async () => {
+              if (!(await confirmBox(`Hapus grup "${r.name}"? Tombol yang memakai grup ini akan berhenti berfungsi sampai diganti.`, { ok: 'Hapus', danger: true }))) return;
+              rs.splice(i, 1);
+              saveRot('Grup CS dihapus.');
+            }, { class: 'danger' })),
+          h('label', { class: 'bp-sub' }, h('span', {}, 'Nomor WhatsApp ', h('span', { class: 'hint', text: `(${r.numbers.length} nomor, satu per baris)` })), nums),
+          h('label', { class: 'bp-sub' }, h('span', { text: 'Pesan default' }), msg),
+          h('small', { class: 'bp-hint', text: `Link: ${location.origin}/go/wa/${r.id}` }));
+      }));
+      const pix = (key, label, ph, re, help) => h('label', { class: 'field' }, h('span', {}, label, h('span', { class: 'hint', text: ` ${help}` })),
+        h('input', { type: 'text', maxlength: 40, value: global[key] || '', placeholder: ph, spellcheck: false, autocapitalize: 'off',
+          onchange: (e) => {
+            const v = e.target.value.trim();
+            if (v && !re.test(v)) { toast(`Format ${label} tidak valid (contoh: ${ph}).`, 'error'); e.target.value = global[key] || ''; return; }
+            setG({ [key]: v }, v ? `${label} diisi (berlaku setelah Publikasikan).` : `${label} dimatikan.`);
+          } }));
       return [
-        h('p', { class: 'note', text: 'Pengaturan global adalah default untuk semua halaman. Berlaku setelah Simpan.' }),
+        h('p', { class: 'note', text: 'Pengaturan global adalah default untuk semua halaman. Berlaku setelah Publikasikan.' }),
         h('div', { class: 'row' }, field('Lebar Halaman (Default)', width), field('Jenis Font', font)),
         h('label', { class: 'field' }, h('span', {}, 'Google Analytics 4', h('span', { class: 'hint', text: ' (Measurement ID, contoh G-AB12CD34EF; kosongkan untuk mematikan)' })),
           h('input', { type: 'text', maxlength: 20, value: global.ga4Id || '', placeholder: 'G-XXXXXXXXXX', autocapitalize: 'characters', spellcheck: false,
-            onchange: (e) => { const v = e.target.value.trim().toUpperCase(); if (v && !/^G-[A-Z0-9]{4,15}$/.test(v)) { toast('Format ID harus G-XXXXXXXX.', 'error'); return; } setG({ ga4Id: v }, v ? 'GA4 diaktifkan (berlaku setelah Simpan).' : 'GA4 dimatikan.'); } })),
+            onchange: (e) => { const v = e.target.value.trim().toUpperCase(); if (v && !/^G-[A-Z0-9]{4,15}$/.test(v)) { toast('Format ID harus G-XXXXXXXX.', 'error'); return; } setG({ ga4Id: v }, v ? 'GA4 diaktifkan (berlaku setelah Publikasikan).' : 'GA4 dimatikan.'); } })),
         h('h2', { class: 'sub', text: 'Favicon' }),
         h('div', { class: 'thumb-box fav' }, global.favicon ? h('img', { src: global.favicon, alt: 'Favicon' }) : h('span', { class: 'fine', text: 'Tidak ada favicon' })),
         h('div', { class: 'row-buttons' },
           btn('Upload', () => favIn.click(), '', 'upload'),
           global.favicon ? btn('Hapus', () => setG({ favicon: '' }, 'Favicon dihapus.'), 'btn-danger', 'trash') : null, favIn),
+        h('h2', { class: 'sub', text: 'CS Rotator' }),
+        h('p', { class: 'fine', text: 'Bagi chat WhatsApp ke beberapa admin secara bergiliran: pengunjung pertama ke nomor 1, berikutnya ke nomor 2, dan seterusnya. Pakai di Tombol → Tujuan: CS Rotator.' }),
+        rotList,
+        rs.length ? h('p', { class: 'fine' }, h('a', { href: '/admin/reports?tab=cs', target: '_blank', rel: 'noopener', text: 'Lihat jumlah chat per nomor di Laporan →' })) : null,
+        rs.length < 20 ? btn('Tambah grup CS', () => { rs.push({ id: '', name: `CS ${rs.length + 1}`, numbers: [], message: '' }); saveRot('Grup CS ditambahkan. Isi nomornya.'); }, 'btn-sm', 'plus') : null,
+        h('h2', { class: 'sub', text: 'Pixel iklan' }),
+        h('p', { class: 'fine', text: 'Untuk mengukur iklan Meta, TikTok dan Google. Pixel baru aktif setelah pengunjung menekan "Setuju" pada pemberitahuan cookie (sesuai UU PDP). Tombol dengan "Event iklan" mengirim event saat diklik.' }),
+        pix('fbPixelId', 'Meta (Facebook) Pixel ID', '123456789012345', /^d{8,20}$/, '(angka saja)'),
+        pix('tiktokPixelId', 'TikTok Pixel ID', 'C1ABCDEF2GHIJ3KLMNO', /^[A-Z0-9]{10,30}$/i, ''),
+        h('div', { class: 'row' },
+          pix('gadsId', 'Google Ads ID', 'AW-123456789', /^AW-d{6,15}$/i, ''),
+          pix('gadsLabel', 'Label konversi', 'AbCdEfGh123', /^[w-]{4,40}$/, '(opsional)')),
       ];
     }
 
@@ -1527,14 +3006,14 @@
         ].filter(Boolean).join(' · ');
         box.replaceChildren(
           h('h2', { class: 'sub', text: 'Versi tersimpan' }),
-          h('p', { class: 'fine', text: 'Setiap kali Simpan, versi sebelumnya dicadangkan (50 terakhir). "Muat" memasukkan versi itu ke draft; klik Simpan untuk mempublikasikannya.' }),
+          h('p', { class: 'fine', text: 'Setiap kali Publikasikan, versi sebelumnya dicadangkan (50 terakhir). "Muat" memasukkan versi itu ke draft; klik Publikasikan untuk menayangkannya lagi.' }),
           historyData.versions.length
             ? h('ul', { class: 'history' }, historyData.versions.map((v) => h('li', {},
               h('div', {}, h('strong', { text: fmtDate(v.savedAt || new Date(v.ts).toISOString()) }), h('br'),
                 h('small', { text: `${v.sections} section${v.by ? ` · oleh ${v.by}` : ''}` })),
               btn('Muat ke draft', async () => {
                 if (!(await confirmBox('Muat versi ini ke draft? Bisa dibatalkan dengan Undo.'))) return;
-                edit('POST', P(`/history/${v.ts}/restore`), undefined, 'Versi dimuat ke draft. Klik Simpan untuk mempublikasikan.');
+                edit('POST', P(`/history/${v.ts}/restore`), undefined, 'Versi dimuat ke draft. Klik Publikasikan untuk menayangkannya.');
               }, 'btn-sm'))))
             : h('p', { class: 'empty', text: 'Belum ada versi tersimpan.' }),
           h('h2', { class: 'sub', text: 'Aktivitas halaman ini' }),
@@ -1561,173 +3040,6 @@
       if (idx >= 0) panel.querySelectorAll(sel)[idx]?.focus({ preventScroll: true });
     }
 
-    // ============================================================ section dialog (create / edit)
-    function sectionDialog(sec) {
-      if (anyDialogOpen()) return;
-      const isNew = !sec;
-      let type = sec ? sec.type : 'image';
-      const name = h('input', { type: 'text', maxlength: 120, value: sec ? sec.name : '', placeholder: 'mis. Slider Event, Testimoni' });
-      const mt = h('input', { type: 'number', min: -200, max: 400, step: 1, value: sec ? sec.mt : 0 });
-      const selIndex = page.sections.findIndex((s) => s.id === selected);
-      const position = h('select', {},
-        h('option', { value: String(page.sections.length), text: 'Di paling bawah' }),
-        h('option', { value: '0', text: 'Di paling atas' }),
-        selIndex >= 0 ? h('option', { value: String(selIndex + 1), text: `Setelah "${page.sections[selIndex].name}"`, selected: true }) : null);
-
-      // -- image tab
-      const files = [];
-      const rows = sec && sec.type === 'image' ? sec.items.map((it, i) => ({ keep: i, alt: it.alt, href: it.href, thumb: `${it.src}.${it.ext || 'webp'}` })) : [];
-      const layoutStack = h('input', { type: 'radio', name: 'layout', value: 'stack', checked: !sec || sec.layout !== 'slider' });
-      const layoutSlider = h('input', { type: 'radio', name: 'layout', value: 'slider', checked: Boolean(sec && sec.layout === 'slider') });
-      const itemList = h('ul', { class: 'items' });
-      const readThumb = (file, row) => {
-        const fr = new FileReader();
-        fr.onload = () => { row.thumb = fr.result; renderItems(); };
-        fr.readAsDataURL(file);
-      };
-      function addFiles(fileList, replaceRow) {
-        for (const f of fileList) {
-          if (!/^image\/(png|jpeg|webp|gif|avif)$/.test(f.type)) { toast(`"${f.name}" bukan JPG/PNG/WebP/GIF/AVIF.`, 'error'); continue; }
-          if (f.size > 15 * 1024 * 1024) { toast(`"${f.name}" lebih dari 15 MB.`, 'error'); continue; }
-          files.push(f);
-          if (replaceRow) {
-            replaceRow.replaces = replaceRow.keep ?? replaceRow.replaces;
-            delete replaceRow.keep;
-            replaceRow.file = files.length - 1;
-            replaceRow.isNew = true;
-            readThumb(f, replaceRow);
-            break;
-          }
-          const row = { file: files.length - 1, alt: '', href: '', thumb: '', isNew: true };
-          rows.push(row);
-          readThumb(f, row);
-        }
-        renderItems();
-      }
-      function renderItems() {
-        itemList.replaceChildren(...rows.map((row, i) => {
-          const alt = h('input', { class: 'input', type: 'text', maxlength: 300, value: row.alt || '', placeholder: 'Teks alternatif (deskripsi gambar)', 'aria-label': `Teks alternatif gambar ${i + 1}`, oninput: (e) => { row.alt = e.target.value; } });
-          const href = h('input', { class: 'input', type: 'url', maxlength: 1000, value: row.href || '', placeholder: 'Link saat diklik (opsional), mis. https://wa.me/62…', 'aria-label': `Link gambar ${i + 1}`, oninput: (e) => { row.href = e.target.value; } });
-          const replaceInput = h('input', { type: 'file', accept: 'image/png,image/jpeg,image/webp,image/gif,image/avif', hidden: true, onchange: (e) => addFiles(e.target.files, row) });
-          return h('li', { class: 'item' },
-            h('img', { class: 'thumb', src: row.thumb || 'data:image/gif;base64,R0lGODlhAQABAAAAACw=', alt: '' }),
-            h('div', { class: 'fields' }, row.isNew ? h('span', { class: 'new', text: 'BARU — akan diproses saat disimpan' }) : null, alt, href),
-            h('div', { class: 'ctl' },
-              iconBtn('up', 'Naikkan gambar', () => { rows.splice(i - 1, 0, rows.splice(i, 1)[0]); renderItems(); }, { attrs: { disabled: i === 0 } }),
-              iconBtn('down', 'Turunkan gambar', () => { rows.splice(i + 1, 0, rows.splice(i, 1)[0]); renderItems(); }, { attrs: { disabled: i === rows.length - 1 } }),
-              iconBtn('swap', 'Ganti gambar', () => replaceInput.click()),
-              iconBtn('trash', 'Hapus gambar', () => { rows.splice(i, 1); renderItems(); }, { class: 'danger' }),
-              replaceInput));
-        }));
-      }
-      renderItems();
-      const imgInput = h('input', { type: 'file', multiple: true, accept: 'image/png,image/jpeg,image/webp,image/gif,image/avif', onchange: (e) => { addFiles(e.target.files); e.target.value = ''; } });
-      const imagePanel = h('div', { role: 'tabpanel', id: 'tp-image' },
-        h('div', { class: 'field' }, h('span', { text: 'Tata letak' }),
-          h('div', { class: 'seg' }, h('label', {}, layoutStack, 'Tumpuk ke bawah'), h('label', {}, layoutSlider, 'Slider'))),
-        itemList, dropZone(imgInput, (fl) => addFiles(fl), 'Tambah gambar', 'JPG, PNG, WebP, GIF, AVIF · maks 15 MB per file'),
-        h('p', { class: 'fine', text: 'Gambar otomatis disesuaikan dengan lebar halaman (berapa pun lebar aslinya), dikonversi ke WebP/AVIF, dan metadata lokasi/EXIF dihapus.' }));
-
-      // -- html tab
-      const original = sec && sec.type === 'html' ? sec.source || '' : '';
-      const code = h('textarea', { spellcheck: false, 'aria-label': 'Kode HTML', placeholder: '<div class="promo">…</div>\n<style>.promo{…}</style>' });
-      code.value = original;
-      let htmlFile = null;
-      const assetFiles = [];
-      const htmlName = h('span', { class: 'fine' });
-      const assetNames = h('span', { class: 'fine' });
-      const htmlInput = h('input', { type: 'file', accept: '.html,.htm,text/html', onchange: (e) => setHtml(e.target.files[0]) });
-      function setHtml(f) {
-        if (!f) return;
-        if (!/\.html?$/i.test(f.name)) return toast('Pilih file .html', 'error');
-        if (f.size > 1024 * 1024) return toast('File HTML maksimal 1 MB.', 'error');
-        htmlFile = f;
-        htmlName.textContent = `Dipilih: ${f.name} (menggantikan kode di bawah)`;
-        f.text().then((t) => { code.value = t; });
-      }
-      const assetInput = h('input', { type: 'file', multiple: true, accept: 'image/png,image/jpeg,image/webp,image/gif,image/avif', onchange: (e) => setAssets(e.target.files) });
-      function setAssets(fl) {
-        for (const f of fl) if (/^image\//.test(f.type) && f.type !== 'image/svg+xml') assetFiles.push(f);
-        assetNames.textContent = assetFiles.length ? `Gambar pendukung: ${assetFiles.map((f) => f.name).join(', ')}` : '';
-      }
-      const htmlPanel = h('div', { role: 'tabpanel', id: 'tp-html', hidden: true },
-        h('div', { class: 'row' },
-          h('div', { class: 'field' }, h('span', { text: 'File HTML' }), dropZone(htmlInput, (fl) => setHtml(fl[0]), 'Upload file .html', 'maks 1 MB'), htmlName),
-          h('div', { class: 'field' }, h('span', { text: 'Gambar pendukung (opsional)' }), dropZone(assetInput, setAssets, 'Upload gambar', 'nama file sama dengan di HTML'), assetNames)),
-        h('label', { class: 'field' }, h('span', { text: 'Kode HTML' }, h('span', { class: 'hint', text: ' — bisa diedit langsung' })), code),
-        h('div', { class: 'note' }, 'Otomatis diamankan saat disimpan:',
-          h('ul', {},
-            h('li', { text: 'Hanya isi <body> yang dipakai; <html>, <head>, <body> dibuang. <style> dipertahankan dan hanya berlaku di section ini.' }),
-            h('li', { text: 'Script, iframe, form dan atribut on* dihapus. Video YouTube diubah jadi pemutar halaman.' }),
-            h('li', { text: 'Lebar konten dibatasi selebar halaman.' }))));
-
-      const tabImage = h('button', { type: 'button', role: 'tab', class: 'tab', id: 't-image', 'aria-controls': 'tp-image' }, icon('image'), 'Gambar');
-      const tabHtml = h('button', { type: 'button', role: 'tab', class: 'tab', id: 't-html', 'aria-controls': 'tp-html' }, icon('code'), 'HTML');
-      const typeWarn = h('p', { class: 'alert', hidden: true, text: 'Mengganti tipe akan mengganti seluruh isi section ini saat disimpan.' });
-      function setType(t) {
-        type = t;
-        tabImage.setAttribute('aria-selected', String(t === 'image'));
-        tabHtml.setAttribute('aria-selected', String(t === 'html'));
-        tabImage.tabIndex = t === 'image' ? 0 : -1;
-        tabHtml.tabIndex = t === 'html' ? 0 : -1;
-        imagePanel.hidden = t !== 'image';
-        htmlPanel.hidden = t !== 'html';
-        typeWarn.hidden = isNew || t === sec.type;
-      }
-      tabImage.addEventListener('click', () => setType('image'));
-      tabHtml.addEventListener('click', () => setType('html'));
-      const tablist = h('div', { class: 'tabs', role: 'tablist', 'aria-label': 'Jenis konten',
-        onkeydown: (e) => { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { setType(type === 'image' ? 'html' : 'image'); (type === 'image' ? tabImage : tabHtml).focus(); } } }, tabImage, tabHtml);
-      setType(type);
-
-      const prevIds = new Set(page.sections.map((s) => s.id));
-      async function save() {
-        const fd = new FormData();
-        fd.append('name', name.value);
-        fd.append('mt', mt.value || '0');
-        if (isNew) fd.append('position', position.value);
-        fd.append('type', type);
-        if (type === 'image') {
-          if (!rows.length) return toast('Tambahkan minimal satu gambar.', 'error');
-          fd.append('layout', layoutSlider.checked ? 'slider' : 'stack');
-          const used = [];
-          const entries = rows.map((r) => {
-            const e = { alt: r.alt || '', href: r.href || '' };
-            if (r.file != null) { e.file = used.length; used.push(files[r.file]); if (r.replaces != null) e.replaces = r.replaces; } else e.keep = r.keep;
-            return e;
-          });
-          fd.append('items', JSON.stringify(entries));
-          for (const f of used) fd.append('images', f, f.name);
-        } else {
-          const changed = htmlFile || code.value !== original || isNew || sec.type !== 'html';
-          if (changed) {
-            if (!code.value.trim() && !htmlFile) return toast('Upload file .html atau tempel kode HTML.', 'error');
-            if (htmlFile) fd.append('htmlFile', htmlFile, htmlFile.name);
-            else fd.append('code', code.value);
-            for (const f of assetFiles) fd.append('assets', f, f.name);
-          }
-        }
-        const out = await edit(isNew ? 'POST' : 'PATCH', isNew ? P('/sections') : P(`/sections/${sec.id}`), fd, isNew ? 'Section ditambahkan.' : 'Section disimpan.', { pulse: true });
-        if (out) {
-          d.close();
-          const id = isNew ? (out.page.sections.find((s) => !prevIds.has(s.id)) || {}).id : sec.id;
-          if (id) { selected = id; sessionStorage.setItem(`sel:${SLUG}`, id); renderList(); }
-        }
-      }
-
-      const d = dialog({
-        title: isNew ? 'Tambah section' : `Edit: ${sec.name}`,
-        body: h('form', { onsubmit: (e) => { e.preventDefault(); save(); } },
-          h('div', { class: 'row' },
-            field('Nama section', name),
-            h('label', { class: 'field' }, h('span', {}, 'Jarak atas', h('span', { class: 'hint', text: ' (lebar halaman = 320)' })), mt),
-            isNew ? field('Posisi', position) : null),
-          tablist, typeWarn, imagePanel, htmlPanel),
-        foot: [btn('Batal', () => d.close()), btn(isNew ? 'Tambah' : 'Simpan', save, 'btn-primary')],
-      });
-      name.focus();
-    }
-
     function dropZone(input, onFiles, label, hint) {
       const z = h('label', { class: 'file-drop' }, icon('upload'), h('span', {}, h('strong', { text: label }), ' atau tarik file ke sini'), h('span', { class: 'fine', text: hint }), input);
       z.addEventListener('dragover', (e) => { e.preventDefault(); z.classList.add('drag'); });
@@ -1737,11 +3049,12 @@
     }
 
     // ---- boot
-    const data = await run(() => api('GET', P()));
+    const [data, defs] = await Promise.all([run(() => api('GET', P())), api('GET', '/admin/api/blocks').catch(() => null)]);
     if (!data) return;
+    blockDefs = defs;
     setState(data, { reload: false });
     setTab(tab);
-    requestAnimationFrame(fitPhone);
+    requestAnimationFrame(() => setDevice(device));
   }
 
   // ============================================================ PROMO
@@ -1941,5 +3254,9 @@
     if (data) render();
   }
 
-  ({ dashboard: viewDashboard, reports: viewReports, pages: viewPages, editor: viewEditor, promo: viewPromo })[VIEW]?.();
+  // Shared helpers for the Produk views (public/admin/shop.js, loaded after this file).
+  window.MBA = { h, icon, ICONS, iconBtn, btn, field, api, run, toast, busy, dialog, confirmBox, choiceBox, promptBox, contextMenu, closeMenu,
+    layout, subtabs, nf, fmtDate, dLabel, lineChart, slugify, isTyping, EMAIL };
+
+  ({ dashboard: viewDashboard, reports: viewReports, pages: viewPages, homepage: viewHomepage, distributors: viewDistributors, templates: viewTemplates, editor: viewEditor, promo: viewPromo })[VIEW]?.();
 })();

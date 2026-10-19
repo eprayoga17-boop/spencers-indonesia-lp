@@ -217,3 +217,52 @@ export function sanitizeSection(input, { scope, assets = new Map() } = {}) {
   const source = (rawCss ? `<style>\n${rawCss.replace(/<\/style/gi, '')}\n</style>\n` : '') + clean.trim();
   return { html, source, removed: [...removed] };
 }
+
+/**
+ * Product descriptions from the rich-text editor: a small allowlist (headings, bold/italic/underline/strike,
+ * lists, links, images, line breaks). No classes, ids, styles or scripts. Images only from our uploads or https.
+ */
+export function sanitizeRich(input) {
+  return sanitizeHtml(String(input || ''), {
+    allowedTags: ['p', 'br', 'h2', 'h3', 'h4', 'strong', 'b', 'em', 'i', 'u', 's', 'strike', 'ul', 'ol', 'li', 'a', 'img', 'blockquote', 'hr', 'div', 'span'],
+    allowedAttributes: { a: ['href', 'target', 'rel'], img: ['src', 'alt', 'width', 'height', 'loading'] },
+    allowedSchemes: ['http', 'https', 'mailto', 'tel'],
+    allowedSchemesByTag: { img: ['https'] },
+    allowProtocolRelative: false,
+    disallowedTagsMode: 'discard',
+    transformTags: {
+      b: 'strong', i: 'em', strike: 's',
+      a: (tagName, attribs) => ({ tagName, attribs: { href: attribs.href, ...(attribs.target === '_blank' ? { target: '_blank', rel: 'noopener noreferrer' } : {}) } }),
+      img: (tagName, attribs) => ({ tagName, attribs: { ...attribs, loading: 'lazy' } }),
+    },
+    exclusiveFilter: (frame) => frame.tag === 'img' && !/^(\/uploads\/[\w./-]+|https:\/\/)/.test(frame.attribs.src || ''),
+  }).trim();
+}
+
+/**
+ * Text from the element editor (Teks, FAQ answers, popup text…): basic formatting plus colour, relative size
+ * (em) and alignment. Links: http(s), mailto, tel and #anchors only. No classes, ids or scripts.
+ */
+export function sanitizeBlockText(input) {
+  const colorRe = [/^#[0-9a-f]{3,8}$/i, /^rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*(,\s*(0|1|0?\.\d+)\s*)?\)$/i];
+  return sanitizeHtml(String(input || ''), {
+    allowedTags: ['p', 'br', 'h2', 'h3', 'h4', 'strong', 'b', 'em', 'i', 'u', 's', 'strike', 'ul', 'ol', 'li', 'a', 'span', 'div', 'mark', 'small'],
+    allowedAttributes: { a: ['href', 'target', 'rel'], '*': ['style'] },
+    allowedStyles: {
+      '*': {
+        color: colorRe, 'background-color': colorRe,
+        'font-size': [/^(0?\.[5-9]|[1-3](\.\d{1,2})?|4)em$/],
+        'text-align': [/^(left|center|right|justify)$/],
+        'font-weight': [/^(400|500|600|700|800|bold|normal)$/],
+      },
+    },
+    allowedSchemes: ['http', 'https', 'mailto', 'tel'],
+    allowProtocolRelative: false,
+    disallowedTagsMode: 'discard',
+    transformTags: {
+      b: 'strong', i: 'em', strike: 's',
+      a: (tagName, attribs) => ({ tagName, attribs: { href: attribs.href, ...(/^https?:/i.test(attribs.href || '') ? { target: '_blank', rel: 'noopener noreferrer' } : {}) } }),
+    },
+    exclusiveFilter: (frame) => frame.tag === 'a' && !/^(https?:|mailto:|tel:|#[a-z0-9-]+$)/i.test(frame.attribs.href || ''),
+  }).trim();
+}
